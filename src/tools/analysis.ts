@@ -525,7 +525,7 @@ export function prioritizeIssues(
 }
 
 /**
- * Knowledge base for WAVE rule explanations
+ * Knowledge base for accessibility rule explanations
  * Maps rule IDs to comprehensive explanations with code examples
  */
 const RULE_EXPLANATIONS: Record<
@@ -744,7 +744,7 @@ const RULE_EXPLANATIONS: Record<
 }
 
 /**
- * Get explanation for a WAVE rule, with fallback for unknown rules
+ * Get explanation for an accessibility rule, with fallback for unknown rules
  */
 function getRuleExplanation(
   ruleId: string,
@@ -768,8 +768,8 @@ function getRuleExplanation(
     explanation: `This accessibility issue (${ruleId}) indicates a violation that may impact users with disabilities. While we don't have detailed information about this specific rule, it's important to address it to ensure accessibility.`,
     userImpact:
       'This issue may prevent users with disabilities from accessing or understanding content. The specific impact depends on the nature of the violation.',
-    howToFix: `Review the WAVE documentation for ${ruleId} at https://wave.webaim.org/help#${ruleId} to understand the specific requirements and how to fix this issue.`,
-    wcagReference: 'WCAG 2.1 Guidelines - See WAVE documentation for specific criterion',
+    howToFix: `Review the accessibility documentation for ${ruleId} to understand the specific requirements and how to fix this issue.`,
+    wcagReference: 'WCAG 2.1 Guidelines - See accessibility documentation for specific criterion',
     commonMistakes: [
       'Not addressing the issue',
       'Implementing a partial fix',
@@ -778,7 +778,7 @@ function getRuleExplanation(
     codeExample: context
       ? {
           before: context,
-          after: 'Review WAVE documentation for the correct implementation',
+          after: 'Review accessibility documentation for the correct implementation',
         }
       : undefined,
   }
@@ -787,7 +787,7 @@ function getRuleExplanation(
 /**
  * explain_issue - Educational tool that explains accessibility issues
  * 
- * Provides comprehensive explanations of WAVE accessibility rules in plain language,
+ * Provides comprehensive explanations of accessibility rules in plain language,
  * including why they matter, how to fix them, and common mistakes to avoid.
  * 
  * @param input - Explanation input (ruleId, optional context)
@@ -995,7 +995,7 @@ export async function getQuickFixes(
 
 /**
  * WCAG 2.1 Success Criteria mapping
- * Maps WAVE rule IDs to WCAG 2.1 success criteria
+ * Maps accessibility rule IDs to WCAG 2.1 success criteria
  */
 const WCAG_CRITERIA_MAPPING: Record<string, { criterion: string; title: string; level: WCAGLevel }> = {
   // Level A criteria

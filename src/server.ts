@@ -1,6 +1,6 @@
 /**
  * Main MCP server entry point
- * WAVE Accessibility MCP Server
+ * Accessibility MCP Server
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -26,6 +26,16 @@ import { generateComplianceReport } from './tools/analysis.js'
 import { getWCAGCompliance } from './tools/analysis.js'
 import { compareAccessibility } from './tools/comparison.js'
 import { trackAccessibility } from './tools/comparison.js'
+import { exportToCsv } from './tools/export.js'
+import { exportToExcel } from './tools/export.js'
+import { exportToJson } from './tools/export.js'
+import { exportToHtmlReport } from './tools/export.js'
+import { filterIssues } from './tools/filter.js'
+import { searchIssues } from './tools/filter.js'
+import { aggregateAuditResults } from './tools/aggregate.js'
+import { getStatistics } from './tools/aggregate.js'
+import { generateDashboard } from './tools/visualize.js'
+import { generateSummaryReport } from './tools/visualize.js'
 
 // Import error handling and progress utilities
 import {
@@ -42,7 +52,7 @@ import type { BatchAuditProgress } from './types/index.js'
 async function createServer(): Promise<Server> {
   const server = new Server(
     {
-      name: 'wave-accessibility-audit',
+      name: 'accessibility-audit',
       version: '1.0.0',
     },
     {
@@ -337,7 +347,7 @@ async function createServer(): Promise<Server> {
             ruleId: {
               type: 'string',
               description:
-                'WAVE rule ID (e.g., "alt_missing", "contrast", "label_missing").',
+                'Accessibility rule ID (e.g., "alt_missing", "contrast", "label_missing").',
             },
             context: {
               type: 'string',
@@ -523,6 +533,436 @@ async function createServer(): Promise<Server> {
               default: 'AA',
               description:
                 'WCAG compliance level to check: "A", "AA", or "AAA". Default: AA.',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'export_to_csv',
+        description:
+          'Export audit results to CSV format for spreadsheet analysis. Includes metadata section and violation rows.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'string',
+                  description: 'URL to audit and export. If provided, an audit will be run first.',
+                },
+              ],
+              description:
+                'Audit results object or URL string. If URL is provided, an audit will be run first.',
+            },
+            includeMetadata: {
+              type: 'boolean',
+              default: true,
+              description:
+                'Include test information and environment data (default: true).',
+            },
+            includeViolations: {
+              type: 'boolean',
+              default: true,
+              description: 'Include detailed violation rows (default: true).',
+            },
+            format: {
+              type: 'string',
+              enum: ['standard', 'detailed', 'minimal'],
+              default: 'standard',
+              description:
+                'Export format: "standard" (default), "detailed" (includes all fields), or "minimal" (essential fields only).',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'export_to_excel',
+        description:
+          'Export audit results to Excel/XLSX format with formatting. Requires xlsx package.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'string',
+                  description: 'URL to audit and export. If provided, an audit will be run first.',
+                },
+              ],
+              description:
+                'Audit results object or URL string. If URL is provided, an audit will be run first.',
+            },
+            includeCharts: {
+              type: 'boolean',
+              default: false,
+              description:
+                'Generate charts for score trends and category breakdown (default: false).',
+            },
+            formatting: {
+              type: 'boolean',
+              default: true,
+              description: 'Apply colors, headers, and styling (default: true).',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'export_to_json',
+        description:
+          'Export audit results as structured JSON. Supports pretty-printing and optional raw results.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'string',
+                  description: 'URL to audit and export. If provided, an audit will be run first.',
+                },
+              ],
+              description:
+                'Audit results object or URL string. If URL is provided, an audit will be run first.',
+            },
+            pretty: {
+              type: 'boolean',
+              default: true,
+              description: 'Pretty-print JSON (default: true).',
+            },
+            includeRaw: {
+              type: 'boolean',
+              default: false,
+              description:
+                'Include raw accessibility engine results (default: false).',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'export_to_html_report',
+        description:
+          'Generate standalone HTML report with styling. Includes optional visual charts.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'string',
+                  description: 'URL to audit and export. If provided, an audit will be run first.',
+                },
+              ],
+              description:
+                'Audit results object or URL string. If URL is provided, an audit will be run first.',
+            },
+            template: {
+              type: 'string',
+              enum: ['default', 'minimal', 'detailed'],
+              default: 'default',
+              description:
+                'Report template: "default" (standard report), "minimal" (essential info only), or "detailed" (comprehensive report).',
+            },
+            includeCharts: {
+              type: 'boolean',
+              default: true,
+              description: 'Include visual charts (default: true).',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'filter_issues',
+        description:
+          'Filter issues from audit results by various criteria (rule IDs, categories, impact levels, WCAG levels, etc.). Supports include/exclude modes.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              type: 'object',
+              description: 'Audit result object from a previous audit.',
+            },
+            filters: {
+              type: 'object',
+              properties: {
+                ruleIds: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Array of rule IDs to include/exclude.',
+                },
+                categories: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Array of categories (error, contrast, etc.).',
+                },
+                impactLevels: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                    enum: ['critical', 'serious', 'moderate', 'minor'],
+                  },
+                  description: 'Array of impact levels to filter by.',
+                },
+                wcagLevels: {
+                  type: 'array',
+                  items: { type: 'string', enum: ['A', 'AA', 'AAA'] },
+                  description: 'Array of WCAG levels to filter by.',
+                },
+                minCount: {
+                  type: 'number',
+                  description: 'Minimum occurrence count for an issue to be included.',
+                },
+                elementTypes: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description:
+                    'Filter by HTML element types (e.g., ["img", "input", "button"]).',
+                },
+              },
+              description: 'Filter criteria object.',
+            },
+            mode: {
+              type: 'string',
+              enum: ['include', 'exclude'],
+              default: 'include',
+              description:
+                'Filter mode: "include" (only include matching issues) or "exclude" (exclude matching issues).',
+            },
+          },
+          required: ['results', 'filters'],
+        },
+      },
+      {
+        name: 'search_issues',
+        description:
+          'Search issues by text content, selector, XPath, or description. Supports case-sensitive and case-insensitive search.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              type: 'object',
+              description: 'Audit result object from a previous audit.',
+            },
+            query: {
+              type: 'string',
+              description: 'Search query string.',
+            },
+            fields: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: [
+                  'description',
+                  'element',
+                  'xpath',
+                  'selector',
+                  'ruleId',
+                  'userImpact',
+                  'fix',
+                  'all',
+                ],
+              },
+              default: ['all'],
+              description:
+                'Fields to search: "description", "element", "xpath", "selector", "ruleId", "userImpact", "fix", or "all" (default: ["all"]).',
+            },
+            caseSensitive: {
+              type: 'boolean',
+              default: false,
+              description: 'Case-sensitive search (default: false).',
+            },
+          },
+          required: ['results', 'query'],
+        },
+      },
+      {
+        name: 'aggregate_audit_results',
+        description:
+          'Combine and aggregate multiple audit results. Groups issues by URL, category, rule, or none, and provides aggregated summary statistics.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              type: 'array',
+              items: {
+                type: 'object',
+                description: 'Audit result object from a previous audit.',
+              },
+              description: 'Array of audit result objects to aggregate.',
+            },
+            groupBy: {
+              type: 'string',
+              enum: ['url', 'category', 'rule', 'none'],
+              default: 'url',
+              description:
+                'Grouping strategy: "url" (group by URL), "category" (group by category), "rule" (group by rule ID), or "none" (no grouping). Default: "url".',
+            },
+            includeSummary: {
+              type: 'boolean',
+              default: true,
+              description:
+                'Include aggregated summary statistics (default: true).',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'get_statistics',
+        description:
+          'Generate detailed statistics from audit results with breakdowns by category, impact, WCAG level, or rule ID. Supports single or multiple audit results.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    description: 'Audit result object from a previous audit.',
+                  },
+                  description: 'Array of audit result objects.',
+                },
+              ],
+              description:
+                'Audit result object or array of audit results to analyze.',
+            },
+            breakdown: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['category', 'impact', 'wcag', 'rule'],
+              },
+              default: ['category', 'impact', 'wcag', 'rule'],
+              description:
+                'Array of breakdown dimensions: "category", "impact", "wcag", "rule". Default: all dimensions.',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'generate_dashboard',
+        description:
+          'Create a visual dashboard summary of audit results with key metrics, charts, and summaries. Supports multiple formats (text, markdown, HTML, JSON) and optional charts.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    description: 'Audit result object from a previous audit.',
+                  },
+                  description: 'Array of audit result objects.',
+                },
+                {
+                  type: 'string',
+                  description: 'URL to audit and generate dashboard for. If provided, an audit will be run first.',
+                },
+                {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Array of URLs to audit and generate dashboard for.',
+                },
+              ],
+              description:
+                'Audit result object(s) or URL string(s). If URL(s) provided, audit(s) will be run first.',
+            },
+            format: {
+              type: 'string',
+              enum: ['text', 'markdown', 'html', 'json'],
+              default: 'markdown',
+              description:
+                'Output format: "text" (plain text), "markdown" (markdown format), "html" (HTML report), or "json" (structured JSON). Default: "markdown".',
+            },
+            includeCharts: {
+              type: 'boolean',
+              default: true,
+              description:
+                'Include ASCII/text charts in the dashboard (default: true).',
+            },
+          },
+          required: ['results'],
+        },
+      },
+      {
+        name: 'generate_summary_report',
+        description:
+          'Generate executive summary report with key findings and recommendations. Supports multiple formats (text, markdown, HTML) and detail levels (executive, detailed, technical).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            results: {
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result object from a previous audit.',
+                },
+                {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    description: 'Audit result object from a previous audit.',
+                  },
+                  description: 'Array of audit result objects.',
+                },
+                {
+                  type: 'string',
+                  description: 'URL to audit and generate report for. If provided, an audit will be run first.',
+                },
+                {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Array of URLs to audit and generate report for.',
+                },
+              ],
+              description:
+                'Audit result object(s) or URL string(s). If URL(s) provided, audit(s) will be run first.',
+            },
+            format: {
+              type: 'string',
+              enum: ['text', 'markdown', 'html'],
+              default: 'markdown',
+              description:
+                'Output format: "text" (plain text), "markdown" (markdown format), or "html" (HTML report). Default: "markdown".',
+            },
+            level: {
+              type: 'string',
+              enum: ['executive', 'detailed', 'technical'],
+              default: 'executive',
+              description:
+                'Detail level: "executive" (high-level summary for executives), "detailed" (comprehensive summary with breakdowns), or "technical" (technical details for developers). Default: "executive".',
             },
           },
           required: ['results'],
@@ -803,6 +1243,177 @@ async function createServer(): Promise<Server> {
           } as CallToolResult
         }
 
+        case 'export_to_csv': {
+          const csvResult = await exportToCsv({
+            results: args?.results as any, // AuditResult or string URL
+            includeMetadata: args?.includeMetadata as boolean | undefined,
+            includeViolations: args?.includeViolations as boolean | undefined,
+            format: args?.format as 'standard' | 'detailed' | 'minimal' | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(csvResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'export_to_excel': {
+          const excelResult = await exportToExcel({
+            results: args?.results as any, // AuditResult or string URL
+            includeCharts: args?.includeCharts as boolean | undefined,
+            formatting: args?.formatting as boolean | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(excelResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'export_to_json': {
+          const jsonResult = await exportToJson({
+            results: args?.results as any, // AuditResult or string URL
+            pretty: args?.pretty as boolean | undefined,
+            includeRaw: args?.includeRaw as boolean | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(jsonResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'export_to_html_report': {
+          const htmlResult = await exportToHtmlReport({
+            results: args?.results as any, // AuditResult or string URL
+            template: args?.template as 'default' | 'minimal' | 'detailed' | undefined,
+            includeCharts: args?.includeCharts as boolean | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(htmlResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'filter_issues': {
+          const filterResult = filterIssues({
+            results: args?.results as any, // AuditResult
+            filters: args?.filters as any, // FilterCriteria
+            mode: args?.mode as 'include' | 'exclude' | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(filterResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'search_issues': {
+          const searchResult = searchIssues({
+            results: args?.results as any, // AuditResult
+            query: args?.query as string,
+            fields: args?.fields as any, // Array of field names
+            caseSensitive: args?.caseSensitive as boolean | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(searchResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'aggregate_audit_results': {
+          const aggregateResult = aggregateAuditResults({
+            results: args?.results as any[], // Array of AuditResult
+            groupBy: args?.groupBy as 'url' | 'category' | 'rule' | 'none' | undefined,
+            includeSummary: args?.includeSummary as boolean | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(aggregateResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'get_statistics': {
+          const statisticsResult = getStatistics({
+            results: args?.results as any, // AuditResult or AuditResult[]
+            breakdown: args?.breakdown as ('category' | 'impact' | 'wcag' | 'rule')[] | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(statisticsResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'generate_dashboard': {
+          const dashboardResult = await generateDashboard({
+            results: args?.results as any, // AuditResult | AuditResult[] | string | string[]
+            format: args?.format as 'text' | 'markdown' | 'html' | 'json' | undefined,
+            includeCharts: args?.includeCharts as boolean | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(dashboardResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
+        case 'generate_summary_report': {
+          const summaryReportResult = await generateSummaryReport({
+            results: args?.results as any, // AuditResult | AuditResult[] | string | string[]
+            format: args?.format as 'text' | 'markdown' | 'html' | undefined,
+            level: args?.level as 'executive' | 'detailed' | 'technical' | undefined,
+          })
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(summaryReportResult, null, 2),
+              },
+            ],
+          } as CallToolResult
+        }
+
         default:
           throw new Error(`Unknown tool: ${name}`)
       }
@@ -847,7 +1458,7 @@ async function main() {
 
   await server.connect(transport)
 
-  console.error('WAVE Accessibility MCP Server running on stdio')
+  console.error('Accessibility MCP Server running on stdio')
 }
 
 // Start the server

@@ -1,16 +1,16 @@
 /**
  * TypeScript type definitions
- * Shared types for the WAVE Accessibility MCP Server
+ * Shared types for the Accessibility MCP Server
  */
 
 // ============================================================================
-// Core WAVE Result Types
+// Core Accessibility Result Types
 // ============================================================================
 
 /**
- * WAVE rule data structure from the WAVE engine
+ * Accessibility rule data structure from the accessibility engine
  */
-export interface WaveRuleData {
+export interface AccessibilityRuleData {
   count: number
   xpaths: string[]
   selectors?: (string | boolean)[]
@@ -37,20 +37,20 @@ export interface DOMInfo {
 }
 
 /**
- * WAVE category structure (error, contrast, etc.)
+ * Accessibility category structure (error, contrast, etc.)
  */
-export interface WaveCategory {
+export interface AccessibilityCategory {
   count: number
-  items: Record<string, WaveRuleData>
+  items: Record<string, AccessibilityRuleData>
 }
 
 /**
- * WAVE report structure containing categories
+ * Accessibility report structure containing categories
  */
-export interface WaveReport {
-  error?: WaveCategory
-  contrast?: WaveCategory
-  [key: string]: WaveCategory | undefined
+export interface AccessibilityReport {
+  error?: AccessibilityCategory
+  contrast?: AccessibilityCategory
+  [key: string]: AccessibilityCategory | undefined
 }
 
 /**
@@ -80,15 +80,15 @@ export interface TestEnvironment {
 }
 
 /**
- * Complete WAVE results structure
+ * Complete accessibility results structure
  */
-export interface WaveResults {
+export interface AccessibilityResults {
   url: string
   timestamp: string
   testEngine: TestEngine
   testRunner: TestRunner
   testEnvironment: TestEnvironment
-  violations: WaveReport
+  violations: AccessibilityReport
 }
 
 /**
@@ -211,7 +211,7 @@ export interface AuditResult {
   quickWins: QuickWin[]
   criticalBlockers: CriticalBlocker[]
   metadata?: TestMetadata
-  rawResults?: WaveResults // Optional: preserve original WAVE results
+  rawResults?: AccessibilityResults // Optional: preserve original accessibility results
 }
 
 // ============================================================================
@@ -612,4 +612,261 @@ export type AccessibilityTag =
 export interface TagFilter {
   tags: AccessibilityTag[]
   mode?: 'include' | 'exclude' // Whether to include or exclude these tags
+}
+
+// ============================================================================
+// Export Tool Types
+// ============================================================================
+
+/**
+ * Export to CSV input
+ */
+export interface ExportToCsvInput {
+  results: AuditResult | string // Audit result object or URL string
+  includeMetadata?: boolean // Include test information and environment data (default: true)
+  includeViolations?: boolean // Include detailed violation rows (default: true)
+  format?: 'standard' | 'detailed' | 'minimal' // Export format (default: "standard")
+}
+
+/**
+ * Export to CSV result
+ */
+export interface ExportToCsvResult {
+  csv: string // CSV content as string
+  format: 'standard' | 'detailed' | 'minimal'
+  totalIssues: number
+  includeMetadata: boolean
+  includeViolations: boolean
+}
+
+/**
+ * Export to Excel input
+ */
+export interface ExportToExcelInput {
+  results: AuditResult | string // Audit result object or URL string
+  includeCharts?: boolean // Generate charts for score trends and category breakdown (default: false)
+  formatting?: boolean // Apply colors, headers, and styling (default: true)
+}
+
+/**
+ * Export to Excel result
+ */
+export interface ExportToExcelResult {
+  excel: string // Excel file content (base64 encoded)
+  format: 'xlsx'
+  totalIssues: number
+  includeCharts: boolean
+  formatting: boolean
+}
+
+/**
+ * Export to JSON input
+ */
+export interface ExportToJsonInput {
+  results: AuditResult | string // Audit result object or URL string
+  pretty?: boolean // Pretty-print JSON (default: true)
+  includeRaw?: boolean // Include raw accessibility engine results (default: false)
+}
+
+/**
+ * Export to JSON result
+ */
+export interface ExportToJsonResult {
+  json: string // JSON string
+  pretty: boolean
+  includeRaw: boolean
+  totalIssues: number
+}
+
+/**
+ * Export to HTML input
+ */
+export interface ExportToHtmlInput {
+  results: AuditResult | string // Audit result object or URL string
+  template?: 'default' | 'minimal' | 'detailed' // Report template (default: "default")
+  includeCharts?: boolean // Include visual charts (default: true)
+}
+
+/**
+ * Export to HTML result
+ */
+export interface ExportToHtmlResult {
+  html: string // HTML string with embedded CSS/JS
+  template: 'default' | 'minimal' | 'detailed'
+  includeCharts: boolean
+  totalIssues: number
+}
+
+// ============================================================================
+// Filter Tool Types
+// ============================================================================
+
+/**
+ * Filter criteria for filtering issues
+ */
+export interface FilterCriteria {
+  ruleIds?: string[] // Array of rule IDs to include/exclude
+  categories?: string[] // Array of categories (error, contrast, etc.)
+  impactLevels?: ImpactLevel[] // Array of impact levels (critical, serious, etc.)
+  wcagLevels?: WCAGLevel[] // Array of WCAG levels (A, AA, AAA)
+  minCount?: number // Minimum occurrence count
+  elementTypes?: string[] // Filter by HTML element types (e.g., ["img", "input", "button"])
+}
+
+/**
+ * Filter issues input
+ */
+export interface FilterIssuesInput {
+  results: AuditResult // Audit result object
+  filters: FilterCriteria // Filter criteria
+  mode?: 'include' | 'exclude' // Filter mode (default: "include")
+}
+
+/**
+ * Filter issues result
+ */
+export interface FilterIssuesResult {
+  filtered: AuditResult // Filtered audit result object
+  originalCount: number // Total issues before filtering
+  filteredCount: number // Total issues after filtering
+  filtersApplied: FilterCriteria // Filters that were applied
+  mode: 'include' | 'exclude'
+}
+
+/**
+ * Search issues input
+ */
+export interface SearchIssuesInput {
+  results: AuditResult // Audit result object
+  query: string // Search query string
+  fields?: ('description' | 'element' | 'xpath' | 'selector' | 'ruleId' | 'userImpact' | 'fix' | 'all')[] // Fields to search (default: ["all"])
+  caseSensitive?: boolean // Case-sensitive search (default: false)
+}
+
+/**
+ * Search issues result
+ */
+export interface SearchIssuesResult {
+  matches: PrioritizedIssue[] // Array of matching issues
+  query: string // Search query used
+  totalMatches: number // Total number of matches
+  fields: ('description' | 'element' | 'xpath' | 'selector' | 'ruleId' | 'userImpact' | 'fix' | 'all')[] // Fields that were searched
+}
+
+// ============================================================================
+// Aggregate Tool Types
+// ============================================================================
+
+/**
+ * Aggregate audit results input
+ */
+export interface AggregateAuditResultsInput {
+  results: AuditResult[] // Array of audit result objects
+  groupBy?: 'url' | 'category' | 'rule' | 'none' // Grouping strategy (default: "url")
+  includeSummary?: boolean // Include aggregated summary statistics (default: true)
+}
+
+/**
+ * Aggregated audit result with grouped issues
+ */
+export interface AggregateAuditResultsResult {
+  aggregated: AuditResult // Aggregated audit result with combined statistics
+  groupedBy: 'url' | 'category' | 'rule' | 'none' // Grouping strategy used
+  totalResults: number // Number of results aggregated
+  groupedIssues?: Record<string, PrioritizedIssue[]> // Issues grouped by the grouping strategy
+  summary: AuditSummary // Aggregated summary statistics
+}
+
+/**
+ * Breakdown dimension for statistics
+ */
+export type BreakdownDimension = 'category' | 'impact' | 'wcag' | 'rule'
+
+/**
+ * Get statistics input
+ */
+export interface GetStatisticsInput {
+  results: AuditResult | AuditResult[] // Audit result object or array of results
+  breakdown?: BreakdownDimension[] // Array of breakdown dimensions (default: all)
+}
+
+/**
+ * Statistics breakdown by dimension
+ */
+export interface StatisticsBreakdown {
+  counts: Record<string, number> // Counts by dimension value
+  percentages: Record<string, number> // Percentages by dimension value
+  distribution: Record<string, number> // Distribution (normalized to 0-1)
+}
+
+/**
+ * Statistics result
+ */
+export interface GetStatisticsResult {
+  totalIssues: number // Total number of issues
+  averageScore: number // Average accessibility score
+  totalResults: number // Number of audit results analyzed
+  byCategory?: StatisticsBreakdown // Breakdown by category
+  byImpact?: StatisticsBreakdown // Breakdown by impact level
+  byWCAG?: StatisticsBreakdown // Breakdown by WCAG level
+  byRule?: StatisticsBreakdown // Breakdown by rule ID
+  wcagCompliance: WCAGCompliance // Average WCAG compliance
+  breakdownDimensions: BreakdownDimension[] // Dimensions included in breakdown
+}
+
+// ============================================================================
+// Visualization Tool Types
+// ============================================================================
+
+/**
+ * Dashboard format
+ */
+export type DashboardFormat = 'text' | 'markdown' | 'html' | 'json'
+
+/**
+ * Generate dashboard input
+ */
+export interface GenerateDashboardInput {
+  results: AuditResult | AuditResult[] | string | string[] // Audit result object(s) or URL string(s)
+  format?: DashboardFormat // Output format (default: "markdown")
+  includeCharts?: boolean // Include ASCII/text charts (default: true)
+}
+
+/**
+ * Generate dashboard result
+ */
+export interface GenerateDashboardResult {
+  dashboard: string // Formatted dashboard content
+  format: DashboardFormat // Format used
+  includeCharts: boolean // Whether charts were included
+  totalResults: number // Number of audit results included
+}
+
+/**
+ * Summary report format
+ */
+export type SummaryReportFormat = 'text' | 'markdown' | 'html'
+
+/**
+ * Summary report level
+ */
+export type SummaryReportLevel = 'executive' | 'detailed' | 'technical'
+
+/**
+ * Generate summary report input
+ */
+export interface GenerateSummaryReportInput {
+  results: AuditResult | AuditResult[] | string | string[] // Audit result object(s) or URL string(s)
+  format?: SummaryReportFormat // Output format (default: "markdown")
+  level?: SummaryReportLevel // Detail level (default: "executive")
+}
+
+/**
+ * Generate summary report result
+ */
+export interface GenerateSummaryReportResult {
+  report: string // Formatted summary report content
+  format: SummaryReportFormat // Format used
+  level: SummaryReportLevel // Detail level used
+  totalResults: number // Number of audit results included
 }

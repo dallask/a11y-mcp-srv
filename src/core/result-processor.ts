@@ -1,11 +1,11 @@
 /**
- * Result Processor - Formats WAVE results into conversational, actionable format
- * Converts raw WAVE results into structured, prioritized, and human-readable format
+ * Result Processor - Formats accessibility results into conversational, actionable format
+ * Converts raw accessibility results into structured, prioritized, and human-readable format
  */
 
 import type {
-  WaveResults,
-  WaveReport,
+  AccessibilityResults,
+  AccessibilityReport,
   AuditResult,
   AuditSummary,
   PrioritizedIssue,
@@ -18,7 +18,7 @@ import type {
 } from '../types/index.js'
 
 /**
- * ResultProcessor class - Formats and processes WAVE results
+ * ResultProcessor class - Formats and processes accessibility results
  */
 export class ResultProcessor {
   /**
@@ -126,7 +126,7 @@ export class ResultProcessor {
     } else if (ruleId.includes('link_empty')) {
       explanation = 'Add descriptive link text. Links should clearly indicate their destination or purpose.'
     } else {
-      explanation = `Fix ${ruleId} issue. See WAVE documentation for specific guidance.`
+      explanation = `Fix ${ruleId} issue. See accessibility documentation for specific guidance.`
     }
 
     return {
@@ -153,10 +153,10 @@ export class ResultProcessor {
   }
 
   /**
-   * Process WAVE violations into prioritized issues
+   * Process accessibility violations into prioritized issues
    */
   private processViolations(
-    violations: WaveReport,
+    violations: AccessibilityReport,
     _appliedFilters?: AppliedFilters
   ): PrioritizedIssue[] {
     const issues: PrioritizedIssue[] = []
@@ -205,7 +205,7 @@ export class ResultProcessor {
             userImpact,
             priority: 0, // Will be calculated after all issues are collected
             category: categoryKey,
-            helpUrl: `https://wave.webaim.org/help#${ruleId}`,
+            helpUrl: `https://webaim.org/resources/help/`,
           }
 
           issues.push(issue)
@@ -461,14 +461,14 @@ export class ResultProcessor {
   }
 
   /**
-   * Process WAVE results into structured audit result
+   * Process accessibility results into structured audit result
    */
   process(
-    waveResults: WaveResults,
+    accessibilityResults: AccessibilityResults,
     appliedFilters?: AppliedFilters
   ): AuditResult {
     // Use filtered results if available, otherwise use original
-    const violations = waveResults.violations
+    const violations = accessibilityResults.violations
 
     // Process violations into prioritized issues
     const issues = this.processViolations(violations, appliedFilters)
@@ -492,11 +492,11 @@ export class ResultProcessor {
 
     // Extract metadata
     const metadata: TestMetadata = {
-      testEngine: waveResults.testEngine,
-      testRunner: waveResults.testRunner,
-      testEnvironment: waveResults.testEnvironment,
-      timestamp: waveResults.timestamp,
-      url: waveResults.url,
+      testEngine: accessibilityResults.testEngine,
+      testRunner: accessibilityResults.testRunner,
+      testEnvironment: accessibilityResults.testEnvironment,
+      timestamp: accessibilityResults.timestamp,
+      url: accessibilityResults.url,
     }
 
     return {
@@ -507,7 +507,7 @@ export class ResultProcessor {
       quickWins,
       criticalBlockers,
       metadata,
-      rawResults: waveResults,
+      rawResults: accessibilityResults,
     }
   }
 }

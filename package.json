@@ -1,27 +1,40 @@
 {
-  "name": "@wave-accessibility-audit/mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server for WAVE accessibility auditing",
+  "name": "@ali0113/accessibility-mcp-server",
+  "version": "1.1.0",
+  "description": "MCP server for accessibility auditing with export, filter, aggregation, and visualization tools",
   "main": "dist/server.js",
   "type": "module",
+  "bin": {
+    "accessibility-mcp-server": "bin/server.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "test:phase1": "npm run build && node test-phase1-compiled.js",
-    "test:phase2": "tsx test-phase2-analysis.ts"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",
     "accessibility",
-    "wave",
-    "a11y"
+    "a11y",
+    "audit",
+    "wcag",
+    "export",
+    "csv",
+    "excel",
+    "dashboard"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alii13/accessibility-audit.git",
+    "directory": "accessibility-mcp-server"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
-    "playwright": "^1.40.0"
+    "playwright": "^1.40.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -32,4 +45,3 @@
     "node": ">=18.0.0"
   }
 }
-

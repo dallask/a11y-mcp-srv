@@ -1,6 +1,6 @@
-# 🌊 WAVE Accessibility MCP Server
+# ♿ Accessibility MCP Server
 
-A Model Context Protocol (MCP) server that provides conversational, actionable accessibility testing powered by the WAVE accessibility engine. This server exposes accessibility auditing tools that can be used by AI agents and chat interfaces.
+A Model Context Protocol (MCP) server that provides conversational, actionable accessibility testing. This server exposes accessibility auditing tools that can be used by AI agents and chat interfaces.
 
 ## ✨ Features
 
@@ -24,7 +24,7 @@ A Model Context Protocol (MCP) server that provides conversational, actionable a
 ### Step 1: Install Dependencies
 
 ```bash
-cd mcp-server
+cd accessibility-mcp-server
 npm install
 ```
 
@@ -40,13 +40,9 @@ npx playwright install --with-deps chromium
 npm run build
 ```
 
-### Step 4: Verify wave.min.js
+### Step 4: Verify accessibility script
 
-The `wave.min.js` file should be present in the `mcp-server` directory. This file contains the WAVE accessibility engine and is required for all audits. If it's missing, copy it from the project root:
-
-```bash
-cp ../wave.min.js ./wave.min.js
-```
+The `wave.min.js` file should be present in the `accessibility-mcp-server` directory. This file contains the accessibility engine and is required for all audits. If it's missing, you'll need to obtain it separately.
 
 ## 🔧 Running the MCP Server
 
@@ -73,9 +69,9 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 ```json
 {
   "mcpServers": {
-    "wave-accessibility-audit": {
+    "accessibility-audit": {
       "command": "node",
-      "args": ["/absolute/path/to/wave-accessibility-audit/mcp-server/dist/server.js"]
+      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
     }
   }
 }
@@ -88,9 +84,9 @@ Add to your Cursor MCP settings:
 ```json
 {
   "mcpServers": {
-    "wave-accessibility-audit": {
+    "accessibility-audit": {
       "command": "node",
-      "args": ["/absolute/path/to/wave-accessibility-audit/mcp-server/dist/server.js"]
+      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
     }
   }
 }
@@ -289,7 +285,7 @@ Intelligently prioritize issues, identifying quick wins and critical blockers.
 Explain what an accessibility issue means in plain language.
 
 **Inputs:**
-- `ruleId` (required): WAVE rule ID (e.g., `"alt_missing"`, `"contrast"`, `"label_missing"`)
+- `ruleId` (required): Accessibility rule ID (e.g., `"alt_missing"`, `"contrast"`, `"label_missing"`)
 - `context` (optional): Additional context about the issue (HTML element, page URL, etc.)
 
 **Example:**
@@ -434,6 +430,288 @@ Track accessibility over time with trend analysis.
 - Trend visualization (text-based)
 - Predictions
 - Recommendations
+
+### Tier 5: Export & Data Management
+
+#### `export_to_csv` - Export to CSV
+
+Export audit results to CSV format for spreadsheet analysis, including metadata and violation rows.
+
+**Inputs:**
+- `results` (required): Audit result object or URL string
+- `includeMetadata` (optional): Include test information and environment data (default: `true`)
+- `includeViolations` (optional): Include detailed violation rows (default: `true`)
+- `format` (optional): `"standard"` | `"detailed"` | `"minimal"` (default: `"standard"`)
+
+**Example:**
+```json
+{
+  "results": "https://example.com",
+  "format": "detailed",
+  "includeMetadata": true,
+  "includeViolations": true
+}
+```
+
+**Output:**
+- CSV content as string with metadata section and violation rows
+- Format type used
+- Total issues count
+
+**Use case**: Import into Excel, share with stakeholders, data analysis
+
+#### `export_to_excel` - Export to Excel
+
+Export audit results to Excel/XLSX format with formatting. Requires `xlsx` package.
+
+**Inputs:**
+- `results` (required): Audit result object or URL string
+- `includeCharts` (optional): Generate charts for score trends and category breakdown (default: `false`)
+- `formatting` (optional): Apply colors, headers, and styling (default: `true`)
+
+**Example:**
+```json
+{
+  "results": { /* audit result object */ },
+  "includeCharts": true,
+  "formatting": true
+}
+```
+
+**Output:**
+- Excel file content (base64 encoded)
+- Format type (`xlsx`)
+- Total issues count
+
+**Use case**: Professional reports, presentations, stakeholder sharing
+
+**Note**: Requires `xlsx` package. Install with `npm install xlsx`.
+
+#### `export_to_json` - Export to JSON
+
+Export audit results as structured JSON with optional raw results.
+
+**Inputs:**
+- `results` (required): Audit result object or URL string
+- `pretty` (optional): Pretty-print JSON (default: `true`)
+- `includeRaw` (optional): Include raw accessibility engine results (default: `false`)
+
+**Example:**
+```json
+{
+  "results": "https://example.com",
+  "pretty": true,
+  "includeRaw": false
+}
+```
+
+**Output:**
+- JSON string with audit results
+- Pretty-print status
+- Raw results inclusion status
+
+**Use case**: API integration, data processing, backup
+
+#### `export_to_html_report` - Generate HTML Report
+
+Generate standalone HTML report with styling and optional visual charts.
+
+**Inputs:**
+- `results` (required): Audit result object or URL string
+- `template` (optional): `"default"` | `"minimal"` | `"detailed"` (default: `"default"`)
+- `includeCharts` (optional): Include visual charts (default: `true`)
+
+**Example:**
+```json
+{
+  "results": "https://example.com",
+  "template": "detailed",
+  "includeCharts": true
+}
+```
+
+**Output:**
+- HTML string with embedded CSS/JS
+- Template used
+- Charts inclusion status
+
+**Use case**: Web sharing, email reports, documentation
+
+### Tier 6: Filtering & Search
+
+#### `filter_issues` - Filter Issues
+
+Filter issues from audit results by various criteria (rule IDs, categories, impact levels, WCAG levels, etc.). Supports include/exclude modes.
+
+**Inputs:**
+- `results` (required): Audit result object
+- `filters` (required): Object with filter criteria:
+  - `ruleIds` (optional): Array of rule IDs to include/exclude
+  - `categories` (optional): Array of categories (error, contrast, etc.)
+  - `impactLevels` (optional): Array of impact levels (`"critical"`, `"serious"`, `"moderate"`, `"minor"`)
+  - `wcagLevels` (optional): Array of WCAG levels (`"A"`, `"AA"`, `"AAA"`)
+  - `minCount` (optional): Minimum occurrence count
+  - `elementTypes` (optional): Filter by HTML element types (e.g., `["img", "input", "button"]`)
+- `mode` (optional): `"include"` | `"exclude"` (default: `"include"`)
+
+**Example:**
+```json
+{
+  "results": { /* audit result object */ },
+  "filters": {
+    "impactLevels": ["critical", "serious"],
+    "wcagLevels": ["A", "AA"]
+  },
+  "mode": "include"
+}
+```
+
+**Output:**
+- Filtered audit result object
+- Original issue count
+- Filtered issue count
+- Filters applied
+
+**Use case**: Focus on specific issue types, exclude false positives
+
+#### `search_issues` - Search Issues
+
+Search issues by text content, selector, XPath, or description. Supports case-sensitive and case-insensitive search.
+
+**Inputs:**
+- `results` (required): Audit result object
+- `query` (required): Search query string
+- `fields` (optional): Array of fields to search (`"description"`, `"element"`, `"xpath"`, `"selector"`, `"ruleId"`, `"userImpact"`, `"fix"`, `"all"`) (default: `["all"]`)
+- `caseSensitive` (optional): Case-sensitive search (default: `false`)
+
+**Example:**
+```json
+{
+  "results": { /* audit result object */ },
+  "query": "missing alt",
+  "fields": ["description", "userImpact"],
+  "caseSensitive": false
+}
+```
+
+**Output:**
+- Array of matching issues
+- Total matches count
+- Fields searched
+
+**Use case**: Find specific issues, locate elements
+
+### Tier 7: Aggregation & Statistics
+
+#### `aggregate_audit_results` - Aggregate Results
+
+Combine and aggregate multiple audit results. Groups issues by URL, category, rule, or none, and provides aggregated summary statistics.
+
+**Inputs:**
+- `results` (required): Array of audit result objects
+- `groupBy` (optional): `"url"` | `"category"` | `"rule"` | `"none"` (default: `"url"`)
+- `includeSummary` (optional): Include aggregated summary statistics (default: `true`)
+
+**Example:**
+```json
+{
+  "results": [
+    { /* audit result 1 */ },
+    { /* audit result 2 */ }
+  ],
+  "groupBy": "category",
+  "includeSummary": true
+}
+```
+
+**Output:**
+- Aggregated audit result with combined statistics
+- Grouping strategy used
+- Total results aggregated
+- Grouped issues (if applicable)
+
+**Use case**: Site-wide reports, batch analysis, trend identification
+
+#### `get_statistics` - Generate Statistics
+
+Generate detailed statistics from audit results with breakdowns by category, impact, WCAG level, or rule ID. Supports single or multiple audit results.
+
+**Inputs:**
+- `results` (required): Audit result object or array of audit results
+- `breakdown` (optional): Array of breakdown dimensions (`"category"`, `"impact"`, `"wcag"`, `"rule"`) (default: all dimensions)
+
+**Example:**
+```json
+{
+  "results": [
+    { /* audit result 1 */ },
+    { /* audit result 2 */ }
+  ],
+  "breakdown": ["category", "impact", "wcag"]
+}
+```
+
+**Output:**
+- Total issues count
+- Average accessibility score
+- WCAG compliance breakdown
+- Statistics by category, impact, WCAG level, and rule ID
+- Counts, percentages, and distributions
+
+**Use case**: Dashboard data, reporting, analysis
+
+### Tier 8: Visualization & Reporting
+
+#### `generate_dashboard` - Generate Dashboard
+
+Create a visual dashboard summary of audit results with key metrics, charts, and summaries. Supports multiple formats and optional charts.
+
+**Inputs:**
+- `results` (required): Audit result object, array of audit results, URL string, or array of URL strings
+- `format` (optional): `"text"` | `"markdown"` | `"html"` | `"json"` (default: `"markdown"`)
+- `includeCharts` (optional): Include ASCII/text charts (default: `true`)
+
+**Example:**
+```json
+{
+  "results": ["https://example.com/page1", "https://example.com/page2"],
+  "format": "markdown",
+  "includeCharts": true
+}
+```
+
+**Output:**
+- Formatted dashboard with key metrics, charts, and summaries
+- Format used
+- Total results processed
+
+**Use case**: Quick overview, presentations, status reports
+
+#### `generate_summary_report` - Generate Summary Report
+
+Generate executive summary report with key findings and recommendations. Supports multiple formats and detail levels.
+
+**Inputs:**
+- `results` (required): Audit result object, array of audit results, URL string, or array of URL strings
+- `format` (optional): `"text"` | `"markdown"` | `"html"` (default: `"markdown"`)
+- `level` (optional): `"executive"` | `"detailed"` | `"technical"` (default: `"executive"`)
+
+**Example:**
+```json
+{
+  "results": "https://example.com",
+  "format": "markdown",
+  "level": "executive"
+}
+```
+
+**Output:**
+- Summary report with key findings and recommendations
+- Format used
+- Detail level used
+- Total results processed
+
+**Use case**: Stakeholder communication, documentation
 
 ## 🏷️ Supported Accessibility Tags
 
@@ -604,6 +882,146 @@ All audit tools return structured results in the following format:
 }
 ```
 
+### Export to CSV
+
+```json
+{
+  "tool": "export_to_csv",
+  "arguments": {
+    "results": "https://example.com",
+    "format": "detailed",
+    "includeMetadata": true,
+    "includeViolations": true
+  }
+}
+```
+
+### Export to Excel
+
+```json
+{
+  "tool": "export_to_excel",
+  "arguments": {
+    "results": { /* audit result object */ },
+    "includeCharts": true,
+    "formatting": true
+  }
+}
+```
+
+### Export to JSON
+
+```json
+{
+  "tool": "export_to_json",
+  "arguments": {
+    "results": "https://example.com",
+    "pretty": true,
+    "includeRaw": false
+  }
+}
+```
+
+### Generate HTML Report
+
+```json
+{
+  "tool": "export_to_html_report",
+  "arguments": {
+    "results": "https://example.com",
+    "template": "detailed",
+    "includeCharts": true
+  }
+}
+```
+
+### Filter Issues
+
+```json
+{
+  "tool": "filter_issues",
+  "arguments": {
+    "results": { /* audit result object */ },
+    "filters": {
+      "impactLevels": ["critical", "serious"],
+      "wcagLevels": ["A", "AA"]
+    },
+    "mode": "include"
+  }
+}
+```
+
+### Search Issues
+
+```json
+{
+  "tool": "search_issues",
+  "arguments": {
+    "results": { /* audit result object */ },
+    "query": "missing alt",
+    "fields": ["description", "userImpact"],
+    "caseSensitive": false
+  }
+}
+```
+
+### Aggregate Audit Results
+
+```json
+{
+  "tool": "aggregate_audit_results",
+  "arguments": {
+    "results": [
+      { /* audit result 1 */ },
+      { /* audit result 2 */ }
+    ],
+    "groupBy": "category",
+    "includeSummary": true
+  }
+}
+```
+
+### Get Statistics
+
+```json
+{
+  "tool": "get_statistics",
+  "arguments": {
+    "results": [
+      { /* audit result 1 */ },
+      { /* audit result 2 */ }
+    ],
+    "breakdown": ["category", "impact", "wcag"]
+  }
+}
+```
+
+### Generate Dashboard
+
+```json
+{
+  "tool": "generate_dashboard",
+  "arguments": {
+    "results": ["https://example.com/page1", "https://example.com/page2"],
+    "format": "markdown",
+    "includeCharts": true
+  }
+}
+```
+
+### Generate Summary Report
+
+```json
+{
+  "tool": "generate_summary_report",
+  "arguments": {
+    "results": "https://example.com",
+    "format": "markdown",
+    "level": "executive"
+  }
+}
+```
+
 ## 🐛 Error Handling
 
 The server includes comprehensive error handling:
@@ -622,23 +1040,27 @@ Common error scenarios:
 ## 🏗️ Project Structure
 
 ```
-mcp-server/
+accessibility-mcp-server/
 ├── src/
 │   ├── server.ts           # Main MCP server entry point
 │   ├── tools/              # Tool implementations
 │   │   ├── audit.ts       # Core audit tools
 │   │   ├── session.ts     # Session management
 │   │   ├── analysis.ts    # Analysis & reporting
-│   │   └── comparison.ts  # Comparison tools
-│   ├── core/              # Core WAVE functionality
-│   │   ├── wave-runner.ts      # WAVE execution
+│   │   ├── comparison.ts  # Comparison tools
+│   │   ├── export.ts      # Export tools (CSV, Excel, JSON, HTML)
+│   │   ├── filter.ts      # Filtering and search tools
+│   │   ├── aggregate.ts   # Aggregation and statistics tools
+│   │   └── visualize.ts   # Visualization and dashboard tools
+│   ├── core/              # Core accessibility functionality
+│   │   ├── accessibility-runner.ts      # Accessibility execution
 │   │   ├── session-manager.ts  # Session handling
 │   │   ├── result-processor.ts # Result formatting
 │   │   ├── error-handler.ts    # Error handling
 │   │   └── progress-streamer.ts # Progress updates
 │   └── types/             # TypeScript types
 ├── dist/                  # Compiled JavaScript
-├── wave.min.js           # WAVE accessibility engine (required)
+├── wave.min.js           # Accessibility engine script (required)
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -687,4 +1109,4 @@ For issues, questions, or contributions, please open an issue on the repository.
 
 ---
 
-**Happy accessibility testing! 🌊✨**
+**Happy accessibility testing! ♿✨**

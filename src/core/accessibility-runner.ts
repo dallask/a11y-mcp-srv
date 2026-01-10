@@ -1,6 +1,6 @@
 /**
- * WaveRunner - Refactored WAVE execution logic
- * Handles running WAVE accessibility tests with support for tag filtering
+ * AccessibilityRunner - Refactored accessibility execution logic
+ * Handles running accessibility tests with support for tag filtering
  * and configurable wait strategies
  */
 
@@ -9,10 +9,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 import type {
-  WaveResults,
-  WaveReport,
-  WaveCategory,
-  WaveRuleData,
+  AccessibilityResults,
+  AccessibilityReport,
+  AccessibilityCategory,
+  AccessibilityRuleData,
   WaitStrategy,
   AccessibilityTag,
 } from '../types/index.js'
@@ -25,9 +25,9 @@ function debugLog(...args: any[]) {
 }
 
 /**
- * Configuration for running a WAVE accessibility test
+ * Configuration for running an accessibility test
  */
-export interface WaveRunnerConfig {
+export interface AccessibilityRunnerConfig {
   /** URL to test */
   url: string
   /** Wait strategy for page loading */
@@ -39,13 +39,13 @@ export interface WaveRunnerConfig {
 }
 
 /**
- * Result from running a WAVE test
+ * Result from running an accessibility test
  */
-export interface WaveRunnerResult {
-  /** Raw WAVE results */
-  waveResults: WaveResults
+export interface AccessibilityRunnerResult {
+  /** Raw accessibility results */
+  accessibilityResults: AccessibilityResults
   /** Filtered results if tags were specified */
-  filteredResults?: WaveResults
+  filteredResults?: AccessibilityResults
   /** Applied filters information */
   appliedFilters?: {
     tags?: AccessibilityTag[]
@@ -54,54 +54,52 @@ export interface WaveRunnerResult {
 }
 
 /**
- * WaveRunner class - Handles WAVE accessibility test execution
+ * AccessibilityRunner class - Handles accessibility test execution
  */
-export class WaveRunner {
-  private waveScriptPath: string
-  private waveScript: string | null = null
+export class AccessibilityRunner {
+  private accessibilityScriptPath: string
+  private accessibilityScript: string | null = null
 
   constructor() {
-    // Determine the path to wave.min.js
-    // Try mcp-server directory first, then project root
+    // Determine the path to accessibility script
+    // Try accessibility-mcp-server directory first, then project root
     const currentFile = fileURLToPath(import.meta.url)
     const currentDir = path.dirname(currentFile)
-    // Go from mcp-server/src/core/ to mcp-server directory
-    const mcpServerDir = path.resolve(currentDir, '../../')
-    const mcpServerWavePath = path.join(mcpServerDir, 'wave.min.js')
+    // Go from accessibility-mcp-server/src/core/ to accessibility-mcp-server directory
+    const serverDir = path.resolve(currentDir, '../../')
+    const serverScriptPath = path.join(serverDir, 'wave.min.js')
     
-    // Also check project root
+    // Also check project root (for backward compatibility)
     const projectRoot = path.resolve(currentDir, '../../../')
-    const projectRootWavePath = path.join(projectRoot, 'wave.min.js')
+    const projectRootScriptPath = path.join(projectRoot, 'wave.min.js')
     
-    // Prefer mcp-server directory, fallback to project root
-    if (fs.existsSync(mcpServerWavePath)) {
-      this.waveScriptPath = mcpServerWavePath
-    } else if (fs.existsSync(projectRootWavePath)) {
-      this.waveScriptPath = projectRootWavePath
+    // Prefer accessibility-mcp-server directory, fallback to project root
+    if (fs.existsSync(serverScriptPath)) {
+      this.accessibilityScriptPath = serverScriptPath
+    } else if (fs.existsSync(projectRootScriptPath)) {
+      this.accessibilityScriptPath = projectRootScriptPath
     } else {
-      // Default to mcp-server directory (will throw error if not found)
-      this.waveScriptPath = mcpServerWavePath
+      // Default to accessibility-mcp-server directory (will throw error if not found)
+      this.accessibilityScriptPath = serverScriptPath
     }
   }
 
   /**
-   * Load WAVE script from disk
-   * @deprecated Now using addScriptTag with path instead
+   * Load accessibility script from disk
    */
-  // @ts-ignore - Method kept for potential future use
-  private loadWaveScript(): string {
-    if (this.waveScript) {
-      return this.waveScript
+  private loadAccessibilityScript(): string {
+    if (this.accessibilityScript) {
+      return this.accessibilityScript
     }
 
-    if (!fs.existsSync(this.waveScriptPath)) {
+    if (!fs.existsSync(this.accessibilityScriptPath)) {
       throw new Error(
-        `WAVE script not found at ${this.waveScriptPath}. Please ensure wave.min.js exists in the project root.`
+        `Accessibility script not found at ${this.accessibilityScriptPath}. Please ensure wave.min.js exists in the project root.`
       )
     }
 
-    this.waveScript = fs.readFileSync(this.waveScriptPath, 'utf8')
-    return this.waveScript
+    this.accessibilityScript = fs.readFileSync(this.accessibilityScriptPath, 'utf8')
+    return this.accessibilityScript
   }
 
   /**
@@ -170,48 +168,49 @@ export class WaveRunner {
 
     const elapsedTime = Date.now() - startTime
     debugLog(
-      `Page loading completed in ${elapsedTime}ms - proceeding with WAVE analysis`
+      `Page loading completed in ${elapsedTime}ms - proceeding with accessibility analysis`
     )
   }
 
   /**
-   * Run WAVE analysis in the browser context
+   * Run accessibility analysis in the browser context
    */
-  private async runWaveAnalysis(page: Page): Promise<WaveResults> {
-    const waveScriptPath = this.waveScriptPath
+  private async runAccessibilityAnalysis(page: Page): Promise<AccessibilityResults> {
+    // Load the script content first
+    const scriptContent = this.loadAccessibilityScript()
 
-    debugLog('Running WAVE analysis...')
+    debugLog('Running accessibility analysis...')
 
-    // Load WAVE using addScriptTag with path instead of inject via content
-    // This avoids serialization issues
-    await page.evaluate(() => {
-      // @ts-ignore - Browser context
-      ;(window as any).waveconfig = {
-        debug: false,
-        extensionUrl: '',
-        platform: 'standalone',
-        browser: 'chrome',
-      }
-    })
-    
-    // Use addScriptTag with file path - this bypasses serialization
-    await page.addScriptTag({ path: waveScriptPath })
-    
-    // Wait for WAVE to be available
-    await page.waitForFunction(
-      () => {
-        // @ts-ignore - Browser context
-        return typeof (window as any).wave !== 'undefined' && (window as any).wave && (window as any).wave.fn
-      },
-      { timeout: 10000 }
-    )
-
-    // Now run the WAVE analysis in a separate evaluate context
-    const accessibilityScanResults = (await page.evaluate(() => {
+    // Inject script content directly (same approach as wave-test.ts which was working)
+    // This avoids issues with addScriptTag path loading
+    const accessibilityScanResults = (await page.evaluate((scriptContent: string) => {
         return new Promise((resolve, reject) => {
           try {
+            // Debug logger for browser context (uses console.error which is available in browser)
+            // @ts-ignore - Browser context code
+            function debugLog(...args: any[]) {
+              // @ts-ignore - Browser context code
+              console.error(...args)
+            }
 
-            // Function to enhance WAVE results (injected into page context)
+            // Set up WAVE configuration (same as wave-test.ts)
+            // @ts-ignore - Browser context code
+            ;(window as any).waveconfig = {
+              debug: false,
+              extensionUrl: '',
+              platform: 'standalone',
+              browser: 'chrome',
+            }
+
+            // Inject WAVE script (same as wave-test.ts)
+            // @ts-ignore - Browser context code
+            const scriptElement = document.createElement('script')
+            // @ts-ignore - Browser context code
+            scriptElement.textContent = scriptContent
+            // @ts-ignore - Browser context code
+            document.head.appendChild(scriptElement)
+
+            // Function to enhance accessibility results (injected into page context)
             // This code runs in browser context, so DOM types are available
             // @ts-ignore - Browser context code
             function enhanceResultsWithDOMInfo(results) {
@@ -291,8 +290,8 @@ export class WaveRunner {
                   Object.keys(category.items).forEach((itemKey) => {
                     const item = category.items[itemKey]
                     
-                    // Extract tags from WAVE rule metadata if available
-                    // WAVE stores rule metadata in wave.rules[ruleId]
+                    // Extract tags from accessibility rule metadata if available
+                    // Accessibility engine stores rule metadata in wave.rules[ruleId]
                     // @ts-ignore - Browser context code
                     if (typeof window !== 'undefined' && window.wave && window.wave.rules) {
                       // @ts-ignore - Browser context code
@@ -359,7 +358,7 @@ export class WaveRunner {
               return enhanced
             }
 
-                // Wait for WAVE to initialize with retry logic
+                // Wait for accessibility engine to initialize with retry logic
             // This code runs in browser context - DOM types are available
             /* eslint-disable @typescript-eslint/ban-ts-comment */
             // @ts-ignore - Browser context: window, document, etc. are available
@@ -368,7 +367,7 @@ export class WaveRunner {
             const retryDelay = 200
 
             // @ts-ignore - Browser context code
-            const checkWaveAvailability = () => {
+            const checkAccessibilityAvailability = () => {
               attempts++
 
               // @ts-ignore - Browser context: window is available in page.evaluate context
@@ -381,13 +380,13 @@ export class WaveRunner {
                 window.wave.fn
               ) {
                 try {
-                  debugLog('WAVE available, checking DOM readiness...')
+                  debugLog('Accessibility engine available, checking DOM readiness...')
 
-                  // Ensure DOM is completely ready before initializing WAVE
+                  // Ensure DOM is completely ready before initializing accessibility engine
                   // @ts-ignore - Browser context code
                   if (document.readyState !== 'complete') {
                     debugLog('DOM not ready, waiting longer...')
-                    setTimeout(checkWaveAvailability, retryDelay)
+                    setTimeout(checkAccessibilityAvailability, retryDelay)
                     return
                   }
 
@@ -402,7 +401,7 @@ export class WaveRunner {
                     !document.head
                   ) {
                     debugLog('Body or head not ready, waiting...')
-                    setTimeout(checkWaveAvailability, retryDelay)
+                    setTimeout(checkAccessibilityAvailability, retryDelay)
                     return
                   }
 
@@ -414,29 +413,29 @@ export class WaveRunner {
                     debugLog('Style access test passed')
                   } catch (styleError) {
                     debugLog('Style access test failed, waiting...', styleError)
-                    setTimeout(checkWaveAvailability, retryDelay)
+                    setTimeout(checkAccessibilityAvailability, retryDelay)
                     return
                   }
 
-                  debugLog('DOM ready, initializing WAVE...')
+                  debugLog('DOM ready, initializing accessibility engine...')
 
-                  // Initialize WAVE with error handling
+                  // Initialize accessibility engine with error handling
                   try {
                     // @ts-ignore - Browser context code
                     ;window.wave.fn.initialize()
-                    debugLog('WAVE initialized successfully')
+                    debugLog('Accessibility engine initialized successfully')
                   } catch (initError: any) {
                     debugLog(
-                      'WAVE initialization failed, retrying...',
+                      'Accessibility engine initialization failed, retrying...',
                       initError
                     )
                     if (attempts < maxRetries) {
-                      setTimeout(checkWaveAvailability, retryDelay * 2)
+                      setTimeout(checkAccessibilityAvailability, retryDelay * 2)
                       return
                     } else {
                       reject(
                         new Error(
-                          `WAVE initialization failed after retries: ${
+                          `Accessibility engine initialization failed after retries: ${
                             initError.message
                           }`
                         )
@@ -445,12 +444,12 @@ export class WaveRunner {
                     }
                   }
 
-                  // Run WAVE analysis
+                  // Run accessibility analysis
                   // @ts-ignore - Browser context code
                   ;window.wave.fn
                     .run()
                     .then((results: any) => {
-                      debugLog('WAVE analysis completed successfully')
+                      debugLog('Accessibility analysis completed successfully')
                       // Enhance results with better DOM information
                       const enhancedResults = enhanceResultsWithDOMInfo(results)
 
@@ -459,11 +458,11 @@ export class WaveRunner {
                         url: window.location.href,
                         timestamp: new Date().toISOString(),
                         testEngine: {
-                          name: 'WAVE',
+                          name: 'Accessibility Analyzer',
                           version: '3.2.7',
                         },
                         testRunner: {
-                          name: 'WAVE Standalone Analyzer',
+                          name: 'Standalone Accessibility Analyzer',
                         },
                         testEnvironment: {
                           // @ts-ignore - Browser context code
@@ -483,18 +482,18 @@ export class WaveRunner {
                     .catch((error: any) => {
                       reject(
                         new Error(
-                          `WAVE analysis execution failed: ${error.message}`
+                          `Accessibility analysis execution failed: ${error.message}`
                         )
                       )
                     })
                 } catch (error: any) {
-                  debugLog('Unexpected error in WAVE process:', error)
+                  debugLog('Unexpected error in accessibility process:', error)
                   if (attempts < maxRetries) {
-                    setTimeout(checkWaveAvailability, retryDelay * 2)
+                    setTimeout(checkAccessibilityAvailability, retryDelay * 2)
                   } else {
                     reject(
                       new Error(
-                        `WAVE process failed: ${error.message}`
+                        `Accessibility process failed: ${error.message}`
                       )
                     )
                   }
@@ -502,36 +501,35 @@ export class WaveRunner {
               } else if (attempts >= maxRetries) {
                 reject(
                   new Error(
-                    `WAVE failed to initialize after ${maxRetries} attempts`
+                    `Accessibility engine failed to initialize after ${maxRetries} attempts`
                   )
                 )
               } else {
                 // Retry after delay
-                setTimeout(checkWaveAvailability, retryDelay)
+                setTimeout(checkAccessibilityAvailability, retryDelay)
               }
             }
 
-            checkWaveAvailability()
+            checkAccessibilityAvailability()
             /* eslint-enable @typescript-eslint/ban-ts-comment */
           } catch (error: any) {
             reject(
-              new Error(`WAVE analysis failed: ${error.message}`)
+              new Error(`Accessibility analysis failed: ${error.message}`)
             )
           }
         })
-      }
-    )) as WaveResults
+    }, scriptContent)) as AccessibilityResults
 
-    debugLog('WAVE analysis completed, processing results...')
+    debugLog('Accessibility analysis completed, processing results...')
     return accessibilityScanResults
   }
 
   /**
-   * Count total issues in WAVE results
+   * Count total issues in accessibility results
    */
-  private countTotalIssues(violations: WaveReport): number {
+  private countTotalIssues(violations: AccessibilityReport): number {
     let total = 0
-    Object.values(violations).forEach((category: WaveCategory | undefined) => {
+    Object.values(violations).forEach((category: AccessibilityCategory | undefined) => {
       if (category && category.count) {
         total += category.count
       }
@@ -540,11 +538,11 @@ export class WaveRunner {
   }
 
   /**
-   * Get a mapping of common WAVE rule IDs to their accessibility tags
-   * This is a fallback when WAVE doesn't provide tag metadata directly
+   * Get a mapping of common accessibility rule IDs to their accessibility tags
+   * This is a fallback when the accessibility engine doesn't provide tag metadata directly
    */
   private getRuleTagMapping(): Record<string, AccessibilityTag[]> {
-    // Common WAVE rule IDs mapped to their WCAG tags
+    // Common accessibility rule IDs mapped to their WCAG tags
     // This is a partial mapping - in production, this should be comprehensive
     return {
       // Contrast-related rules (WCAG 2.1 AA)
@@ -574,11 +572,11 @@ export class WaveRunner {
 
   /**
    * Check if a rule matches any of the specified tags
-   * Checks WAVE metadata first, then falls back to rule ID mapping
+   * Checks accessibility engine metadata first, then falls back to rule ID mapping
    */
   private ruleMatchesTags(
     ruleId: string,
-    ruleData: WaveRuleData,
+    ruleData: AccessibilityRuleData,
     tags: AccessibilityTag[]
   ): boolean {
     // If no tags specified, include all rules
@@ -586,7 +584,7 @@ export class WaveRunner {
       return true
     }
 
-    // Check if rule has tags property (from WAVE metadata)
+    // Check if rule has tags property (from accessibility engine metadata)
     if (ruleData.tags && Array.isArray(ruleData.tags)) {
       return ruleData.tags.some((tag) => tags.includes(tag as AccessibilityTag))
     }
@@ -604,24 +602,24 @@ export class WaveRunner {
   }
 
   /**
-   * Filter WAVE results by accessibility tags
+   * Filter accessibility results by accessibility tags
    */
   private filterByTags(
-    results: WaveResults,
+    results: AccessibilityResults,
     tags: AccessibilityTag[]
-  ): WaveResults {
+  ): AccessibilityResults {
     if (!tags || tags.length === 0) {
       return results
     }
 
-    const filteredViolations: WaveReport = {}
+    const filteredViolations: AccessibilityReport = {}
 
     Object.entries(results.violations).forEach(([categoryKey, category]) => {
       if (!category || !category.items) {
         return
       }
 
-      const filteredItems: Record<string, WaveRuleData> = {}
+      const filteredItems: Record<string, AccessibilityRuleData> = {}
 
       Object.entries(category.items).forEach(([ruleId, ruleData]) => {
         if (this.ruleMatchesTags(ruleId, ruleData, tags)) {
@@ -655,8 +653,8 @@ export class WaveRunner {
    */
   async run(
     page: Page,
-    config: WaveRunnerConfig
-  ): Promise<WaveRunnerResult> {
+    config: AccessibilityRunnerConfig
+  ): Promise<AccessibilityRunnerResult> {
     const {
       url,
       waitForLoad = 'networkidle',
@@ -668,14 +666,14 @@ export class WaveRunner {
       // Navigate and wait for page to be ready
       await this.navigateAndWait(page, url, waitForLoad, timeout)
 
-      // Run WAVE analysis
-      const waveResults = await this.runWaveAnalysis(page)
+      // Run accessibility analysis
+      const accessibilityResults = await this.runAccessibilityAnalysis(page)
 
       // Count original issues before filtering
-      const originalIssueCount = this.countTotalIssues(waveResults.violations)
+      const originalIssueCount = this.countTotalIssues(accessibilityResults.violations)
 
       // Filter by tags if specified
-      let filteredResults: WaveResults | undefined
+      let filteredResults: AccessibilityResults | undefined
       let appliedFilters:
         | {
             tags?: AccessibilityTag[]
@@ -684,7 +682,7 @@ export class WaveRunner {
         | undefined
 
       if (tags && tags.length > 0) {
-        filteredResults = this.filterByTags(waveResults, tags)
+        filteredResults = this.filterByTags(accessibilityResults, tags)
         const filteredIssueCount = this.countTotalIssues(
           filteredResults.violations
         )
@@ -700,17 +698,17 @@ export class WaveRunner {
       }
 
       return {
-        waveResults,
+        accessibilityResults,
         filteredResults,
         appliedFilters,
       }
     } catch (error) {
-      console.error('Error running WAVE test:', error)
+      console.error('Error running accessibility test:', error)
       // Re-throw with more context - let caller handle retry logic
       const errorMessage =
         error instanceof Error ? error.message : String(error)
       throw new Error(
-        `WAVE accessibility test failed for ${url}: ${errorMessage}`
+        `Accessibility test failed for ${url}: ${errorMessage}`
       )
     }
   }

@@ -1,6 +1,6 @@
 /**
  * Error Handler - Comprehensive error handling with retry logic and graceful degradation
- * Provides utilities for handling errors throughout the WAVE accessibility audit system
+ * Provides utilities for handling errors throughout the accessibility audit system
  */
 
 /**
@@ -11,7 +11,7 @@ export enum ErrorCategory {
   TIMEOUT = 'timeout',
   VALIDATION = 'validation',
   BROWSER = 'browser',
-  WAVE = 'wave',
+  ACCESSIBILITY = 'accessibility',
   SESSION = 'session',
   UNKNOWN = 'unknown',
 }
@@ -114,16 +114,15 @@ export function categorizeError(error: unknown): CategorizedError {
     }
   }
 
-  // WAVE errors
+  // Accessibility errors
   if (
-    errorMessage.includes('WAVE') ||
-    errorMessage.includes('wave') ||
-    errorMessage.includes('accessibility')
+    errorMessage.includes('accessibility') ||
+    errorMessage.includes('Accessibility')
   ) {
     return {
-      name: 'WaveError',
-      message: `WAVE analysis error: ${errorMessage}`,
-      category: ErrorCategory.WAVE,
+      name: 'AccessibilityError',
+      message: `Accessibility analysis error: ${errorMessage}`,
+      category: ErrorCategory.ACCESSIBILITY,
       retryable: true,
       originalError: error instanceof Error ? error : undefined,
       stack: errorStack,
@@ -274,9 +273,9 @@ export function formatErrorMessage(
       message +=
         '\n\nSuggestion: There may be an issue with the browser instance. Try again or check system resources.'
       break
-    case ErrorCategory.WAVE:
+    case ErrorCategory.ACCESSIBILITY:
       message +=
-        '\n\nSuggestion: There may be an issue with the WAVE analysis engine. Try again or check the page structure.'
+        '\n\nSuggestion: There may be an issue with the accessibility analysis engine. Try again or check the page structure.'
       break
     case ErrorCategory.SESSION:
       message +=
@@ -324,8 +323,8 @@ function getErrorSuggestion(category: ErrorCategory): string {
       return 'The page may be loading slowly. Try increasing the timeout.'
     case ErrorCategory.BROWSER:
       return 'There may be an issue with the browser instance. Try again.'
-    case ErrorCategory.WAVE:
-      return 'There may be an issue with the WAVE analysis engine. Try again.'
+    case ErrorCategory.ACCESSIBILITY:
+      return 'There may be an issue with the accessibility analysis engine. Try again.'
     case ErrorCategory.SESSION:
       return 'The session may have expired. Please create a new session.'
     case ErrorCategory.VALIDATION:

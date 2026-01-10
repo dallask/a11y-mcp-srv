@@ -5,7 +5,7 @@
 
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright'
 import { SessionManager } from '../core/session-manager.js'
-import { WaveRunner } from '../core/wave-runner.js'
+import { AccessibilityRunner } from '../core/accessibility-runner.js'
 import { ResultProcessor } from '../core/result-processor.js'
 import {
   retryWithBackoff,
@@ -255,15 +255,15 @@ export async function auditWithSession(
       'Accept-Language': 'en-US,en;q=0.9',
     })
 
-    // Initialize WaveRunner
-    const waveRunner = new WaveRunner()
+    // Initialize AccessibilityRunner
+    const accessibilityRunner = new AccessibilityRunner()
 
-    // Run WAVE test with default wait strategy and timeout
+    // Run accessibility test with default wait strategy and timeout
     // Using authenticated page context with retry logic
-    console.log(`Running WAVE accessibility test on authenticated page: ${fullUrl}`)
-    const waveResult = await retryWithBackoff(
+    console.log(`Running accessibility test on authenticated page: ${fullUrl}`)
+    const accessibilityResult = await retryWithBackoff(
       async () => {
-        return await waveRunner.run(page!, {
+        return await accessibilityRunner.run(page!, {
           url: fullUrl,
           waitForLoad: 'networkidle' as WaitStrategy,
           timeout: 30000, // 30 seconds
@@ -281,11 +281,11 @@ export async function auditWithSession(
 
     // Use filtered results if tags were applied, otherwise use original
     const resultsToProcess =
-      waveResult.filteredResults || waveResult.waveResults
+      accessibilityResult.filteredResults || accessibilityResult.accessibilityResults
 
     const auditResult = resultProcessor.process(
       resultsToProcess,
-      waveResult.appliedFilters
+      accessibilityResult.appliedFilters
     )
 
     console.log(

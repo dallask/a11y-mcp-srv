@@ -1,6 +1,6 @@
 {
   "name": "@ali0113/accessibility-mcp-server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MCP server for accessibility auditing with export, filter, aggregation, and visualization tools",
   "main": "dist/server.js",
   "type": "module",
@@ -43,5 +43,12 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "wave.min.js",
+    "README.md",
+    "package.json"
+  ]
 }

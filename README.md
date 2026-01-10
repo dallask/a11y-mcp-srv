@@ -16,53 +16,16 @@ A Model Context Protocol (MCP) server that provides conversational, actionable a
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
-- Playwright browsers (installed automatically)
+- **Node.js 18+** (for `npx` command)
+- That's it! Everything else is handled automatically.
 
-## 🚀 Installation & Setup
+## 🚀 Quick Start (Using Published Package)
 
-### Step 1: Install Dependencies
-
-```bash
-cd accessibility-mcp-server
-npm install
-```
-
-### Step 2: Install Playwright Browsers
-
-```bash
-npx playwright install --with-deps chromium
-```
-
-### Step 3: Build the Project
-
-```bash
-npm run build
-```
-
-### Step 4: Verify accessibility script
-
-The `wave.min.js` file should be present in the `accessibility-mcp-server` directory. This file contains the accessibility engine and is required for all audits. If it's missing, you'll need to obtain it separately.
-
-## 🔧 Running the MCP Server
-
-### Development Mode (with watch)
-
-```bash
-npm run dev
-```
-
-### Production Mode
-
-```bash
-npm start
-```
-
-## ⚙️ MCP Client Configuration
+### Step 1: Add to Your MCP Client Configuration
 
 Add this server to your MCP client configuration (e.g., Claude Desktop, Cursor):
 
-### Claude Desktop Configuration
+#### Claude Desktop Configuration
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
@@ -70,29 +33,158 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 {
   "mcpServers": {
     "accessibility-audit": {
-      "command": "node",
-      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
+      "command": "npx",
+      "args": ["-y", "@ali0113/accessibility-mcp-server"]
     }
   }
 }
 ```
 
-### Cursor Configuration
+#### Cursor Configuration
 
-Add to your Cursor MCP settings:
+Add to your Cursor MCP settings (`~/.cursor/mcp.json` or Cursor Settings → MCP):
 
 ```json
 {
   "mcpServers": {
     "accessibility-audit": {
-      "command": "node",
-      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
+      "command": "npx",
+      "args": ["-y", "@ali0113/accessibility-mcp-server"]
     }
   }
 }
 ```
 
-**Note**: Use absolute paths in your configuration. Replace `/absolute/path/to/` with the actual path to your project.
+### Step 2: Restart Your MCP Client
+
+Restart Claude Desktop or Cursor to load the new MCP server configuration.
+
+### Step 3: Start Using It!
+
+That's it! You're ready to use all 25+ accessibility tools. The package will be automatically downloaded and cached by `npx` on first use.
+
+**How it works:**
+- `npx` automatically downloads and runs the package if needed
+- The `-y` flag answers "yes" to prompts (non-interactive)
+- Playwright browsers install automatically on first run
+- No manual installation, building, or configuration needed!
+
+## 🎉 Awesome Things You Can Do
+
+### 🔍 **Comprehensive Accessibility Auditing**
+- **Audit any website** - Single URLs, multiple pages, or entire sites
+- **Test protected pages** - Authenticated session management for login-protected content
+- **Batch processing** - Test multiple URLs in parallel with progress tracking
+- **WCAG compliance** - Check against WCAG 2.0, 2.1 (Levels A, AA, AAA) and best practices
+
+### 🎯 **Smart Prioritization & Quick Wins**
+- **Identify critical blockers** - Find must-fix issues that block users
+- **Quick wins detection** - Easy fixes with high impact
+- **Intelligent prioritization** - Sort by impact, WCAG level, fixability, or user impact
+- **Focus your efforts** - Know exactly what to fix first
+
+### 💻 **Code-Level Fixes**
+- **Before/after code examples** - See exactly what needs to change
+- **Copy-paste ready solutions** - Actual code, not just descriptions
+- **Multiple formats** - Markdown, HTML, or JSON output
+- **Specific fix suggestions** - Targeted solutions for each issue
+
+### 📚 **Educational Resources**
+- **Plain language explanations** - Understand what each issue means
+- **Why it matters** - Learn the user impact
+- **How to fix** - Step-by-step guidance with examples
+- **WCAG references** - Direct links to accessibility standards
+- **Common mistakes** - Learn from typical errors
+
+### 📊 **Compliance & Reporting**
+- **VPAT reports** - Generate Voluntary Product Accessibility Template documentation
+- **WCAG compliance reports** - Detailed compliance breakdowns
+- **ADA reports** - Americans with Disabilities Act compliance
+- **Section 508 reports** - Federal accessibility compliance
+- **Executive summaries** - High-level reports for stakeholders
+
+### 📈 **Tracking & Comparison**
+- **Before/after comparison** - Track improvements over time
+- **Trend analysis** - Historical data and predictions
+- **Score tracking** - Monitor accessibility scores
+- **Visual diffs** - See what changed between audits
+
+### 📤 **Export & Share**
+- **CSV export** - Import into Excel for analysis
+- **Excel export** - Professional reports with charts and formatting
+- **JSON export** - For API integration and data processing
+- **HTML reports** - Standalone web reports with visualizations
+- **Dashboard generation** - Visual summaries with charts
+
+### 🔎 **Filtering & Search**
+- **Filter by criteria** - Rule IDs, categories, impact levels, WCAG levels
+- **Search issues** - Find specific problems quickly
+- **Include/exclude modes** - Focus on what matters
+- **Element type filtering** - Find issues in specific HTML elements
+
+### 📊 **Statistics & Aggregation**
+- **Site-wide analysis** - Combine multiple audit results
+- **Detailed statistics** - Breakdowns by category, impact, WCAG level
+- **Aggregated summaries** - Overall site accessibility metrics
+- **Grouping options** - Organize by URL, category, rule, or impact
+
+### 🎨 **Visualization**
+- **Dashboards** - Visual summaries with key metrics
+- **Charts** - Score trends and category breakdowns
+- **Multiple formats** - Text, Markdown, HTML, JSON
+- **Executive reports** - High-level summaries for stakeholders
+
+## 💡 Real-World Use Cases
+
+### For Developers
+- Get code-level fixes for accessibility issues
+- Learn accessibility concepts with educational explanations
+- Integrate into CI/CD pipelines
+- Export results for team sharing
+
+### For QA Teams
+- Batch test multiple pages efficiently
+- Track accessibility over time
+- Generate compliance reports
+- Compare before/after deployments
+
+### For Product Managers
+- Executive summary reports
+- Compliance documentation (VPAT, ADA)
+- Dashboard visualizations
+- Track accessibility scores over time
+
+### For Compliance Teams
+- Generate VPAT reports automatically
+- WCAG compliance documentation
+- Section 508 compliance checks
+- Detailed remediation plans
+
+## 🎬 Quick Usage Example
+
+Once configured, you can immediately start using the accessibility tools in your AI assistant:
+
+**Example: Audit a website**
+```
+"Audit https://example.com for accessibility issues"
+```
+
+**Example: Get quick fixes**
+```
+"Show me quick fixes for the accessibility issues on cursor.com"
+```
+
+**Example: Generate compliance report**
+```
+"Generate a VPAT report for docs.atlan.com"
+```
+
+**Example: Compare before/after**
+```
+"Compare the accessibility of example.com before and after the redesign"
+```
+
+The AI assistant will automatically use the appropriate tools to fulfill your requests!
 
 ## 🛠️ Available Tools
 
@@ -1066,34 +1158,82 @@ accessibility-mcp-server/
 └── README.md
 ```
 
-## 🔨 Development
+## 🔨 Local Development (Optional)
 
-### Building
+If you want to contribute or modify the code, you can set up a local development environment:
 
-```bash
-npm run build
-```
+### Prerequisites for Local Development
 
-### Development Mode (with watch)
+- Node.js 18+
+- npm or yarn
 
+### Setup Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd accessibility-mcp-server
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Install Playwright browsers**
+   ```bash
+   npx playwright install --with-deps chromium
+   ```
+
+4. **Build the project**
+   ```bash
+   npm run build
+   ```
+
+5. **Verify accessibility script**
+   - Ensure `wave.min.js` is present in the project root
+
+### Running Locally
+
+**Development Mode (with watch)**
 ```bash
 npm run dev
 ```
 
-### TypeScript Configuration
+**Production Mode**
+```bash
+npm start
+```
 
-The project uses TypeScript with ES modules. See `tsconfig.json` for configuration details.
+### Using Local Version in MCP Client
+
+If you want to use the local version instead of the published package:
+
+```json
+{
+  "mcpServers": {
+    "accessibility-audit": {
+      "command": "node",
+      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
+    }
+  }
+}
+```
+
+**Note**: Use absolute paths in your configuration.
 
 ## 🔑 Key Differentiators
 
-1. **Conversational Interface**: Results formatted for natural language understanding
-2. **Session Management**: Only MCP with reusable authenticated sessions
-3. **Educational**: `explain_issue` teaches accessibility concepts
-4. **Code-Level Fixes**: Actual code examples, not just descriptions
-5. **Progress Updates**: Streaming progress for long operations
-6. **Smart Prioritization**: AI-powered issue prioritization
-7. **Compliance Reports**: Automated VPAT/WCAG documentation
-8. **Tag Filtering**: Filter by specific WCAG levels to reduce noise
+1. **Zero Setup Required** - Just add config and use! No installation, building, or manual setup needed
+2. **Conversational Interface** - Results formatted for natural language understanding
+3. **Session Management** - Only MCP with reusable authenticated sessions for protected pages
+4. **Educational Focus** - `explain_issue` teaches accessibility concepts, not just reports problems
+5. **Code-Level Fixes** - Actual before/after code examples, not just descriptions
+6. **Progress Updates** - Streaming progress for long-running batch operations
+7. **Smart Prioritization** - AI-powered issue prioritization with quick wins identification
+8. **Compliance Reports** - Automated VPAT/WCAG/ADA/Section 508 documentation
+9. **Tag Filtering** - Filter by specific WCAG levels to reduce noise and focus on what matters
+10. **25+ Tools** - Comprehensive suite covering auditing, analysis, reporting, export, and more
 
 ## 📄 License
 

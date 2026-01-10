@@ -1,0 +1,50 @@
+# Source files (only dist/ is needed)
+src/
+*.ts
+!*.d.ts
+
+# Development files
+tsconfig.json
+tsconfig.tsbuildinfo
+test-*.ts
+test-*.js
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Test files
+TEST-*.md
+*-RESULTS.md
+*-COMPLETE.md
+
+# Documentation (keep README.md)
+# README.md is included by default

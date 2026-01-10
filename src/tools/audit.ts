@@ -21,6 +21,13 @@ import type {
 } from '../types/index.js'
 
 /**
+ * Debug logger that writes to stderr to avoid interfering with MCP protocol
+ */
+function debugLog(...args: any[]) {
+  console.error(...args)
+}
+
+/**
  * Normalize URL - handles relative URLs and adds domain if needed
  */
 function normalizeUrl(url: string, domain?: string): string {
@@ -87,7 +94,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
 
   try {
     // Launch browser with retry logic
-    console.log(`Launching browser for audit: ${fullUrl}`)
+    debugLog(`Launching browser for audit: ${fullUrl}`)
     browser = await retryWithBackoff(
       async () => {
         return await chromium.launch({
@@ -120,7 +127,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
     const waveRunner = new WaveRunner()
 
     // Run WAVE test with retry logic for transient errors
-    console.log(`Running WAVE accessibility test on: ${fullUrl}`)
+    debugLog(`Running WAVE accessibility test on: ${fullUrl}`)
     const waveResult = await retryWithBackoff(
       async () => {
         return await waveRunner.run(page!, {
@@ -148,7 +155,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       waveResult.appliedFilters
     )
 
-    console.log(
+    debugLog(
       `Audit complete: ${auditResult.summary.totalIssues} issues found, score: ${auditResult.summary.score}/100`
     )
 
@@ -304,7 +311,7 @@ async function processBatchParallel(
     }
 
     // Log progress
-    console.log(
+    debugLog(
       `Progress: ${completed}/${urlArray.length} (${percentage}%) - Completed: ${completedUrls.length}, Failed: ${failedUrls.length}`
     )
   }
@@ -374,7 +381,7 @@ async function processBatchSequential(
     }
 
     // Log progress
-    console.log(
+    debugLog(
       `Progress: ${completed}/${urlArray.length} (${percentage}%) - ${url}`
     )
   }
@@ -505,7 +512,7 @@ export async function auditMultipleUrls(
     throw new Error('No valid URLs provided')
   }
 
-  console.log(
+  debugLog(
     `Starting batch audit: ${urlArray.length} URL(s), parallel: ${parallel}`
   )
 
@@ -547,7 +554,7 @@ export async function auditMultipleUrls(
     onProgress(finalProgress)
   }
 
-  console.log(
+  debugLog(
     `Batch audit complete: ${aggregatedSummary.successful} successful, ${aggregatedSummary.failed} failed`
   )
 

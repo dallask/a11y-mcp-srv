@@ -18,6 +18,13 @@ import type {
 } from '../types/index.js'
 
 /**
+ * Debug logger that writes to stderr to avoid interfering with MCP protocol
+ */
+function debugLog(...args: any[]) {
+  console.error(...args)
+}
+
+/**
  * Configuration for running a WAVE accessibility test
  */
 export interface WaveRunnerConfig {
@@ -106,7 +113,7 @@ export class WaveRunner {
     waitStrategy: WaitStrategy = 'networkidle',
     timeout: number = 30000
   ): Promise<void> {
-    console.log(`Navigating to ${url}...`)
+    debugLog(`Navigating to ${url}...`)
     const startTime = Date.now()
 
     // Basic navigation
@@ -114,7 +121,7 @@ export class WaveRunner {
       waitUntil: 'domcontentloaded',
       timeout,
     })
-    console.log('Page navigation started')
+    debugLog('Page navigation started')
 
     // Wait for page to stabilize based on strategy
     const remainingTime = timeout - (Date.now() - startTime)
@@ -126,17 +133,17 @@ export class WaveRunner {
             await page.waitForLoadState('networkidle', {
               timeout: Math.min(remainingTime, 6000),
             })
-            console.log('Page reached networkidle state')
+            debugLog('Page reached networkidle state')
             break
           case 'load':
             await page.waitForLoadState('load', {
               timeout: Math.min(remainingTime, 6000),
             })
-            console.log('Page reached load state')
+            debugLog('Page reached load state')
             break
           case 'domcontentloaded':
             // Already waited for domcontentloaded in goto
-            console.log('DOM content loaded')
+            debugLog('DOM content loaded')
             break
         }
 
@@ -151,18 +158,18 @@ export class WaveRunner {
                 document.readyState === 'complete' && document.body !== null,
               { timeout: Math.min(finalWaitTime, 2000) }
             )
-            console.log('DOM is ready')
+            debugLog('DOM is ready')
           } catch (error) {
-            console.log('DOM readiness check timed out, proceeding anyway...')
+            debugLog('DOM readiness check timed out, proceeding anyway...')
           }
         }
       } catch (error) {
-        console.log('Page still loading, but proceeding with analysis...')
+        debugLog('Page still loading, but proceeding with analysis...')
       }
     }
 
     const elapsedTime = Date.now() - startTime
-    console.log(
+    debugLog(
       `Page loading completed in ${elapsedTime}ms - proceeding with WAVE analysis`
     )
   }
@@ -173,7 +180,7 @@ export class WaveRunner {
   private async runWaveAnalysis(page: Page): Promise<WaveResults> {
     const waveScriptPath = this.waveScriptPath
 
-    console.log('Running WAVE analysis...')
+    debugLog('Running WAVE analysis...')
 
     // Load WAVE using addScriptTag with path instead of inject via content
     // This avoids serialization issues
@@ -374,12 +381,12 @@ export class WaveRunner {
                 window.wave.fn
               ) {
                 try {
-                  console.log('WAVE available, checking DOM readiness...')
+                  debugLog('WAVE available, checking DOM readiness...')
 
                   // Ensure DOM is completely ready before initializing WAVE
                   // @ts-ignore - Browser context code
                   if (document.readyState !== 'complete') {
-                    console.log('DOM not ready, waiting longer...')
+                    debugLog('DOM not ready, waiting longer...')
                     setTimeout(checkWaveAvailability, retryDelay)
                     return
                   }
@@ -394,7 +401,7 @@ export class WaveRunner {
                     // @ts-ignore - Browser context code
                     !document.head
                   ) {
-                    console.log('Body or head not ready, waiting...')
+                    debugLog('Body or head not ready, waiting...')
                     setTimeout(checkWaveAvailability, retryDelay)
                     return
                   }
@@ -404,22 +411,22 @@ export class WaveRunner {
                     // @ts-ignore - Browser context code
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const _testStyle = document.body.style.display
-                    console.log('Style access test passed')
+                    debugLog('Style access test passed')
                   } catch (styleError) {
-                    console.log('Style access test failed, waiting...', styleError)
+                    debugLog('Style access test failed, waiting...', styleError)
                     setTimeout(checkWaveAvailability, retryDelay)
                     return
                   }
 
-                  console.log('DOM ready, initializing WAVE...')
+                  debugLog('DOM ready, initializing WAVE...')
 
                   // Initialize WAVE with error handling
                   try {
                     // @ts-ignore - Browser context code
                     ;window.wave.fn.initialize()
-                    console.log('WAVE initialized successfully')
+                    debugLog('WAVE initialized successfully')
                   } catch (initError: any) {
-                    console.log(
+                    debugLog(
                       'WAVE initialization failed, retrying...',
                       initError
                     )
@@ -443,7 +450,7 @@ export class WaveRunner {
                   ;window.wave.fn
                     .run()
                     .then((results: any) => {
-                      console.log('WAVE analysis completed successfully')
+                      debugLog('WAVE analysis completed successfully')
                       // Enhance results with better DOM information
                       const enhancedResults = enhanceResultsWithDOMInfo(results)
 
@@ -481,7 +488,7 @@ export class WaveRunner {
                       )
                     })
                 } catch (error: any) {
-                  console.log('Unexpected error in WAVE process:', error)
+                  debugLog('Unexpected error in WAVE process:', error)
                   if (attempts < maxRetries) {
                     setTimeout(checkWaveAvailability, retryDelay * 2)
                   } else {
@@ -515,7 +522,7 @@ export class WaveRunner {
       }
     )) as WaveResults
 
-    console.log('WAVE analysis completed, processing results...')
+    debugLog('WAVE analysis completed, processing results...')
     return accessibilityScanResults
   }
 
@@ -687,7 +694,7 @@ export class WaveRunner {
           originalIssueCount,
         }
 
-        console.log(
+        debugLog(
           `Filtered results: ${originalIssueCount} -> ${filteredIssueCount} issues (tags: ${tags.join(', ')})`
         )
       }

@@ -1,6 +1,6 @@
 {
   "name": "@ali0113/accessibility-mcp-server",
-  "version": "1.1.1",
+  "version": "1.1.7",
   "description": "MCP server for accessibility auditing with export, filter, aggregation, and visualization tools",
   "main": "dist/server.js",
   "type": "module",

@@ -42,6 +42,7 @@ import {
   handleErrorGracefully,
   retryWithBackoff,
   formatErrorMessage,
+  toErrorMessage,
 } from './core/error-handler.js'
 import { formatTimeRemaining } from './core/progress-streamer.js'
 import type { BatchAuditProgress } from './types/index.js'
@@ -1438,18 +1439,35 @@ async function createServer(): Promise<Server> {
           throw new Error(`Unknown tool: ${name}`)
       }
     } catch (error) {
-      // Use comprehensive error handling
-      const errorInfo = handleErrorGracefully(error, `Tool: ${name}`)
-      const errorMessage = formatErrorMessage(error, `Tool: ${name}`)
-
-      // Log error details
-      console.error(`[ERROR] ${errorMessage}`)
-
-      const errorPayload = {
-        error: String(errorInfo.error),
-        category: errorInfo.category,
-        retryable: errorInfo.retryable,
-        suggestion: errorInfo.suggestion,
+      // Use comprehensive error handling; ensure error text is never [object Object]
+      let errorPayload: {
+        error: string
+        category: string
+        retryable: boolean
+        suggestion?: string
+      }
+      try {
+        const errorInfo = handleErrorGracefully(error, `Tool: ${name}`)
+        const errorMessage = formatErrorMessage(error, `Tool: ${name}`)
+        console.error(`[ERROR] ${errorMessage}`)
+        const errText =
+          typeof errorInfo.error === 'string'
+            ? errorInfo.error
+            : toErrorMessage(errorInfo.error ?? error)
+        errorPayload = {
+          error: errText,
+          category: errorInfo.category,
+          retryable: errorInfo.retryable,
+          suggestion: errorInfo.suggestion,
+        }
+      } catch (fallbackError) {
+        errorPayload = {
+          error: toErrorMessage(error),
+          category: 'unknown',
+          retryable: false,
+          suggestion: 'An unexpected error occurred. Please try again.',
+        }
+        console.error(`[ERROR] ${errorPayload.error}`)
       }
       return {
         content: [

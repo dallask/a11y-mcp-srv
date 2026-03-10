@@ -53,11 +53,43 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 }
 
 /**
+ * Convert any thrown value to a readable string for logging/MCP.
+ * Avoids "[object Object]" when error is a plain object (e.g. from Playwright or reject(obj)).
+ */
+export function toErrorMessage(error: unknown): string {
+  if (error === null) return 'null'
+  if (error === undefined) return 'undefined'
+  if (error instanceof Error) {
+    return error.message || error.name || String(error)
+  }
+  if (typeof error === 'object') {
+    const obj = error as Record<string, unknown>
+    const msg =
+      typeof obj.message === 'string'
+        ? obj.message
+        : typeof obj.msg === 'string'
+          ? obj.msg
+          : typeof obj.error === 'string'
+            ? obj.error
+            : typeof obj.reason === 'string'
+              ? obj.reason
+              : null
+    if (msg) return msg
+    try {
+      const json = JSON.stringify(error)
+      return json.length > 500 ? json.slice(0, 497) + '...' : json
+    } catch {
+      return Object.prototype.toString.call(error)
+    }
+  }
+  return String(error)
+}
+
+/**
  * Categorize an error based on its message and type
  */
 export function categorizeError(error: unknown): CategorizedError {
-  const errorMessage =
-    error instanceof Error ? error.message : String(error)
+  const errorMessage = toErrorMessage(error)
   const errorStack = error instanceof Error ? error.stack : undefined
 
   // Network errors
@@ -307,7 +339,9 @@ export function handleErrorGracefully(
   const errorString =
     typeof formattedMessage === 'string'
       ? formattedMessage
-      : String(categorizedError?.message ?? error)
+      : (typeof categorizedError?.message === 'string'
+          ? categorizedError.message
+          : toErrorMessage(error))
 
   return {
     error: errorString,

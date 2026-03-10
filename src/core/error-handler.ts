@@ -343,11 +343,17 @@ export function handleErrorGracefully(
           ? categorizedError.message
           : toErrorMessage(error))
 
+  const suggestion =
+    categorizedError.category === ErrorCategory.BROWSER &&
+    categorizedError.message.toLowerCase().includes('failed to launch the browser process')
+      ? 'Install system dependencies for Chromium: run `npx playwright install --with-deps` (Linux/Docker). Then try again.'
+      : getErrorSuggestion(categorizedError.category)
+
   return {
     error: errorString,
     category: categorizedError.category,
     retryable: categorizedError.retryable,
-    suggestion: getErrorSuggestion(categorizedError.category),
+    suggestion,
   }
 }
 

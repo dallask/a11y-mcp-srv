@@ -48,15 +48,69 @@ export function installPlaywrightChromium(): void {
 export type LaunchOptions = Parameters<typeof chromium.launch>[0]
 
 /**
+ * Chromium args that improve launch success in CI, containers, and restricted environments
+ * (e.g. CodeMie, Docker, headless Linux). Reduces GPU/sandbox/display issues.
+ */
+const ROBUST_LAUNCH_ARGS = [
+  '--disable-dev-shm-usage',
+  '--no-sandbox',
+  '--disable-setuid-sandbox',
+  '--disable-gpu',
+  '--disable-software-rasterizer',
+  '--disable-extensions',
+  '--disable-background-networking',
+  '--disable-default-apps',
+  '--disable-sync',
+  '--disable-translate',
+  '--metrics-recording-only',
+  '--mute-audio',
+  '--no-first-run',
+  '--safebrowsing-disable-auto-update',
+  '--disable-features=TranslateUI',
+  '--disable-ipc-flooding-protection',
+  '--disable-renderer-backgrounding',
+  '--disable-backgrounding-occluded-windows',
+  '--disable-hang-monitor',
+  '--disable-prompt-on-repost',
+  '--disable-client-side-phishing-detection',
+  '--run-all-compositor-stages-before-draw',
+]
+
+/**
+ * Merge caller args with robust defaults (caller args take precedence; no duplicates).
+ */
+function mergeLaunchArgs(callerArgs: string[] | undefined): string[] {
+  const seen = new Set(ROBUST_LAUNCH_ARGS)
+  const out = [...ROBUST_LAUNCH_ARGS]
+  if (Array.isArray(callerArgs)) {
+    for (const a of callerArgs) {
+      const flag = a.split('=')[0]
+      if (!seen.has(flag)) {
+        seen.add(flag)
+        out.push(a)
+      }
+    }
+  }
+  return out
+}
+
+/**
  * Launch Chromium, installing the browser if missing (e.g. first run in CodeMie).
  * Retries launch once after install on "Executable doesn't exist".
+ * Uses robust launch args for CI/containers; caller args are merged in.
  */
 export async function launchChromium(options: LaunchOptions): Promise<Browser> {
+  const args = mergeLaunchArgs(options?.args as string[] | undefined)
+  const launchOpts: LaunchOptions = {
+    ...options,
+    headless: options?.headless !== false,
+    args,
+  }
   try {
-    return await chromium.launch(options)
+    return await chromium.launch(launchOpts)
   } catch (error) {
     if (!isMissingBrowserError(error)) throw error
     installPlaywrightChromium()
-    return await chromium.launch(options)
+    return await chromium.launch(launchOpts)
   }
 }

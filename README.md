@@ -1290,6 +1290,10 @@ If you want to use the local version instead of the published package:
 9. **Tag Filtering** - Filter by specific WCAG levels to reduce noise and focus on what matters
 10. **25+ Tools** - Comprehensive suite covering auditing, analysis, reporting, export, and more
 
+## Attribution
+
+This project is derived from [alii13/accessibility-mcp-server](https://github.com/alii13/accessibility-mcp-server), which is licensed under the [MIT License](LICENSE). The original copyright notice and license are preserved in this distribution. See the [NOTICE](NOTICE) file for details.
+
 ## 📄 License
 
 MIT License - feel free to use in your projects!

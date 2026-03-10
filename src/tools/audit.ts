@@ -3,7 +3,8 @@
  * Implements: audit_url, audit_multiple_urls, audit_site
  */
 
-import { chromium, type Browser, type Page } from 'playwright'
+import type { Browser, Page } from 'playwright'
+import { launchChromium } from '../core/playwright-bootstrap.js'
 import { AccessibilityRunner } from '../core/accessibility-runner.js'
 import { ResultProcessor } from '../core/result-processor.js'
 import {
@@ -117,7 +118,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
     debugLog(`Launching browser for audit: ${fullUrl}`)
     browser = await retryWithBackoff(
       async () => {
-        return await chromium.launch({
+        return await launchChromium({
           headless: config.headless,
           args: [
             '--disable-dev-shm-usage',

@@ -3,7 +3,8 @@
  * Implements: create_session, audit_with_session
  */
 
-import { chromium, type Browser, type BrowserContext, type Page } from 'playwright'
+import type { Browser, BrowserContext, Page } from 'playwright'
+import { launchChromium } from '../core/playwright-bootstrap.js'
 import { SessionManager } from '../core/session-manager.js'
 import { AccessibilityRunner } from '../core/accessibility-runner.js'
 import { ResultProcessor } from '../core/result-processor.js'
@@ -72,7 +73,7 @@ export async function createSession(
     console.log(`Launching browser for session creation: ${normalizedDomain}`)
     browser = await retryWithBackoff(
       async () => {
-        return await chromium.launch({
+        return await launchChromium({
           headless: true,
           args: [
             '--disable-dev-shm-usage',

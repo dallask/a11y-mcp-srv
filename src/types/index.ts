@@ -10,6 +10,24 @@
 /**
  * Accessibility rule data structure from the accessibility engine
  */
+/**
+ * Impact/severity level for an issue (aligns with IBM Equal Access and axe-core)
+ */
+/**
+ * Severity levels aligned with IBM Equal Access Accessibility Checker browser tool:
+ * - violation     → definite failure (🚫 red)
+ * - needs-review  → potential violation requiring manual review (⚠️ yellow)
+ * - recommendation → best-practice suggestion (ℹ️ blue)
+ * - minor         → informational / low priority
+ *
+ * Axe-core native levels (critical / serious / moderate) are mapped into this set.
+ */
+export type ImpactLevel =
+  | 'violation'
+  | 'needs-review'
+  | 'recommendation'
+  | 'minor'
+
 export interface AccessibilityRuleData {
   count: number
   xpaths: string[]
@@ -20,6 +38,8 @@ export interface AccessibilityRuleData {
   domInfo?: DOMInfo[]
   contrastdata?: any[]
   tags?: string[] // Accessibility tags (e.g., "wcag2a", "wcag2aa", "best-practice")
+  /** Engine-reported impact; used when present (e.g. from ACE) to match browser tool breakdown */
+  impact?: ImpactLevel
 }
 
 /**
@@ -105,11 +125,6 @@ export interface TestMetadata {
 // ============================================================================
 // Audit Result Types
 // ============================================================================
-
-/**
- * Impact level of an accessibility issue
- */
-export type ImpactLevel = 'critical' | 'serious' | 'moderate' | 'minor'
 
 /**
  * WCAG compliance levels
@@ -208,6 +223,7 @@ export interface AuditResult {
   prioritizedIssues: PrioritizedIssue[]
   appliedFilters?: AppliedFilters
   conversationalSummary: string // Natural language summary
+  issuesTable: string // Markdown table of all issues
   quickWins: QuickWin[]
   criticalBlockers: CriticalBlocker[]
   metadata?: TestMetadata
@@ -276,6 +292,11 @@ export type WaitStrategy = 'networkidle' | 'load' | 'domcontentloaded'
 export type AuditStrategy = 'critical' | 'comprehensive' | 'custom'
 
 /**
+ * Accessibility engine: axe-core (Deque) or IBM Equal Access (ACE)
+ */
+export type AccessibilityEngine = 'axe' | 'ace'
+
+/**
  * Single URL audit input
  */
 export interface AuditUrlInput {
@@ -284,6 +305,7 @@ export interface AuditUrlInput {
   tags?: string[] // Specific accessibility tags to check (e.g., ["wcag2a", "wcag2aa"])
   waitForLoad?: WaitStrategy
   timeout?: number // Timeout in seconds
+  engine?: AccessibilityEngine // 'axe' (default) or 'ace'
 }
 
 /**
@@ -295,6 +317,7 @@ export interface AuditMultipleUrlsInput {
   parallel?: number // Number of parallel tests
   continueOnError?: boolean
   tags?: string[] // Applied to all URLs
+  engine?: AccessibilityEngine // 'axe' (default) or 'ace'
 }
 
 /**
@@ -604,6 +627,9 @@ export type AccessibilityTag =
   | 'wcag21a'
   | 'wcag21aa'
   | 'wcag21aaa'
+  | 'wcag22a'
+  | 'wcag22aa'
+  | 'wcag22aaa'
   | 'best-practice'
 
 /**

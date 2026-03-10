@@ -57,13 +57,13 @@ function calculateScore(issues: PrioritizedIssue[]): number {
   let score = 100
   issues.forEach((issue) => {
     switch (issue.impact) {
-      case 'critical':
+      case 'violation':
         score -= 5
         break
-      case 'serious':
+      case 'needs-review':
         score -= 3
         break
-      case 'moderate':
+      case 'recommendation':
         score -= 1
         break
       case 'minor':
@@ -227,8 +227,9 @@ export function aggregateAuditResults(
     summary,
     prioritizedIssues: allIssues,
     conversationalSummary: `Aggregated ${results.length} audit result(s) with ${allIssues.length} total issue(s). ${summary.score}/100 accessibility score.`,
-    quickWins: [], // Quick wins would need to be recalculated from aggregated issues
-    criticalBlockers: [], // Critical blockers would need to be recalculated from aggregated issues
+    issuesTable: '',
+    quickWins: [],
+    criticalBlockers: [],
     metadata: firstResult.metadata,
   }
 

@@ -93,11 +93,20 @@ async function createServer(): Promise<Server> {
                   'wcag21a',
                   'wcag21aa',
                   'wcag21aaa',
+                  'wcag22a',
+                  'wcag22aa',
+                  'wcag22aaa',
                   'best-practice',
                 ],
               },
               description:
-                'Specific accessibility tags to check. If not provided, all tags are checked.',
+                'Specific accessibility tags to check. If not provided, tags from env WCAG_LEVEL and BEST_PRACTICES are used.',
+            },
+            engine: {
+              type: 'string',
+              enum: ['axe', 'ace'],
+              description:
+                'Testing engine: "axe" (axe-core, default) or "ace" (IBM Equal Access). Overrides env A11Y_ENGINE when provided.',
             },
             waitForLoad: {
               type: 'string',
@@ -164,11 +173,20 @@ async function createServer(): Promise<Server> {
                   'wcag21a',
                   'wcag21aa',
                   'wcag21aaa',
+                  'wcag22a',
+                  'wcag22aa',
+                  'wcag22aaa',
                   'best-practice',
                 ],
               },
               description:
-                'Specific accessibility tags to check. Applied to all URLs.',
+                'Specific accessibility tags to check. Applied to all URLs. If not provided, env WCAG_LEVEL and BEST_PRACTICES are used.',
+            },
+            engine: {
+              type: 'string',
+              enum: ['axe', 'ace'],
+              description:
+                'Testing engine: "axe" or "ace". Overrides env A11Y_ENGINE when provided.',
             },
           },
           required: ['urls'],
@@ -988,6 +1006,7 @@ async function createServer(): Promise<Server> {
                 url: args?.url as string,
                 domain: args?.domain as string | undefined,
                 tags: args?.tags as string[] | undefined,
+                engine: args?.engine as 'axe' | 'ace' | undefined,
                 waitForLoad: args?.waitForLoad as
                   | 'networkidle'
                   | 'load'
@@ -1035,6 +1054,7 @@ async function createServer(): Promise<Server> {
                   parallel: args?.parallel as number | undefined,
                   continueOnError: args?.continueOnError as boolean | undefined,
                   tags: args?.tags as string[] | undefined,
+                  engine: args?.engine as 'axe' | 'ace' | undefined,
                 },
                 progressCallback
               ),
@@ -1425,20 +1445,17 @@ async function createServer(): Promise<Server> {
       // Log error details
       console.error(`[ERROR] ${errorMessage}`)
 
+      const errorPayload = {
+        error: String(errorInfo.error),
+        category: errorInfo.category,
+        retryable: errorInfo.retryable,
+        suggestion: errorInfo.suggestion,
+      }
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(
-              {
-                error: errorInfo.error,
-                category: errorInfo.category,
-                retryable: errorInfo.retryable,
-                suggestion: errorInfo.suggestion,
-              },
-              null,
-              2
-            ),
+            text: JSON.stringify(errorPayload, null, 2),
           },
         ],
         isError: true,

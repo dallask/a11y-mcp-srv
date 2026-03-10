@@ -11,6 +11,7 @@ import {
   handleErrorGracefully,
   formatErrorMessage,
 } from '../core/error-handler.js'
+import { getConfig, getAxeTagsFromConfig } from '../core/config.js'
 import type {
   AuditUrlInput,
   AuditResult,
@@ -58,33 +59,52 @@ function normalizeUrl(url: string, domain?: string): string {
  * @param input - Audit configuration
  * @returns Structured audit results with prioritized issues, quick wins, and conversational summary
  */
+const VALID_TAGS: AccessibilityTag[] = [
+  'wcag2a',
+  'wcag2aa',
+  'wcag2aaa',
+  'wcag21a',
+  'wcag21aa',
+  'wcag21aaa',
+  'wcag22a',
+  'wcag22aa',
+  'wcag22aaa',
+  'best-practice',
+]
+
 export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
+  const config = getConfig()
   const {
     url,
     domain,
-    tags,
+    tags: inputTags,
     waitForLoad = 'networkidle',
     timeout = 30,
+    engine: inputEngine,
   } = input
+
+  const engine = inputEngine ?? config.engine
+
+  // Determine tags to pass to the engine:
+  // - If user explicitly provides tags → use those (and post-filter results to match)
+  // - Otherwise → derive from env config (WCAG_LEVEL + BEST_PRACTICES) and pass to engine
+  //   but do NOT post-filter, so all matching issues are shown without silent filtering
+  const userProvidedTags = inputTags && inputTags.length > 0
+  const tags = userProvidedTags
+    ? (inputTags as AccessibilityTag[])
+    : (getAxeTagsFromConfig() as AccessibilityTag[])
 
   // Normalize URL
   const fullUrl = normalizeUrl(url, domain)
 
   // Validate tags if provided
   if (tags && tags.length > 0) {
-    const validTags: AccessibilityTag[] = [
-      'wcag2a',
-      'wcag2aa',
-      'wcag2aaa',
-      'wcag21a',
-      'wcag21aa',
-      'wcag21aaa',
-      'best-practice',
-    ]
-    const invalidTags = tags.filter((tag) => !validTags.includes(tag as AccessibilityTag))
+    const invalidTags = tags.filter(
+      (tag) => !VALID_TAGS.includes(tag as AccessibilityTag)
+    )
     if (invalidTags.length > 0) {
       throw new Error(
-        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${validTags.join(', ')}`
+        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${VALID_TAGS.join(', ')}`
       )
     }
   }
@@ -98,7 +118,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
     browser = await retryWithBackoff(
       async () => {
         return await chromium.launch({
-          headless: true,
+          headless: config.headless,
           args: [
             '--disable-dev-shm-usage',
             '--no-sandbox',
@@ -118,6 +138,15 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     })
 
+    // Set viewport from config (first screen size)
+    const viewport = config.screenSizes[0]
+    if (viewport) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      })
+    }
+
     // Set extra HTTP headers
     await page.setExtraHTTPHeaders({
       'Accept-Language': 'en-US,en;q=0.9',
@@ -133,8 +162,12 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
         return await accessibilityRunner.run(page!, {
           url: fullUrl,
           waitForLoad: waitForLoad as WaitStrategy,
-          timeout: timeout * 1000, // Convert seconds to milliseconds
+          timeout: timeout * 1000,
           tags: tags as AccessibilityTag[],
+          engine: engine as 'axe' | 'ace',
+          // Only post-filter results when user explicitly provided tags.
+          // Config-derived tags are passed to the engine for scoping but don't hide results.
+          applyTagFilter: userProvidedTags,
         })
       },
       {
@@ -186,7 +219,8 @@ async function processSingleUrl(
   url: string,
   domain: string | undefined,
   tags: string[] | undefined,
-  continueOnError: boolean = true
+  continueOnError: boolean = true,
+  engine?: 'axe' | 'ace'
 ): Promise<{ url: string; result?: AuditResult; error?: string }> {
   try {
     const result = await retryWithBackoff(
@@ -195,6 +229,7 @@ async function processSingleUrl(
           url,
           domain,
           tags,
+          engine,
         })
       },
       {
@@ -225,7 +260,8 @@ async function processBatchParallel(
   tags: string[] | undefined,
   parallel: number,
   continueOnError: boolean,
-  onProgress?: (progress: BatchAuditProgress) => void
+  onProgress?: (progress: BatchAuditProgress) => void,
+  engine?: 'axe' | 'ace'
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
     []
@@ -237,7 +273,7 @@ async function processBatchParallel(
   for (let i = 0; i < urlArray.length; i += parallel) {
     const batch = urlArray.slice(i, i + parallel)
     const batchPromises = batch.map((url) =>
-      processSingleUrl(url, domain, tags, continueOnError)
+      processSingleUrl(url, domain, tags, continueOnError, engine)
     )
 
     // Wait for batch to complete
@@ -327,7 +363,8 @@ async function processBatchSequential(
   domain: string | undefined,
   tags: string[] | undefined,
   continueOnError: boolean,
-  onProgress?: (progress: BatchAuditProgress) => void
+  onProgress?: (progress: BatchAuditProgress) => void,
+  engine?: 'axe' | 'ace'
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
     []
@@ -337,7 +374,7 @@ async function processBatchSequential(
 
   for (let i = 0; i < urlArray.length; i++) {
     const url = urlArray[i]
-    const result = await processSingleUrl(url, domain, tags, continueOnError)
+    const result = await processSingleUrl(url, domain, tags, continueOnError, engine)
     results.push(result)
 
     if (result.result) {
@@ -495,13 +532,16 @@ export async function auditMultipleUrls(
   }
   progress?: BatchAuditProgress
 }> {
+  const config = getConfig()
   const {
     urls,
     domain,
     parallel = 1,
     continueOnError = true,
     tags,
+    engine: inputEngine,
   } = input
+  const engine = inputEngine ?? config.engine
 
   // Normalize URLs
   const urlArray = Array.isArray(urls)
@@ -525,14 +565,16 @@ export async function auditMultipleUrls(
           tags,
           parallel,
           continueOnError,
-          onProgress
+          onProgress,
+          engine as 'axe' | 'ace'
         )
       : await processBatchSequential(
           urlArray,
           domain,
           tags,
           continueOnError,
-          onProgress
+          onProgress,
+          engine as 'axe' | 'ace'
         )
 
   // Calculate aggregated summary

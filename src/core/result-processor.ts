@@ -32,27 +32,24 @@ export class ResultProcessor {
   }
 
   /**
-   * Determine impact level from category and rule
+   * Determine impact level from category, rule, and optional engine-reported impact.
+   * When ruleData.impact is set (e.g. from ACE), use it so output matches the browser tool.
    */
-  private getImpactLevel(category: string, ruleId: string): ImpactLevel {
-    // Error category is critical
-    if (category === 'error') {
-      return 'critical'
+  private getImpactLevel(
+    category: string,
+    ruleId: string,
+    ruleData?: { impact?: ImpactLevel }
+  ): ImpactLevel {
+    // Use engine-reported impact (ACE or axe) when available
+    if (ruleData?.impact) {
+      return ruleData.impact
     }
-    // Contrast issues are serious
-    if (category === 'contrast') {
-      return 'serious'
-    }
-    // Form-related issues are serious
-    if (ruleId.includes('label') || ruleId.includes('form')) {
-      return 'serious'
-    }
-    // Missing alt text is critical
-    if (ruleId.includes('alt')) {
-      return 'critical'
-    }
-    // Default to moderate
-    return 'moderate'
+    // Fallback for rules without explicit impact (e.g. older axe results)
+    if (category === 'error') return 'violation'
+    if (category === 'contrast') return 'needs-review'
+    if (ruleId.includes('label') || ruleId.includes('form')) return 'needs-review'
+    if (ruleId.includes('alt')) return 'violation'
+    return 'recommendation'
   }
 
   /**
@@ -61,15 +58,15 @@ export class ResultProcessor {
   private calculatePriority(issue: PrioritizedIssue): number {
     let priority = 0
 
-    // Impact weighting
+    // Impact weighting (IBM severity order)
     switch (issue.impact) {
-      case 'critical':
+      case 'violation':
         priority += 100
         break
-      case 'serious':
+      case 'needs-review':
         priority += 50
         break
-      case 'moderate':
+      case 'recommendation':
         priority += 25
         break
       case 'minor':
@@ -140,16 +137,16 @@ export class ResultProcessor {
    * Generate user impact description
    */
   private generateUserImpact(_ruleId: string, impact: ImpactLevel): string {
-    if (impact === 'critical') {
-      return 'This issue prevents users with disabilities from accessing content or functionality.'
+    if (impact === 'violation') {
+      return 'This is a definite accessibility failure that prevents users with disabilities from accessing content or functionality.'
     }
-    if (impact === 'serious') {
-      return 'This issue significantly impacts the user experience for people with disabilities.'
+    if (impact === 'needs-review') {
+      return 'This potential issue needs manual review — it may significantly impact users with disabilities.'
     }
-    if (impact === 'moderate') {
-      return 'This issue may cause difficulties for some users with disabilities.'
+    if (impact === 'recommendation') {
+      return 'This is a best-practice recommendation that improves accessibility for users with disabilities.'
     }
-    return 'This issue may cause minor inconveniences for some users.'
+    return 'This may cause minor inconveniences for some users.'
   }
 
   /**
@@ -183,7 +180,7 @@ export class ResultProcessor {
 
           const tags = ruleData.tags || []
           const wcagLevel = this.getWCAGLevel(tags)
-          const impact = this.getImpactLevel(categoryKey, ruleId)
+          const impact = this.getImpactLevel(categoryKey, ruleId, ruleData)
           const fix = this.generateFixSuggestion(
             ruleId,
             categoryKey,
@@ -238,13 +235,13 @@ export class ResultProcessor {
     // Deduct points based on issues
     issues.forEach((issue) => {
       switch (issue.impact) {
-        case 'critical':
+        case 'violation':
           score -= 5
           break
-        case 'serious':
+        case 'needs-review':
           score -= 3
           break
-        case 'moderate':
+        case 'recommendation':
           score -= 1
           break
         case 'minor':
@@ -329,7 +326,7 @@ export class ResultProcessor {
       // 2. Are easy to fix (have clear fix suggestions)
       // 3. Affect multiple elements (batch fix opportunity)
       const highImpactIssues = groupIssues.filter(
-        (i) => i.impact === 'critical' || i.impact === 'serious'
+        (i) => i.impact === 'violation' || i.impact === 'needs-review'
       )
 
       if (highImpactIssues.length > 0 && groupIssues.length > 1) {
@@ -347,8 +344,8 @@ export class ResultProcessor {
 
     // Sort by impact and number of affected elements
     quickWins.sort((a, b) => {
-      const impactOrder = { critical: 3, serious: 2, moderate: 1, minor: 0 }
-      const impactDiff = impactOrder[b.impact] - impactOrder[a.impact]
+      const impactOrder: Record<string, number> = { violation: 3, 'needs-review': 2, recommendation: 1, minor: 0 }
+      const impactDiff = (impactOrder[b.impact] ?? 0) - (impactOrder[a.impact] ?? 0)
       if (impactDiff !== 0) return impactDiff
       return b.affectedElements - a.affectedElements
     })
@@ -373,12 +370,12 @@ export class ResultProcessor {
 
     ruleGroups.forEach((groupIssues, ruleId) => {
       // Critical blockers are:
-      // 1. Critical impact issues
+      // 1. Definite violations (IBM 'violation' level)
       // 2. WCAG Level A violations (legal requirement)
-      const criticalIssues = groupIssues.filter((i) => i.impact === 'critical')
+      const violationIssues = groupIssues.filter((i) => i.impact === 'violation')
       const levelAIssues = groupIssues.filter((i) => i.wcagLevel === 'A')
 
-      if (criticalIssues.length > 0 || levelAIssues.length > 0) {
+      if (violationIssues.length > 0 || levelAIssues.length > 0) {
         const firstIssue = groupIssues[0]
         blockers.push({
           ruleId,
@@ -391,13 +388,13 @@ export class ResultProcessor {
       }
     })
 
-    // Sort by WCAG level (A first) and impact
+    // Sort by WCAG level (A first) then IBM severity
     blockers.sort((a, b) => {
-      const levelOrder = { A: 3, AA: 2, AAA: 1 }
-      const levelDiff = levelOrder[b.wcagLevel] - levelOrder[a.wcagLevel]
+      const levelOrder: Record<string, number> = { A: 3, AA: 2, AAA: 1 }
+      const levelDiff = (levelOrder[b.wcagLevel] ?? 0) - (levelOrder[a.wcagLevel] ?? 0)
       if (levelDiff !== 0) return levelDiff
-      const impactOrder = { critical: 3, serious: 2, moderate: 1, minor: 0 }
-      return impactOrder[b.impact] - impactOrder[a.impact]
+      const impactOrder: Record<string, number> = { violation: 3, 'needs-review': 2, recommendation: 1, minor: 0 }
+      return (impactOrder[b.impact] ?? 0) - (impactOrder[a.impact] ?? 0)
     })
 
     return blockers
@@ -410,16 +407,26 @@ export class ResultProcessor {
     summary: AuditSummary,
     _issues: PrioritizedIssue[],
     quickWins: QuickWin[],
-    blockers: CriticalBlocker[]
+    blockers: CriticalBlocker[],
+    appliedFilters?: AppliedFilters
   ): string {
     const parts: string[] = []
 
     // Opening
     if (summary.totalIssues === 0) {
+      const totalBefore = appliedFilters?.originalIssueCount
+      if (totalBefore != null && totalBefore > 0) {
+        const tagList = (appliedFilters?.tags ?? []).join(', ')
+        return `Tag filter applied: ${totalBefore} issue${totalBefore !== 1 ? 's' : ''} found, but 0 match your selected tags (${tagList}). Try running without tags to see all issues.`
+      }
       return "🎉 Excellent! No accessibility issues found. This page meets WCAG accessibility standards."
     }
 
     parts.push(`Found ${summary.totalIssues} accessibility issue${summary.totalIssues !== 1 ? 's' : ''} on this page.`)
+    const totalBefore = appliedFilters?.originalIssueCount
+    if (totalBefore != null && totalBefore > summary.totalIssues) {
+      parts.push(`(${totalBefore} issues before tag filter; showing those matching your selected tags.)`)
+    }
 
     // Score
     if (summary.score >= 80) {
@@ -440,12 +447,18 @@ export class ResultProcessor {
       parts.push(`\n✨ ${quickWins.length} quick win${quickWins.length !== 1 ? 's' : ''} available - these are easy fixes that will have high impact.`)
     }
 
-    // Impact breakdown
-    if (summary.byImpact.critical) {
-      parts.push(`\nCritical issues: ${summary.byImpact.critical}`)
+    // Severity breakdown aligned with IBM Equal Access browser tool
+    if (summary.byImpact['violation']) {
+      parts.push(`\n🚫 Violations: ${summary.byImpact['violation']}`)
     }
-    if (summary.byImpact.serious) {
-      parts.push(`Serious issues: ${summary.byImpact.serious}`)
+    if (summary.byImpact['needs-review']) {
+      parts.push(`⚠️  Needs review: ${summary.byImpact['needs-review']}`)
+    }
+    if (summary.byImpact['recommendation']) {
+      parts.push(`ℹ️  Recommendations: ${summary.byImpact['recommendation']}`)
+    }
+    if (summary.byImpact['minor']) {
+      parts.push(`Minor: ${summary.byImpact['minor']}`)
     }
 
     // WCAG compliance
@@ -458,6 +471,47 @@ export class ResultProcessor {
     }
 
     return parts.join('\n')
+  }
+
+  /**
+   * Generate a markdown table summarising all prioritised issues.
+   * Columns: Severity | Rule ID | Description | WCAG | Element / XPath | Fix hint
+   */
+  private generateIssuesTable(issues: PrioritizedIssue[]): string {
+    if (issues.length === 0) {
+      return '| Severity | Rule | Description | WCAG | Element |\n|---|---|---|---|---|\n| — | — | No issues found | — | — |'
+    }
+
+    const severityIcon = (impact: string): string => {
+      switch (impact) {
+        case 'violation':    return '🚫 Violation'
+        case 'needs-review': return '⚠️ Needs Review'
+        case 'recommendation': return 'ℹ️ Recommendation'
+        default:             return impact
+      }
+    }
+
+    const truncate = (s: string, max = 80): string =>
+      s.length > max ? s.substring(0, max - 1) + '…' : s
+
+    const escape = (s: string): string =>
+      s.replace(/\|/g, '\\|').replace(/\n/g, ' ')
+
+    const header = '| # | Severity | Rule ID | Description | WCAG | Element |'
+    const divider = '|---|---|---|---|---|---|'
+
+    const rows = issues.map((issue, i) => {
+      const num = String(i + 1)
+      const severity = severityIcon(issue.impact)
+      const ruleId = `\`${escape(issue.ruleId)}\``
+      const description = escape(truncate(issue.description))
+      const wcag = issue.wcagLevel || 'N/A'
+      // Use selector from domInfo if available, fall back to xpath
+      const element = escape(truncate(issue.xpath || issue.element || '—', 60))
+      return `| ${num} | ${severity} | ${ruleId} | ${description} | ${wcag} | ${element} |`
+    })
+
+    return [header, divider, ...rows].join('\n')
   }
 
   /**
@@ -487,7 +541,8 @@ export class ResultProcessor {
       summary,
       issues,
       quickWins,
-      criticalBlockers
+      criticalBlockers,
+      appliedFilters
     )
 
     // Extract metadata
@@ -499,11 +554,15 @@ export class ResultProcessor {
       url: accessibilityResults.url,
     }
 
+    // Generate issues table
+    const issuesTable = this.generateIssuesTable(issues)
+
     return {
       summary,
       prioritizedIssues: issues,
       appliedFilters,
       conversationalSummary,
+      issuesTable,
       quickWins,
       criticalBlockers,
       metadata,

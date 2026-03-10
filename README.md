@@ -34,7 +34,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
   "mcpServers": {
     "accessibility-audit": {
       "command": "npx",
-      "args": ["-y", "@ali0113/accessibility-mcp-server"]
+      "args": ["-y", "@dallask/a11y-mcp-srv"]
     }
   }
 }
@@ -49,7 +49,7 @@ Add to your Cursor MCP settings (`~/.cursor/mcp.json` or Cursor Settings → MCP
   "mcpServers": {
     "accessibility-audit": {
       "command": "npx",
-      "args": ["-y", "@ali0113/accessibility-mcp-server"]
+      "args": ["-y", "@dallask/a11y-mcp-srv"]
     }
   }
 }
@@ -90,7 +90,7 @@ You can configure the server via your MCP client’s `env` section (e.g. Cursor 
   "mcpServers": {
     "accessibility-audit": {
       "command": "npx",
-      "args": ["-y", "@ali0113/accessibility-mcp-server"],
+      "args": ["-y", "@dallask/a11y-mcp-srv"],
       "env": {
         "A11Y_ENGINE": "axe",
         "WCAG_LEVEL": "2.2_AA",
@@ -110,7 +110,7 @@ You can configure the server via your MCP client’s `env` section (e.g. Cursor 
   "mcpServers": {
     "accessibility-audit": {
       "command": "npx",
-      "args": ["-y", "@ali0113/accessibility-mcp-server"],
+      "args": ["-y", "@dallask/a11y-mcp-srv"],
       "env": {
         "A11Y_ENGINE": "axe",
         "WCAG_LEVEL": "2.2_AA",
@@ -1187,7 +1187,7 @@ Common error scenarios:
 ## 🏗️ Project Structure
 
 ```
-accessibility-mcp-server/
+a11y-mcp-srv/
 ├── src/
 │   ├── server.ts           # Main MCP server entry point
 │   ├── tools/              # Tool implementations
@@ -1227,7 +1227,7 @@ If you want to contribute or modify the code, you can set up a local development
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd accessibility-mcp-server
+   cd a11y-mcp-srv
    ```
 
 2. **Install dependencies**
@@ -1269,7 +1269,7 @@ If you want to use the local version instead of the published package:
   "mcpServers": {
     "accessibility-audit": {
       "command": "node",
-      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
+      "args": ["/absolute/path/to/a11y-mcp-srv/dist/server.js"]
     }
   }
 }

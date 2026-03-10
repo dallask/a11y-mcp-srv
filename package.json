@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alii13/accessibility-audit.git",
+    "url": "git+https://github.com/dallask/a11y-mcp-srv.git",
     "directory": "a11y-mcp-srv"
   },
   "dependencies": {

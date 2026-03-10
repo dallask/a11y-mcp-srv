@@ -16,6 +16,22 @@ import type {
   BreakdownDimension,
 } from '../types/index.js'
 
+/** Safely get prioritizedIssues from a result (handles missing or non-array from external tools). */
+function getPrioritizedIssues(result: unknown): PrioritizedIssue[] {
+  if (result == null || typeof result !== 'object') return []
+  const r = result as Record<string, unknown>
+  const issues = r.prioritizedIssues
+  return Array.isArray(issues) ? (issues as PrioritizedIssue[]) : []
+}
+
+/** Safely get summary from a result for WCAG compliance. */
+function getSummary(result: unknown): AuditSummary | undefined {
+  if (result == null || typeof result !== 'object') return undefined
+  const r = result as Record<string, unknown>
+  const s = r.summary
+  return s != null && typeof s === 'object' ? (s as AuditSummary) : undefined
+}
+
 /**
  * Calculate WCAG compliance from issues
  */
@@ -104,16 +120,20 @@ function generateSummary(issues: PrioritizedIssue[]): AuditSummary {
  * Group issues by URL
  */
 function groupIssuesByUrl(
-  results: AuditResult[]
+  results: unknown[]
 ): Record<string, PrioritizedIssue[]> {
   const grouped: Record<string, PrioritizedIssue[]> = {}
 
   results.forEach((result) => {
-    const url = result.metadata?.url || 'unknown'
-    if (!grouped[url]) {
-      grouped[url] = []
+    const url =
+      (result != null && typeof result === 'object' && (result as Record<string, unknown>).metadata != null && typeof (result as Record<string, unknown>).metadata === 'object')
+        ? ((result as Record<string, unknown>).metadata as Record<string, unknown>).url
+        : undefined
+    const urlStr = typeof url === 'string' ? url : 'unknown'
+    if (!grouped[urlStr]) {
+      grouped[urlStr] = []
     }
-    grouped[url].push(...result.prioritizedIssues)
+    grouped[urlStr].push(...getPrioritizedIssues(result))
   })
 
   return grouped
@@ -174,21 +194,22 @@ export function aggregateAuditResults(
     includeSummary = true,
   } = input
 
-  if (!results || results.length === 0) {
+  const resultsArray = Array.isArray(results) ? results : results != null ? [results] : []
+  if (resultsArray.length === 0) {
     throw new Error('At least one audit result is required')
   }
 
-  // Combine all issues from all results
+  // Combine all issues from all results (safe when prioritizedIssues is missing or not an array)
   const allIssues: PrioritizedIssue[] = []
-  results.forEach((result) => {
-    allIssues.push(...result.prioritizedIssues)
+  resultsArray.forEach((result) => {
+    allIssues.push(...getPrioritizedIssues(result))
   })
 
   // Group issues based on groupBy strategy
   let groupedIssues: Record<string, PrioritizedIssue[]> | undefined
 
   if (groupBy === 'url') {
-    groupedIssues = groupIssuesByUrl(results)
+    groupedIssues = groupIssuesByUrl(resultsArray)
   } else if (groupBy === 'category') {
     groupedIssues = groupIssuesByCategory(allIssues)
   } else if (groupBy === 'rule') {
@@ -222,21 +243,28 @@ export function aggregateAuditResults(
 
   // Create aggregated audit result
   // Use metadata from the first result as a base, or create a combined one
-  const firstResult = results[0]
+  const firstResult = resultsArray[0] as unknown
+  const firstMeta =
+    firstResult != null &&
+    typeof firstResult === 'object' &&
+    (firstResult as Record<string, unknown>).metadata != null &&
+    typeof (firstResult as Record<string, unknown>).metadata === 'object'
+      ? ((firstResult as Record<string, unknown>).metadata as AuditResult['metadata'])
+      : undefined
   const aggregatedResult: AuditResult = {
     summary,
     prioritizedIssues: allIssues,
-    conversationalSummary: `Aggregated ${results.length} audit result(s) with ${allIssues.length} total issue(s). ${summary.score}/100 accessibility score.`,
+    conversationalSummary: `Aggregated ${resultsArray.length} audit result(s) with ${allIssues.length} total issue(s). ${summary.score}/100 accessibility score.`,
     issuesTable: '',
     quickWins: [],
     criticalBlockers: [],
-    metadata: firstResult.metadata,
+    metadata: firstMeta,
   }
 
   return {
     aggregated: aggregatedResult,
     groupedBy: groupBy,
-    totalResults: results.length,
+    totalResults: resultsArray.length,
     groupedIssues,
     summary,
   }
@@ -298,7 +326,7 @@ function calculateBreakdown(
  * Calculate average WCAG compliance from multiple results
  */
 function calculateAverageWCAGCompliance(
-  results: AuditResult[]
+  results: unknown[]
 ): WCAGCompliance {
   if (results.length === 0) {
     return { A: 100, AA: 100, AAA: 100 }
@@ -309,9 +337,11 @@ function calculateAverageWCAGCompliance(
   let totalAAA = 0
 
   results.forEach((result) => {
-    totalA += result.summary.wcagCompliance.A
-    totalAA += result.summary.wcagCompliance.AA
-    totalAAA += result.summary.wcagCompliance.AAA
+    const s = getSummary(result)
+    const wcag = s?.wcagCompliance as WCAGCompliance | undefined
+    totalA += typeof wcag?.A === 'number' ? wcag.A : 100
+    totalAA += typeof wcag?.AA === 'number' ? wcag.AA : 100
+    totalAAA += typeof wcag?.AAA === 'number' ? wcag.AAA : 100
   })
 
   return {
@@ -345,17 +375,20 @@ export function getStatistics(
     throw new Error('At least one audit result is required')
   }
 
-  // Combine all issues
+  // Combine all issues (safe when prioritizedIssues is missing or not an array)
   const allIssues: PrioritizedIssue[] = []
   resultsArray.forEach((result) => {
-    allIssues.push(...result.prioritizedIssues)
+    allIssues.push(...getPrioritizedIssues(result))
   })
 
   // Calculate total issues
   const totalIssues = allIssues.length
 
-  // Calculate average score
-  const totalScore = resultsArray.reduce((sum, result) => sum + result.summary.score, 0)
+  // Calculate average score (safe when summary is missing)
+  const totalScore = resultsArray.reduce((sum, result) => {
+    const s = getSummary(result)
+    return sum + (s?.score ?? 100)
+  }, 0)
   const averageScore = resultsArray.length > 0
     ? Math.round(totalScore / resultsArray.length)
     : 100

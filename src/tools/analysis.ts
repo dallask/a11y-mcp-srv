@@ -1340,8 +1340,17 @@ export function generateComplianceReport(
     includeRemediation = false,
   } = input
 
+  // Normalize: accept single result or array (e.g. from external tools like CodeMie)
+  const auditResult = Array.isArray(results) ? results[0] : results
+  if (auditResult == null || typeof auditResult !== 'object') {
+    throw new Error('Invalid results: expected an audit result object (or array with one result).')
+  }
+  const prioritizedIssues = Array.isArray((auditResult as AuditResult).prioritizedIssues)
+    ? (auditResult as AuditResult).prioritizedIssues
+    : []
+
   // Group issues by WCAG criterion
-  const criterionMap = groupIssuesByCriterion(results.prioritizedIssues)
+  const criterionMap = groupIssuesByCriterion(prioritizedIssues)
 
   // Build WCAG mapping
   const wcagMapping: Record<string, ComplianceStatus> = {}
@@ -1383,16 +1392,17 @@ export function generateComplianceReport(
   // Generate remediation plan if requested
   let remediationPlan: QuickFixItem[] | undefined
   if (includeRemediation) {
-    const quickFixesResult = issuesToQuickFixes(results.prioritizedIssues, true)
+    const quickFixesResult = issuesToQuickFixes(prioritizedIssues, true)
     remediationPlan = quickFixesResult.slice(0, 20) // Top 20 fixes
   }
 
-  // Generate executive summary
+  // Generate executive summary (safe when summary is missing)
+  const totalIssues = (auditResult as AuditResult).summary?.totalIssues ?? 0
   const executiveSummary = generateExecutiveSummary(
     format,
     level,
     compliancePercentage,
-    results.summary.totalIssues,
+    totalIssues,
     wcagMapping
   )
 

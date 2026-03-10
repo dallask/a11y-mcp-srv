@@ -1,11 +1,9 @@
 /**
- * AccessibilityRunner - Refactored accessibility execution logic
- * Handles running accessibility tests with support for tag filtering
- * and configurable wait strategies
+ * AccessibilityRunner - Runs accessibility tests using axe-core or IBM Equal Access (ACE)
+ * Replaces previous WAVE-based implementation with axe-core and accessibility-checker.
  */
 
 import { type Page } from 'playwright'
-import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 import type {
@@ -13,16 +11,21 @@ import type {
   AccessibilityReport,
   AccessibilityCategory,
   AccessibilityRuleData,
-  WaitStrategy,
   AccessibilityTag,
+  AccessibilityEngine,
+  WaitStrategy,
 } from '../types/index.js'
+import type { DOMInfo } from '../types/index.js'
 
 /**
  * Debug logger that writes to stderr to avoid interfering with MCP protocol
  */
-function debugLog(...args: any[]) {
+function debugLog(...args: unknown[]) {
   console.error(...args)
 }
+
+/** Re-export for callers that use runner config */
+export type { AccessibilityEngine } from '../types/index.js'
 
 /**
  * Configuration for running an accessibility test
@@ -34,8 +37,14 @@ export interface AccessibilityRunnerConfig {
   waitForLoad?: WaitStrategy
   /** Timeout in milliseconds (default: 30000) */
   timeout?: number
-  /** Specific accessibility tags to filter by (e.g., ["wcag2a", "wcag2aa"]) */
+  /** Accessibility tags to pass to the engine as runOnly scope */
   tags?: AccessibilityTag[]
+  /** Engine to use: axe-core (default) or IBM Equal Access */
+  engine?: AccessibilityEngine
+  /** Whether to post-filter results by tags (default: false).
+   *  Set to true only when the user explicitly requested specific tags.
+   *  When false, tags are passed to the engine for scoping but all returned issues are shown. */
+  applyTagFilter?: boolean
 }
 
 /**
@@ -53,53 +62,76 @@ export interface AccessibilityRunnerResult {
   }
 }
 
-/**
- * AccessibilityRunner class - Handles accessibility test execution
- */
-export class AccessibilityRunner {
-  private accessibilityScriptPath: string
-  private accessibilityScript: string | null = null
+/** Default axe-core tags for WCAG 2.1 AA */
+const DEFAULT_AXE_TAGS = [
+  'wcag2a',
+  'wcag2aa',
+  'wcag21a',
+  'wcag21aa',
+  'best-practice',
+]
 
-  constructor() {
-    // Determine the path to accessibility script
-    // Try accessibility-mcp-server directory first, then project root
-    const currentFile = fileURLToPath(import.meta.url)
-    const currentDir = path.dirname(currentFile)
-    // Go from accessibility-mcp-server/src/core/ to accessibility-mcp-server directory
-    const serverDir = path.resolve(currentDir, '../../')
-    const serverScriptPath = path.join(serverDir, 'wave.min.js')
-    
-    // Also check project root (for backward compatibility)
-    const projectRoot = path.resolve(currentDir, '../../../')
-    const projectRootScriptPath = path.join(projectRoot, 'wave.min.js')
-    
-    // Prefer accessibility-mcp-server directory, fallback to project root
-    if (fs.existsSync(serverScriptPath)) {
-      this.accessibilityScriptPath = serverScriptPath
-    } else if (fs.existsSync(projectRootScriptPath)) {
-      this.accessibilityScriptPath = projectRootScriptPath
-    } else {
-      // Default to accessibility-mcp-server directory (will throw error if not found)
-      this.accessibilityScriptPath = serverScriptPath
+/** Axe violation node (from axe-core result) */
+interface AxeNode {
+  html?: string
+  target?: string[]
+  failureSummary?: string
+}
+
+/** Axe violation (from axe-core result) */
+interface AxeViolation {
+  id: string
+  impact?: string
+  tags?: string[]
+  description?: string
+  help?: string
+  helpUrl?: string
+  nodes: AxeNode[]
+}
+
+/** Axe results shape (subset we use) */
+interface AxeResultsShape {
+  violations: AxeViolation[]
+  url?: string
+  timestamp?: string
+}
+
+/** ACE result item (from accessibility-checker report) */
+interface ACEResultItem {
+  ruleId: string
+  message: string
+  path: { dom: string; aria?: string }
+  snippet: string
+  category: string
+  level: string // violation | potentialviolation | recommendation | potentialrecommendation | manual | pass
+  value?: [string, string] // e.g. [VIOLATION, FAIL] - optional
+}
+
+/** ACE report (from accessibility-checker) */
+interface ACEReport {
+  summary: {
+    URL: string
+    scanTime: number
+    counts: {
+      violation: number
+      potentialviolation: number
+      recommendation?: number
     }
   }
+  results: ACEResultItem[]
+}
 
-  /**
-   * Load accessibility script from disk
-   */
-  private loadAccessibilityScript(): string {
-    if (this.accessibilityScript) {
-      return this.accessibilityScript
-    }
+/**
+ * AccessibilityRunner class - Handles accessibility test execution with axe-core or ACE
+ */
+export class AccessibilityRunner {
+  private axePath: string
 
-    if (!fs.existsSync(this.accessibilityScriptPath)) {
-      throw new Error(
-        `Accessibility script not found at ${this.accessibilityScriptPath}. Please ensure wave.min.js exists in the project root.`
-      )
-    }
-
-    this.accessibilityScript = fs.readFileSync(this.accessibilityScriptPath, 'utf8')
-    return this.accessibilityScript
+  constructor() {
+    const currentFile = fileURLToPath(import.meta.url)
+    const currentDir = path.dirname(currentFile)
+    const serverDir = path.resolve(currentDir, '../../')
+    this.axePath = path.join(serverDir, 'node_modules', 'axe-core', 'axe.min.js')
   }
 
   /**
@@ -114,16 +146,13 @@ export class AccessibilityRunner {
     debugLog(`Navigating to ${url}...`)
     const startTime = Date.now()
 
-    // Basic navigation
     await page.goto(url, {
       waitUntil: 'domcontentloaded',
       timeout,
     })
     debugLog('Page navigation started')
 
-    // Wait for page to stabilize based on strategy
     const remainingTime = timeout - (Date.now() - startTime)
-
     if (remainingTime > 0) {
       try {
         switch (waitStrategy) {
@@ -140,392 +169,288 @@ export class AccessibilityRunner {
             debugLog('Page reached load state')
             break
           case 'domcontentloaded':
-            // Already waited for domcontentloaded in goto
             debugLog('DOM content loaded')
             break
         }
-
-        // Additional wait for DOM readiness
         const finalWaitTime = timeout - (Date.now() - startTime)
         if (finalWaitTime > 1000) {
           try {
-            // @ts-ignore - Browser context: document is available in page.evaluate context
             await page.waitForFunction(
               () =>
-                // @ts-ignore - Browser context code
-                document.readyState === 'complete' && document.body !== null,
+                (typeof document !== 'undefined' &&
+                  document.readyState === 'complete' &&
+                  document.body !== null) as boolean,
               { timeout: Math.min(finalWaitTime, 2000) }
             )
             debugLog('DOM is ready')
-          } catch (error) {
+          } catch {
             debugLog('DOM readiness check timed out, proceeding anyway...')
           }
         }
-      } catch (error) {
+      } catch {
         debugLog('Page still loading, but proceeding with analysis...')
       }
     }
 
-    const elapsedTime = Date.now() - startTime
     debugLog(
-      `Page loading completed in ${elapsedTime}ms - proceeding with accessibility analysis`
+      `Page loading completed in ${Date.now() - startTime}ms - proceeding with accessibility analysis`
     )
   }
 
   /**
-   * Run accessibility analysis in the browser context
+   * Build axe run options (runOnly tags)
    */
-  private async runAccessibilityAnalysis(page: Page): Promise<AccessibilityResults> {
-    // Load the script content first
-    const scriptContent = this.loadAccessibilityScript()
-
-    debugLog('Running accessibility analysis...')
-
-    // Inject script content directly (same approach as wave-test.ts which was working)
-    // This avoids issues with addScriptTag path loading
-    const accessibilityScanResults = (await page.evaluate((scriptContent: string) => {
-        return new Promise((resolve, reject) => {
-          try {
-            // Debug logger for browser context (uses console.error which is available in browser)
-            // @ts-ignore - Browser context code
-            function debugLog(...args: any[]) {
-              // @ts-ignore - Browser context code
-              console.error(...args)
-            }
-
-            // Set up WAVE configuration (same as wave-test.ts)
-            // @ts-ignore - Browser context code
-            ;(window as any).waveconfig = {
-              debug: false,
-              extensionUrl: '',
-              platform: 'standalone',
-              browser: 'chrome',
-            }
-
-            // Inject WAVE script (same as wave-test.ts)
-            // @ts-ignore - Browser context code
-            const scriptElement = document.createElement('script')
-            // @ts-ignore - Browser context code
-            scriptElement.textContent = scriptContent
-            // @ts-ignore - Browser context code
-            document.head.appendChild(scriptElement)
-
-            // Function to enhance accessibility results (injected into page context)
-            // This code runs in browser context, so DOM types are available
-            // @ts-ignore - Browser context code
-            function enhanceResultsWithDOMInfo(results) {
-              // @ts-ignore - Browser context code
-              function getElementInfo(xpath) {
-                try {
-                  // @ts-ignore - Browser context: document is available in page.evaluate context
-                  // @ts-ignore - Browser context code
-                  // @ts-ignore - Browser context: document is available in page.evaluate context
-                  const element = document.evaluate(
-                    xpath,
-                    // @ts-ignore - Browser context code
-                    document,
-                    null,
-                    // @ts-ignore - Browser context code
-                    XPathResult.FIRST_ORDERED_NODE_TYPE,
-                    null
-                  ).singleNodeValue
-                  if (!element) return null
-
-                  return {
-                    // @ts-ignore - Browser context code
-                    tagName: element.tagName,
-                    id: element.id || null,
-                    className: element.className || null,
-                    textContent: element.textContent
-                      ? element.textContent.trim().substring(0, 100)
-                      : null,
-                    // @ts-ignore - Browser context code
-                    innerHTML: element.innerHTML
-                      ? element.innerHTML.substring(0, 200)
-                      : null,
-                    // @ts-ignore - Browser context code
-                    attributes: Array.from(
-                      element.attributes || []
-                    ).reduce((acc: any, attr: any) => {
-                      acc[attr.name] = attr.value
-                      return acc
-                    }, {}),
-                    // @ts-ignore - Browser context code
-                    selector: generateSelector(element),
-                  }
-                } catch (error: any) {
-                  return { error: error.message }
-                }
-              }
-
-              // @ts-ignore - Browser context code
-              function generateSelector(element: any) {
-                if (element.id) return `#${element.id}`
-                if (element.className) {
-                  const classes = element.className
-                    .trim()
-                    .split(/\s+/)
-                    .slice(0, 2)
-                    .join('.')
-                  return `.${classes}`
-                }
-                return element.tagName.toLowerCase()
-              }
-
-              const enhanced = JSON.parse(JSON.stringify(results))
-
-              // Filter to only include error and contrast categories
-              const filteredCategories: any = {}
-              if (enhanced.categories && enhanced.categories.error) {
-                filteredCategories.error = enhanced.categories.error
-              }
-              if (enhanced.categories && enhanced.categories.contrast) {
-                filteredCategories.contrast = enhanced.categories.contrast
-              }
-
-              // Enhance error and contrast categories
-              Object.keys(filteredCategories).forEach((categoryKey) => {
-                const category = filteredCategories[categoryKey]
-                if (category.items) {
-                  Object.keys(category.items).forEach((itemKey) => {
-                    const item = category.items[itemKey]
-                    
-                    // Extract tags from accessibility rule metadata if available
-                    // Accessibility engine stores rule metadata in wave.rules[ruleId]
-                    // @ts-ignore - Browser context code
-                    if (typeof window !== 'undefined' && window.wave && window.wave.rules) {
-                      // @ts-ignore - Browser context code
-                      const ruleMetadata = window.wave.rules[itemKey]
-                      if (ruleMetadata && ruleMetadata.tags) {
-                        item.tags = ruleMetadata.tags
-                      }
-                    }
-                    
-                    if (item.xpaths && Array.isArray(item.xpaths)) {
-                      // Deduplicate XPaths
-                      const uniqueXPaths = [...new Set(item.xpaths)]
-                      item.xpaths = uniqueXPaths
-
-                      // Update count to reflect actual unique instances
-                      item.count = uniqueXPaths.length
-
-                      // Get DOM info for unique XPaths only
-                      item.domInfo = uniqueXPaths
-                        .map((xpath) => getElementInfo(xpath))
-                        .filter((info) => info !== null)
-
-                      // Also deduplicate other arrays that might have duplicates
-                      if (item.selectors && Array.isArray(item.selectors)) {
-                        item.selectors = item.selectors.slice(
-                          0,
-                          uniqueXPaths.length
-                        )
-                      }
-                      if (item.text && Array.isArray(item.text)) {
-                        item.text = item.text.slice(0, uniqueXPaths.length)
-                      }
-                      if (item.hidden && Array.isArray(item.hidden)) {
-                        item.hidden = item.hidden.slice(0, uniqueXPaths.length)
-                      }
-                      if (
-                        item.contrastdata &&
-                        Array.isArray(item.contrastdata)
-                      ) {
-                        item.contrastdata = item.contrastdata.slice(
-                          0,
-                          uniqueXPaths.length
-                        )
-                      }
-                    }
-                  })
-                }
-              })
-
-              // Recalculate category counts after deduplication
-              Object.keys(filteredCategories).forEach((categoryKey) => {
-                const category = filteredCategories[categoryKey]
-                if (category.items) {
-                  // Recalculate total count for this category
-                  category.count = Object.values(category.items).reduce(
-                    (total: any, item: any) => total + (item.count || 0),
-                    0
-                  )
-                }
-              })
-
-              // Return only filtered categories
-              enhanced.categories = filteredCategories
-              return enhanced
-            }
-
-                // Wait for accessibility engine to initialize with retry logic
-            // This code runs in browser context - DOM types are available
-            /* eslint-disable @typescript-eslint/ban-ts-comment */
-            // @ts-ignore - Browser context: window, document, etc. are available
-            let attempts = 0
-            const maxRetries = 100
-            const retryDelay = 200
-
-            // @ts-ignore - Browser context code
-            const checkAccessibilityAvailability = () => {
-              attempts++
-
-              // @ts-ignore - Browser context: window is available in page.evaluate context
-              if (
-                // @ts-ignore - Browser context code
-                typeof window !== 'undefined' &&
-                // @ts-ignore - Browser context code
-                window.wave !== 'undefined' &&
-                // @ts-ignore - Browser context code
-                window.wave.fn
-              ) {
-                try {
-                  debugLog('Accessibility engine available, checking DOM readiness...')
-
-                  // Ensure DOM is completely ready before initializing accessibility engine
-                  // @ts-ignore - Browser context code
-                  if (document.readyState !== 'complete') {
-                    debugLog('DOM not ready, waiting longer...')
-                    setTimeout(checkAccessibilityAvailability, retryDelay)
-                    return
-                  }
-
-                  // Check if body exists and has been styled
-                  // @ts-ignore - Browser context: document is available in page.evaluate context
-                  if (
-                    // @ts-ignore - Browser context code
-                    !document.body ||
-                    // @ts-ignore - Browser context code
-                    !document.body.style ||
-                    // @ts-ignore - Browser context code
-                    !document.head
-                  ) {
-                    debugLog('Body or head not ready, waiting...')
-                    setTimeout(checkAccessibilityAvailability, retryDelay)
-                    return
-                  }
-
-                  // Additional check for any elements that might cause style access issues
-                  try {
-                    // @ts-ignore - Browser context code
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const _testStyle = document.body.style.display
-                    debugLog('Style access test passed')
-                  } catch (styleError) {
-                    debugLog('Style access test failed, waiting...', styleError)
-                    setTimeout(checkAccessibilityAvailability, retryDelay)
-                    return
-                  }
-
-                  debugLog('DOM ready, initializing accessibility engine...')
-
-                  // Initialize accessibility engine with error handling
-                  try {
-                    // @ts-ignore - Browser context code
-                    ;window.wave.fn.initialize()
-                    debugLog('Accessibility engine initialized successfully')
-                  } catch (initError: any) {
-                    debugLog(
-                      'Accessibility engine initialization failed, retrying...',
-                      initError
-                    )
-                    if (attempts < maxRetries) {
-                      setTimeout(checkAccessibilityAvailability, retryDelay * 2)
-                      return
-                    } else {
-                      reject(
-                        new Error(
-                          `Accessibility engine initialization failed after retries: ${
-                            initError.message
-                          }`
-                        )
-                      )
-                      return
-                    }
-                  }
-
-                  // Run accessibility analysis
-                  // @ts-ignore - Browser context code
-                  ;window.wave.fn
-                    .run()
-                    .then((results: any) => {
-                      debugLog('Accessibility analysis completed successfully')
-                      // Enhance results with better DOM information
-                      const enhancedResults = enhanceResultsWithDOMInfo(results)
-
-                      resolve({
-                        // @ts-ignore - Browser context code
-                        url: window.location.href,
-                        timestamp: new Date().toISOString(),
-                        testEngine: {
-                          name: 'Accessibility Analyzer',
-                          version: '3.2.7',
-                        },
-                        testRunner: {
-                          name: 'Standalone Accessibility Analyzer',
-                        },
-                        testEnvironment: {
-                          // @ts-ignore - Browser context code
-                          userAgent: navigator.userAgent,
-                          // @ts-ignore - Browser context code
-                          windowWidth: window.innerWidth,
-                          // @ts-ignore - Browser context code
-                          windowHeight: window.innerHeight,
-                          // @ts-ignore - Browser context code
-                          orientationType: screen.orientation?.type,
-                          // @ts-ignore - Browser context code
-                          orientationAngle: screen.orientation?.angle,
-                        },
-                        violations: enhancedResults.categories || {},
-                      })
-                    })
-                    .catch((error: any) => {
-                      reject(
-                        new Error(
-                          `Accessibility analysis execution failed: ${error.message}`
-                        )
-                      )
-                    })
-                } catch (error: any) {
-                  debugLog('Unexpected error in accessibility process:', error)
-                  if (attempts < maxRetries) {
-                    setTimeout(checkAccessibilityAvailability, retryDelay * 2)
-                  } else {
-                    reject(
-                      new Error(
-                        `Accessibility process failed: ${error.message}`
-                      )
-                    )
-                  }
-                }
-              } else if (attempts >= maxRetries) {
-                reject(
-                  new Error(
-                    `Accessibility engine failed to initialize after ${maxRetries} attempts`
-                  )
-                )
-              } else {
-                // Retry after delay
-                setTimeout(checkAccessibilityAvailability, retryDelay)
-              }
-            }
-
-            checkAccessibilityAvailability()
-            /* eslint-enable @typescript-eslint/ban-ts-comment */
-          } catch (error: any) {
-            reject(
-              new Error(`Accessibility analysis failed: ${error.message}`)
-            )
-          }
-        })
-    }, scriptContent)) as AccessibilityResults
-
-    debugLog('Accessibility analysis completed, processing results...')
-    return accessibilityScanResults
+  private buildAxeOptions(tags?: AccessibilityTag[]): { runOnly: string[] } {
+    const runOnly =
+      tags && tags.length > 0 ? [...tags] : [...DEFAULT_AXE_TAGS]
+    return { runOnly }
   }
 
   /**
-   * Count total issues in accessibility results
+   * Run axe-core analysis in the browser and return raw axe result
+   */
+  private async runAxeAnalysis(
+    page: Page,
+    tags?: AccessibilityTag[]
+  ): Promise<AxeResultsShape> {
+    const axeOptions = this.buildAxeOptions(tags)
+    await page.addScriptTag({ path: this.axePath })
+
+    const rawResult = await page.evaluate(
+      (options: { runOnly: string[] }) => {
+        return new Promise<AxeResultsShape>((resolve, reject) => {
+          if (typeof (window as unknown as { axe?: { run: (o: unknown) => Promise<AxeResultsShape> } }).axe?.run !== 'function') {
+            reject(new Error('axe.run is not available'))
+            return
+          }
+          ;(window as unknown as { axe: { run: (o: unknown) => Promise<AxeResultsShape> } })
+            .axe.run(options)
+            .then(resolve)
+            .catch(reject)
+        })
+      },
+      axeOptions
+    )
+
+    return rawResult
+  }
+
+  /**
+   * Convert axe-core results to our AccessibilityResults format
+   */
+  private axeToAccessibilityResults(
+    axeResult: AxeResultsShape,
+    url: string,
+    testEnvironment: {
+      userAgent: string
+      windowWidth: number
+      windowHeight: number
+      orientationType?: string
+      orientationAngle?: number
+    }
+  ): AccessibilityResults {
+    const violations: AccessibilityReport = {}
+    const timestamp = new Date().toISOString()
+
+    axeResult.violations.forEach((v: AxeViolation) => {
+      const categoryKey =
+        v.id.toLowerCase().includes('color-contrast') ||
+        v.id.toLowerCase().includes('contrast')
+          ? 'contrast'
+          : 'error'
+
+      if (!violations[categoryKey]) {
+        violations[categoryKey] = { count: 0, items: {} }
+      }
+
+      const xpaths = (v.nodes || []).map(
+        (n) => (n.target && n.target[0]) || ''
+      )
+      const domInfo: DOMInfo[] = (v.nodes || []).map((n) => ({
+        innerHTML: n.html ? n.html.substring(0, 200) : null,
+        selector: n.target && n.target[0],
+      }))
+
+      // Map axe-core impact levels to IBM Equal Access severity levels.
+      // Axe violations are definite failures → 'violation'.
+      // (Axe "incomplete" items would be 'needs-review' but we only process violations here.)
+      const axeImpact = v.impact?.toLowerCase()
+      const impact: AccessibilityRuleData['impact'] =
+        axeImpact === 'critical' || axeImpact === 'serious'
+          ? 'violation'
+          : axeImpact === 'moderate'
+            ? 'needs-review'
+            : 'recommendation'
+
+      const ruleData: AccessibilityRuleData = {
+        count: v.nodes?.length ?? 0,
+        xpaths,
+        description: v.description ?? v.help ?? v.id,
+        domInfo,
+        tags: v.tags ?? [],
+        impact,
+      }
+
+      violations[categoryKey].items[v.id] = ruleData
+      violations[categoryKey].count += ruleData.count
+    })
+
+    return {
+      url,
+      timestamp,
+      testEngine: { name: 'axe-core', version: '4.x' },
+      testRunner: { name: 'Standalone Accessibility Analyzer' },
+      testEnvironment,
+      violations,
+    }
+  }
+
+  /**
+   * Run IBM Equal Access (accessibility-checker) analysis for a URL
+   */
+  private async runACEAnalysis(
+    url: string,
+    _tags?: AccessibilityTag[]
+  ): Promise<AccessibilityResults> {
+    const aChecker = await import('accessibility-checker')
+    const label = `audit-${Date.now()}`
+
+    try {
+      const result = await aChecker.getCompliance(url, label)
+      const report = result.report as unknown as ACEReport
+      return this.aceToAccessibilityResults(report, url)
+    } finally {
+      await aChecker.close?.()
+    }
+  }
+
+  /**
+   * Map ACE report level to IBM Equal Access severity levels.
+   * Matches the IBM browser tool exactly:
+   *   violation              → 'violation'      (🚫 red)
+   *   potentialviolation     → 'needs-review'   (⚠️ yellow)
+   *   potentialrecommendation→ 'needs-review'   (⚠️ yellow)
+   *   recommendation         → 'recommendation' (ℹ️ blue)
+   *   manual                 → 'needs-review'   (⚠️ yellow – manual check required)
+   *   pass / ignored         → 'minor'
+   */
+  private aceLevelToImpact(level: string): AccessibilityRuleData['impact'] {
+    const l = level.toLowerCase()
+    if (l === 'violation') return 'violation'
+    if (l === 'potentialviolation' || l === 'potentialrecommendation' || l === 'manual') return 'needs-review'
+    if (l === 'recommendation') return 'recommendation'
+    return 'minor'
+  }
+
+  /**
+   * Compare impact severity (higher = worse). Used to take the worst impact per rule.
+   */
+  private impactRank(a: AccessibilityRuleData['impact']): number {
+    if (!a) return 0
+    const r: Record<NonNullable<AccessibilityRuleData['impact']>, number> = {
+      violation: 4,
+      'needs-review': 3,
+      recommendation: 2,
+      minor: 1,
+    }
+    return r[a] ?? 0
+  }
+
+  /**
+   * Convert ACE report to our AccessibilityResults format.
+   * Preserves ACE severity (critical/serious/moderate) so output matches the IBM browser tool.
+   */
+  private aceToAccessibilityResults(
+    report: ACEReport,
+    url: string
+  ): AccessibilityResults {
+    const violations: AccessibilityReport = { error: { count: 0, items: {} } }
+    const timestamp = new Date().toISOString()
+
+    const violationItems = report.results.filter(
+      (r) =>
+        r.level === 'violation' ||
+        r.level === 'potentialviolation' ||
+        r.level === 'recommendation' ||
+        r.level === 'potentialrecommendation'
+    )
+
+    violationItems.forEach((item: ACEResultItem) => {
+      const ruleId = item.ruleId
+      const itemImpact = this.aceLevelToImpact(item.level)
+      if (!violations.error!.items[ruleId]) {
+        violations.error!.items[ruleId] = {
+          count: 0,
+          xpaths: [],
+          description: item.message,
+          domInfo: [],
+          tags: [],
+          impact: itemImpact,
+        }
+      }
+
+      const rule = violations.error!.items[ruleId]
+      rule.count += 1
+      rule.xpaths.push(item.path.dom || '')
+      rule.domInfo!.push({
+        innerHTML: item.snippet ? item.snippet.substring(0, 200) : null,
+        selector: item.path.dom,
+      })
+      if (itemImpact && this.impactRank(itemImpact) > this.impactRank(rule.impact)) {
+        rule.impact = itemImpact
+      }
+    })
+
+    Object.values(violations.error!.items).forEach((rule) => {
+      violations.error!.count += rule.count
+    })
+
+    return {
+      url,
+      timestamp,
+      testEngine: { name: 'IBM Equal Access', version: '4.x' },
+      testRunner: { name: 'accessibility-checker' },
+      testEnvironment: {
+        userAgent: 'accessibility-checker',
+        windowWidth: 1280,
+        windowHeight: 720,
+      },
+      violations,
+    }
+  }
+
+  /**
+   * Run accessibility analysis (axe in browser, or ACE via getCompliance)
+   */
+  private async runAccessibilityAnalysis(
+    page: Page,
+    url: string,
+    engine: AccessibilityEngine,
+    tags?: AccessibilityTag[]
+  ): Promise<AccessibilityResults> {
+    if (engine === 'ace') {
+      return this.runACEAnalysis(url, tags)
+    }
+
+    const axeResult = await this.runAxeAnalysis(page, tags)
+    const viewport = page.viewportSize()
+    const testEnvironment = {
+      userAgent: await page.evaluate(() => navigator.userAgent),
+      windowWidth: viewport?.width ?? 1280,
+      windowHeight: viewport?.height ?? 720,
+      orientationType: await page
+        .evaluate(() => (screen as { orientation?: { type?: string } }).orientation?.type)
+        .catch(() => undefined),
+      orientationAngle: await page
+        .evaluate(() => (screen as { orientation?: { angle?: number } }).orientation?.angle)
+        .catch(() => undefined),
+    }
+
+    return this.axeToAccessibilityResults(axeResult, url, testEnvironment)
+  }
+
+  /**
+   * Count total issues in violations
    */
   private countTotalIssues(violations: AccessibilityReport): number {
     let total = 0
@@ -538,103 +463,91 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Get a mapping of common accessibility rule IDs to their accessibility tags
-   * This is a fallback when the accessibility engine doesn't provide tag metadata directly
+   * Get a mapping of common accessibility rule IDs to their accessibility tags.
+   * Includes both axe-core and ACE-style rule IDs; WCAG 2.2 tags ensure strict
+   * tag filters (e.g. wcag22aa only) still include these rules.
    */
   private getRuleTagMapping(): Record<string, AccessibilityTag[]> {
-    // Common accessibility rule IDs mapped to their WCAG tags
-    // This is a partial mapping - in production, this should be comprehensive
+    const wcagA: AccessibilityTag[] = [
+      'wcag2a',
+      'wcag21a',
+      'wcag22a',
+    ]
+    const wcagAA: AccessibilityTag[] = [
+      'wcag2aa',
+      'wcag21aa',
+      'wcag22aa',
+    ]
     return {
-      // Contrast-related rules (WCAG 2.1 AA)
-      contrast: ['wcag21aa', 'wcag2aa'],
-      // Missing alt text (WCAG 2.1 A)
-      alt_missing: ['wcag21a', 'wcag2a'],
-      alt_link_missing: ['wcag21a', 'wcag2a'],
-      // Form labels (WCAG 2.1 A)
-      label_missing: ['wcag21a', 'wcag2a'],
-      label_empty: ['wcag21a', 'wcag2a'],
-      // Headings (WCAG 2.1 A)
-      heading_empty: ['wcag21a', 'wcag2a'],
-      // Language (WCAG 2.1 A)
-      language_missing: ['wcag21a', 'wcag2a'],
-      // Link text (WCAG 2.1 A)
-      link_empty: ['wcag21a', 'wcag2a'],
-      link_skip_broken: ['wcag21a', 'wcag2a'],
-      // ARIA (WCAG 2.1 A)
-      aria_reference_broken: ['wcag21a', 'wcag2a'],
-      aria_hidden: ['wcag21a', 'wcag2a'],
-      // Focus (WCAG 2.1 A)
-      focus_order: ['wcag21a', 'wcag2a'],
-      // Keyboard (WCAG 2.1 A)
-      keyboard: ['wcag21a', 'wcag2a'],
+      'color-contrast': ['wcag21aa', 'wcag2aa', 'wcag22aa'],
+      'image-alt': wcagA,
+      label: wcagA,
+      'heading-order': wcagA,
+      'html-has-lang': wcagA,
+      'link-name': wcagA,
+      'aria-valid-attr-value': wcagA,
+      tabindex: wcagA,
+      'button-name': wcagA,
+      'document-title': wcagA,
+      'heading_empty': wcagA,
+      'button_empty': wcagA,
+      'aria_reference_broken': wcagA,
+      contrast: ['wcag21aa', 'wcag2aa', 'wcag22aa'],
+      // ACE-style rule IDs (common patterns)
+      'RPT_Header_HasContent': wcagA,
+      'RPT_Button_AccessibleName': wcagA,
+      'RPT_Label_FormControls': wcagA,
+      'RPT_Elem_UniqueId': wcagA,
+      'IBMA_Color_Contrast_WCAG2AA': wcagAA,
     }
   }
 
   /**
    * Check if a rule matches any of the specified tags
-   * Checks accessibility engine metadata first, then falls back to rule ID mapping
    */
   private ruleMatchesTags(
     ruleId: string,
     ruleData: AccessibilityRuleData,
     tags: AccessibilityTag[]
   ): boolean {
-    // If no tags specified, include all rules
-    if (!tags || tags.length === 0) {
-      return true
-    }
-
-    // Check if rule has tags property (from accessibility engine metadata)
+    if (!tags || tags.length === 0) return true
     if (ruleData.tags && Array.isArray(ruleData.tags)) {
       return ruleData.tags.some((tag) => tags.includes(tag as AccessibilityTag))
     }
-
-    // Fallback: Use rule ID to tag mapping
-    const ruleTagMapping = this.getRuleTagMapping()
-    const ruleTags = ruleTagMapping[ruleId]
-    if (ruleTags && ruleTags.length > 0) {
+    const mapping = this.getRuleTagMapping()
+    const ruleTags = mapping[ruleId]
+    if (ruleTags?.length) {
       return ruleTags.some((tag) => tags.includes(tag))
     }
-
-    // If no mapping found and no tags in metadata, include the rule
-    // (better to show all issues than to hide potentially important ones)
     return true
   }
 
   /**
-   * Filter accessibility results by accessibility tags
+   * Filter accessibility results by tags
    */
   private filterByTags(
     results: AccessibilityResults,
     tags: AccessibilityTag[]
   ): AccessibilityResults {
-    if (!tags || tags.length === 0) {
-      return results
-    }
+    if (!tags || tags.length === 0) return results
 
     const filteredViolations: AccessibilityReport = {}
 
     Object.entries(results.violations).forEach(([categoryKey, category]) => {
-      if (!category || !category.items) {
-        return
-      }
+      if (!category?.items) return
 
       const filteredItems: Record<string, AccessibilityRuleData> = {}
-
       Object.entries(category.items).forEach(([ruleId, ruleData]) => {
         if (this.ruleMatchesTags(ruleId, ruleData, tags)) {
           filteredItems[ruleId] = ruleData
         }
       })
 
-      // Only include category if it has matching items
       if (Object.keys(filteredItems).length > 0) {
-        // Recalculate category count
         const categoryCount = Object.values(filteredItems).reduce(
           (total, item) => total + (item.count || 0),
           0
         )
-
         filteredViolations[categoryKey] = {
           count: categoryCount,
           items: filteredItems,
@@ -642,10 +555,7 @@ export class AccessibilityRunner {
       }
     })
 
-    return {
-      ...results,
-      violations: filteredViolations,
-    }
+    return { ...results, violations: filteredViolations }
   }
 
   /**
@@ -660,40 +570,54 @@ export class AccessibilityRunner {
       waitForLoad = 'networkidle',
       timeout = 30000,
       tags,
+      engine = 'axe',
+      applyTagFilter = false,
     } = config
 
     try {
-      // Navigate and wait for page to be ready
-      await this.navigateAndWait(page, url, waitForLoad, timeout)
+      if (engine === 'ace') {
+        debugLog(`Running IBM Equal Access (ACE) analysis on ${url}...`)
+        const accessibilityResults = await this.runACEAnalysis(url, tags)
+        const originalIssueCount = this.countTotalIssues(accessibilityResults.violations)
 
-      // Run accessibility analysis
-      const accessibilityResults = await this.runAccessibilityAnalysis(page)
+        let filteredResults: AccessibilityResults | undefined
+        let appliedFilters: AccessibilityRunnerResult['appliedFilters']
 
-      // Count original issues before filtering
-      const originalIssueCount = this.countTotalIssues(accessibilityResults.violations)
-
-      // Filter by tags if specified
-      let filteredResults: AccessibilityResults | undefined
-      let appliedFilters:
-        | {
-            tags?: AccessibilityTag[]
-            originalIssueCount?: number
-          }
-        | undefined
-
-      if (tags && tags.length > 0) {
-        filteredResults = this.filterByTags(accessibilityResults, tags)
-        const filteredIssueCount = this.countTotalIssues(
-          filteredResults.violations
-        )
-
-        appliedFilters = {
-          tags,
-          originalIssueCount,
+        if (applyTagFilter && tags && tags.length > 0) {
+          filteredResults = this.filterByTags(accessibilityResults, tags)
+          appliedFilters = { tags, originalIssueCount }
+          debugLog(
+            `Filtered results: ${originalIssueCount} -> ${this.countTotalIssues(filteredResults.violations)} issues`
+          )
         }
 
+        return {
+          accessibilityResults,
+          filteredResults,
+          appliedFilters,
+        }
+      }
+
+      await this.navigateAndWait(page, url, waitForLoad, timeout)
+      debugLog(`Running axe-core analysis on ${url}...`)
+
+      const accessibilityResults = await this.runAccessibilityAnalysis(
+        page,
+        url,
+        'axe',
+        tags
+      )
+
+      const originalIssueCount = this.countTotalIssues(accessibilityResults.violations)
+
+      let filteredResults: AccessibilityResults | undefined
+      let appliedFilters: AccessibilityRunnerResult['appliedFilters']
+
+      if (applyTagFilter && tags && tags.length > 0) {
+        filteredResults = this.filterByTags(accessibilityResults, tags)
+        appliedFilters = { tags, originalIssueCount }
         debugLog(
-          `Filtered results: ${originalIssueCount} -> ${filteredIssueCount} issues (tags: ${tags.join(', ')})`
+          `Filtered results: ${originalIssueCount} -> ${this.countTotalIssues(filteredResults.violations)} issues (tags: ${tags.join(', ')})`
         )
       }
 
@@ -704,12 +628,9 @@ export class AccessibilityRunner {
       }
     } catch (error) {
       console.error('Error running accessibility test:', error)
-      // Re-throw with more context - let caller handle retry logic
       const errorMessage =
         error instanceof Error ? error.message : String(error)
-      throw new Error(
-        `Accessibility test failed for ${url}: ${errorMessage}`
-      )
+      throw new Error(`Accessibility test failed for ${url}: ${errorMessage}`)
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@ali0113/accessibility-mcp-server",
+  "name": "@dallask/a11y-mcp-srv",
   "version": "1.1.7",
   "description": "MCP server for accessibility auditing with export, filter, aggregation, and visualization tools",
   "main": "dist/server.js",
@@ -29,10 +29,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alii13/accessibility-audit.git",
-    "directory": "accessibility-mcp-server"
+    "directory": "a11y-mcp-srv"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
+    "accessibility-checker": "^4.0.9",
+    "axe-core": "^4.11.0",
     "playwright": "^1.40.0",
     "xlsx": "^0.18.5"
   },
@@ -47,8 +49,9 @@
   "files": [
     "dist/",
     "bin/",
-    "wave.min.js",
     "README.md",
-    "package.json"
+    "package.json",
+    "LICENSE",
+    "NOTICE"
   ]
 }

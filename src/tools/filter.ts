@@ -150,13 +150,13 @@ export function filterIssues(
   let score = 100
   filteredIssues.forEach((issue) => {
     switch (issue.impact) {
-      case 'critical':
+      case 'violation':
         score -= 5
         break
-      case 'serious':
+      case 'needs-review':
         score -= 3
         break
-      case 'moderate':
+      case 'recommendation':
         score -= 1
         break
       case 'minor':

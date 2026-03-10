@@ -303,9 +303,14 @@ export function handleErrorGracefully(
 } {
   const categorizedError = categorizeError(error)
   const formattedMessage = formatErrorMessage(error, context)
+  // Ensure error is always a string for MCP/serialization (no [object Object])
+  const errorString =
+    typeof formattedMessage === 'string'
+      ? formattedMessage
+      : String(categorizedError?.message ?? error)
 
   return {
-    error: formattedMessage,
+    error: errorString,
     category: categorizedError.category,
     retryable: categorizedError.retryable,
     suggestion: getErrorSuggestion(categorizedError.category),

@@ -210,9 +210,9 @@ function prioritizeByCriteria(
     case 'impact': {
       // Sort by impact level (critical > serious > moderate > minor)
       const impactOrder: Record<ImpactLevel, number> = {
-        critical: 4,
-        serious: 3,
-        moderate: 2,
+        violation: 4,
+        'needs-review': 3,
+        recommendation: 2,
         minor: 1,
       }
       sorted.sort((a, b) => {
@@ -235,9 +235,9 @@ function prioritizeByCriteria(
         const levelDiff = levelOrder[b.wcagLevel] - levelOrder[a.wcagLevel]
         if (levelDiff !== 0) return levelDiff
         const impactOrder: Record<ImpactLevel, number> = {
-          critical: 4,
-          serious: 3,
-          moderate: 2,
+          violation: 4,
+          'needs-review': 3,
+          recommendation: 2,
           minor: 1,
         }
         return impactOrder[b.impact] - impactOrder[a.impact]
@@ -265,9 +265,9 @@ function prioritizeByCriteria(
       // Sort by user impact (critical > serious > moderate > minor)
       // This is similar to impact but emphasizes user experience
       const impactOrder: Record<ImpactLevel, number> = {
-        critical: 4,
-        serious: 3,
-        moderate: 2,
+        violation: 4,
+        'needs-review': 3,
+        recommendation: 2,
         minor: 1,
       }
       sorted.sort((a, b) => {
@@ -310,7 +310,7 @@ function identifyQuickWins(issues: PrioritizedIssue[]): QuickWin[] {
     // 2. Have clear fix suggestions (suggested code differs from current)
     // 3. Affect multiple elements (batch fix opportunity)
     const highImpactIssues = groupIssues.filter(
-      (i) => i.impact === 'critical' || i.impact === 'serious'
+      (i) => i.impact === 'violation' || i.impact === 'needs-review'
     )
 
     if (highImpactIssues.length > 0) {
@@ -338,9 +338,9 @@ function identifyQuickWins(issues: PrioritizedIssue[]): QuickWin[] {
   // Sort by impact and number of affected elements
   quickWins.sort((a, b) => {
     const impactOrder: Record<ImpactLevel, number> = {
-      critical: 4,
-      serious: 3,
-      moderate: 2,
+      violation: 4,
+      'needs-review': 3,
+      recommendation: 2,
       minor: 1,
     }
     const impactDiff = impactOrder[b.impact] - impactOrder[a.impact]
@@ -370,7 +370,7 @@ function identifyCriticalBlockers(issues: PrioritizedIssue[]): CriticalBlocker[]
     // Critical blockers are:
     // 1. Critical impact issues
     // 2. WCAG Level A violations (legal requirement)
-    const criticalIssues = groupIssues.filter((i) => i.impact === 'critical')
+    const criticalIssues = groupIssues.filter((i) => i.impact === 'violation')
     const levelAIssues = groupIssues.filter((i) => i.wcagLevel === 'A')
 
     if (criticalIssues.length > 0 || levelAIssues.length > 0) {
@@ -398,9 +398,9 @@ function identifyCriticalBlockers(issues: PrioritizedIssue[]): CriticalBlocker[]
     const levelDiff = levelOrder[b.wcagLevel] - levelOrder[a.wcagLevel]
     if (levelDiff !== 0) return levelDiff
     const impactOrder: Record<ImpactLevel, number> = {
-      critical: 4,
-      serious: 3,
-      moderate: 2,
+      violation: 4,
+      'needs-review': 3,
+      recommendation: 2,
       minor: 1,
     }
     return impactOrder[b.impact] - impactOrder[a.impact]
@@ -434,26 +434,26 @@ function generatePrioritizationReasoning(
 
   // Breakdown by impact
   const impactCounts: Record<ImpactLevel, number> = {
-    critical: 0,
-    serious: 0,
-    moderate: 0,
+    violation: 0,
+    'needs-review': 0,
+    recommendation: 0,
     minor: 0,
   }
   prioritized.forEach((issue) => {
     impactCounts[issue.impact]++
   })
 
-  if (impactCounts.critical > 0) {
-    parts.push(`\nCritical issues: ${impactCounts.critical}`)
+  if (impactCounts['violation'] > 0) {
+    parts.push(`\n🚫 Violations: ${impactCounts['violation']}`)
   }
-  if (impactCounts.serious > 0) {
-    parts.push(`Serious issues: ${impactCounts.serious}`)
+  if (impactCounts['needs-review'] > 0) {
+    parts.push(`⚠️  Needs review: ${impactCounts['needs-review']}`)
   }
-  if (impactCounts.moderate > 0) {
-    parts.push(`Moderate issues: ${impactCounts.moderate}`)
+  if (impactCounts['recommendation'] > 0) {
+    parts.push(`ℹ️  Recommendations: ${impactCounts['recommendation']}`)
   }
-  if (impactCounts.minor > 0) {
-    parts.push(`Minor issues: ${impactCounts.minor}`)
+  if (impactCounts['minor'] > 0) {
+    parts.push(`Minor issues: ${impactCounts['minor']}`)
   }
 
   // Explain the criteria used
@@ -898,11 +898,11 @@ function issuesToQuickFixes(
   ruleGroups.forEach((groupIssues, ruleId) => {
     const firstIssue = groupIssues[0]
     const impactEstimate =
-      firstIssue.impact === 'critical'
+      firstIssue.impact === 'violation'
         ? 'Critical - Must fix immediately'
-        : firstIssue.impact === 'serious'
+        : firstIssue.impact === 'needs-review'
           ? 'Serious - High priority'
-          : firstIssue.impact === 'moderate'
+          : firstIssue.impact === 'recommendation'
             ? 'Moderate - Should fix soon'
             : 'Minor - Consider fixing'
 
@@ -1069,7 +1069,7 @@ function calculateCriterionStatus(violations: PrioritizedIssue[]): ComplianceSta
 
   // If there are critical or serious violations, it's a fail
   const hasCriticalOrSerious = violations.some(
-    (v) => v.impact === 'critical' || v.impact === 'serious'
+    (v) => v.impact === 'violation' || v.impact === 'needs-review'
   )
   if (hasCriticalOrSerious) {
     return 'fail'

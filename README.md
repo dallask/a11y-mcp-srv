@@ -34,7 +34,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
   "mcpServers": {
     "accessibility-audit": {
       "command": "npx",
-      "args": ["-y", "@ali0113/accessibility-mcp-server"]
+      "args": ["-y", "@dallask/a11y-mcp-srv"]
     }
   }
 }
@@ -49,7 +49,7 @@ Add to your Cursor MCP settings (`~/.cursor/mcp.json` or Cursor Settings → MCP
   "mcpServers": {
     "accessibility-audit": {
       "command": "npx",
-      "args": ["-y", "@ali0113/accessibility-mcp-server"]
+      "args": ["-y", "@dallask/a11y-mcp-srv"]
     }
   }
 }
@@ -68,6 +68,61 @@ That's it! You're ready to use all 25+ accessibility tools. The package will be 
 - The `-y` flag answers "yes" to prompts (non-interactive)
 - Playwright browsers install automatically on first run
 - No manual installation, building, or configuration needed!
+
+## ⚙️ Configuration (Environment Variables)
+
+You can configure the server via your MCP client’s `env` section (e.g. Cursor MCP settings or Claude Desktop config). These options follow the same style as [joe-watkins/accessibility-testing-mcp](https://github.com/joe-watkins/accessibility-testing-mcp).
+
+| Variable | Values | Default | Description |
+|----------|--------|---------|-------------|
+| `A11Y_ENGINE` | `axe`, `ace` | `axe` | Testing engine: **axe-core** (Deque) or **IBM Equal Access** (ACE). |
+| `WCAG_LEVEL` | `2.0_A`, `2.0_AA`, `2.0_AAA`, `2.1_A`, `2.1_AA`, `2.1_AAA`, `2.2_A`, `2.2_AA`, `2.2_AAA` | `2.1_AA` | WCAG version and level used when the tool does not specify tags. |
+| `BEST_PRACTICES` | `true`, `false` | `true` | Include best-practice rules (adds `best-practice` tag when no tags are provided). |
+| `SCREEN_SIZES` | Comma-separated `WIDTHxHEIGHT` | `1280x1024` | Viewport size(s) for the browser (e.g. `1280x1024,320x640`). The first size is used for audits. |
+| `HEADLESS_BROWSER` | `true`, `false` | `true` | Run the browser in headless mode; set to `false` to show the browser window. |
+
+### Example MCP config with env
+
+**Cursor** (`~/.cursor/mcp.json` or Settings → MCP):
+
+```json
+{
+  "mcpServers": {
+    "accessibility-audit": {
+      "command": "npx",
+      "args": ["-y", "@dallask/a11y-mcp-srv"],
+      "env": {
+        "A11Y_ENGINE": "axe",
+        "WCAG_LEVEL": "2.2_AA",
+        "BEST_PRACTICES": "true",
+        "SCREEN_SIZES": "1280x1024,320x640",
+        "HEADLESS_BROWSER": "true"
+      }
+    }
+  }
+}
+```
+
+**Claude Desktop** (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "accessibility-audit": {
+      "command": "npx",
+      "args": ["-y", "@dallask/a11y-mcp-srv"],
+      "env": {
+        "A11Y_ENGINE": "axe",
+        "WCAG_LEVEL": "2.2_AA",
+        "BEST_PRACTICES": "true",
+        "HEADLESS_BROWSER": "true"
+      }
+    }
+  }
+}
+```
+
+Tool parameters (e.g. `engine`, `tags`) override these defaults when provided in a request.
 
 ## 🎉 Awesome Things You Can Do
 
@@ -1132,7 +1187,7 @@ Common error scenarios:
 ## 🏗️ Project Structure
 
 ```
-accessibility-mcp-server/
+a11y-mcp-srv/
 ├── src/
 │   ├── server.ts           # Main MCP server entry point
 │   ├── tools/              # Tool implementations
@@ -1172,7 +1227,7 @@ If you want to contribute or modify the code, you can set up a local development
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd accessibility-mcp-server
+   cd a11y-mcp-srv
    ```
 
 2. **Install dependencies**
@@ -1214,7 +1269,7 @@ If you want to use the local version instead of the published package:
   "mcpServers": {
     "accessibility-audit": {
       "command": "node",
-      "args": ["/absolute/path/to/accessibility-mcp-server/dist/server.js"]
+      "args": ["/absolute/path/to/a11y-mcp-srv/dist/server.js"]
     }
   }
 }
@@ -1234,6 +1289,10 @@ If you want to use the local version instead of the published package:
 8. **Compliance Reports** - Automated VPAT/WCAG/ADA/Section 508 documentation
 9. **Tag Filtering** - Filter by specific WCAG levels to reduce noise and focus on what matters
 10. **25+ Tools** - Comprehensive suite covering auditing, analysis, reporting, export, and more
+
+## Attribution
+
+This project is derived from [alii13/accessibility-mcp-server](https://github.com/alii13/accessibility-mcp-server), which is licensed under the [MIT License](LICENSE). The original copyright notice and license are preserved in this distribution. See the [NOTICE](NOTICE) file for details.
 
 ## 📄 License
 

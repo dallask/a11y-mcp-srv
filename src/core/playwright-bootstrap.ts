@@ -19,6 +19,12 @@ export function isMissingBrowserError(error: unknown): boolean {
   )
 }
 
+/** Detect "Failed to launch the browser process" (often missing system deps on Linux/Docker). */
+export function isLaunchFailureError(error: unknown): boolean {
+  const msg = toErrorMessage(error).toLowerCase()
+  return msg.includes('failed to launch the browser process')
+}
+
 /** Resolve path to the Playwright CLI (same package as the one we import). */
 function getPlaywrightCliPath(): string {
   const require = createRequire(import.meta.url)
@@ -42,6 +48,31 @@ export function installPlaywrightChromium(): void {
     const msg = toErrorMessage(err)
     console.error(`[accessibility-mcp-server] Playwright install failed: ${msg}`)
     throw new Error(`Playwright Chromium install failed: ${msg}`)
+  }
+}
+
+/**
+ * Run `playwright install chromium --with-deps` to install browser + system dependencies
+ * (e.g. libgbm, libnss3 on Linux). Use when the browser binary exists but fails to launch.
+ * May require root/sudo in some environments; best-effort only.
+ */
+function installPlaywrightChromiumWithDeps(): void {
+  const cliPath = getPlaywrightCliPath()
+  const node = process.execPath
+  console.error('[accessibility-mcp-server] Installing Chromium with system dependencies (--with-deps)...')
+  try {
+    execSync(`"${node}" "${cliPath}" install chromium --with-deps`, {
+      stdio: 'inherit',
+      env: process.env,
+      cwd: process.cwd(),
+    })
+    console.error('[accessibility-mcp-server] Chromium + deps install completed.')
+  } catch (err) {
+    const msg = toErrorMessage(err)
+    console.error(`[accessibility-mcp-server] install --with-deps failed: ${msg}`)
+    throw new Error(
+      `Chromium system-deps install failed: ${msg}. You may need to run 'npx playwright install --with-deps' manually with appropriate permissions.`
+    )
   }
 }
 
@@ -97,6 +128,7 @@ function mergeLaunchArgs(callerArgs: string[] | undefined): string[] {
 /**
  * Launch Chromium, installing the browser if missing (e.g. first run in CodeMie).
  * Retries launch once after install on "Executable doesn't exist".
+ * On "Failed to launch the browser process", tries `playwright install chromium --with-deps` and retries once.
  * Uses robust launch args for CI/containers; caller args are merged in.
  */
 export async function launchChromium(options: LaunchOptions): Promise<Browser> {
@@ -106,11 +138,20 @@ export async function launchChromium(options: LaunchOptions): Promise<Browser> {
     headless: options?.headless !== false,
     args,
   }
+
+  const tryLaunch = async (): Promise<Browser> => chromium.launch(launchOpts)
+
   try {
-    return await chromium.launch(launchOpts)
+    return await tryLaunch()
   } catch (error) {
-    if (!isMissingBrowserError(error)) throw error
-    installPlaywrightChromium()
-    return await chromium.launch(launchOpts)
+    if (isMissingBrowserError(error)) {
+      installPlaywrightChromium()
+      return await tryLaunch()
+    }
+    if (isLaunchFailureError(error)) {
+      installPlaywrightChromiumWithDeps()
+      return await tryLaunch()
+    }
+    throw error
   }
 }

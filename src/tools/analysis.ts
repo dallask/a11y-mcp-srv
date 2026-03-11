@@ -494,8 +494,14 @@ export function prioritizeIssues(
     limit,
   } = input
 
+  // Normalize: accept single result or placeholder from external tools (e.g. CodeMie)
+  const auditResult = Array.isArray(results) ? results[0] : results
+  const prioritizedIssues = Array.isArray(auditResult?.prioritizedIssues)
+    ? auditResult.prioritizedIssues
+    : []
+
   // Prioritize issues by criteria
-  let prioritized = prioritizeByCriteria(results.prioritizedIssues, criteria)
+  let prioritized = prioritizeByCriteria(prioritizedIssues, criteria)
 
   // Apply limit if specified
   if (limit && limit > 0) {
@@ -503,10 +509,10 @@ export function prioritizeIssues(
   }
 
   // Identify quick wins
-  const quickWins = identifyQuickWins(results.prioritizedIssues)
+  const quickWins = identifyQuickWins(prioritizedIssues)
 
   // Identify critical blockers
-  const criticalBlockers = identifyCriticalBlockers(results.prioritizedIssues)
+  const criticalBlockers = identifyCriticalBlockers(prioritizedIssues)
 
   // Generate reasoning
   const reasoning = generatePrioritizationReasoning(

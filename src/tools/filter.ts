@@ -32,7 +32,13 @@ export function filterIssues(
     mode = 'include',
   } = input
 
-  let filteredIssues = [...results.prioritizedIssues]
+  // Normalize: accept single result or placeholder from external tools (e.g. CodeMie)
+  const auditResult = results != null && typeof results === 'object' ? results : ({} as AuditResult)
+  const prioritizedIssues = Array.isArray(auditResult.prioritizedIssues)
+    ? auditResult.prioritizedIssues
+    : []
+
+  let filteredIssues = [...prioritizedIssues]
 
   // Apply filters
   if (filters.ruleIds && filters.ruleIds.length > 0) {
@@ -166,9 +172,13 @@ export function filterIssues(
   })
   score = Math.max(0, Math.round(score))
 
+  const quickWins = Array.isArray(auditResult.quickWins) ? auditResult.quickWins : []
+  const criticalBlockers = Array.isArray(auditResult.criticalBlockers) ? auditResult.criticalBlockers : []
+  const originalTotalIssues = auditResult.summary?.totalIssues ?? prioritizedIssues.length
+
   // Create filtered audit result
   const filteredResult: AuditResult = {
-    ...results,
+    ...auditResult,
     summary: {
       totalIssues: filteredIssues.length,
       score,
@@ -177,18 +187,17 @@ export function filterIssues(
       byImpact,
     },
     prioritizedIssues: filteredIssues,
-    // Update quick wins and blockers based on filtered issues
-    quickWins: results.quickWins.filter((qw) =>
+    quickWins: quickWins.filter((qw) =>
       filteredIssues.some((issue) => issue.ruleId === qw.ruleId)
     ),
-    criticalBlockers: results.criticalBlockers.filter((cb) =>
+    criticalBlockers: criticalBlockers.filter((cb) =>
       filteredIssues.some((issue) => issue.ruleId === cb.ruleId)
     ),
   }
 
   return {
     filtered: filteredResult,
-    originalCount: results.summary.totalIssues,
+    originalCount: originalTotalIssues,
     filteredCount: filteredIssues.length,
     filtersApplied: filters,
     mode,
@@ -223,10 +232,13 @@ export function searchIssues(
     }
   }
 
+  const issuesToSearch = Array.isArray(results?.prioritizedIssues)
+    ? results.prioritizedIssues
+    : []
   const searchQuery = caseSensitive ? query : query.toLowerCase()
   const matches: PrioritizedIssue[] = []
 
-  results.prioritizedIssues.forEach((issue) => {
+  issuesToSearch.forEach((issue) => {
     let found = false
 
     // Search in specified fields

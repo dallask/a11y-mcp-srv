@@ -120,6 +120,16 @@ async function createServer(): Promise<Server> {
               default: 30,
               description: 'Timeout in seconds (default: 30).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username. Use with basicAuthPassword for sites that require Basic Authentication.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password. Use with basicAuthUsername for sites that require Basic Authentication.',
+            },
           },
           required: ['url'],
         },
@@ -188,6 +198,16 @@ async function createServer(): Promise<Server> {
               enum: ['axe', 'ace'],
               description:
                 'Testing engine: "axe" or "ace". Overrides env A11Y_ENGINE when provided.',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username for all URLs. Use with basicAuthPassword when sites require Basic Authentication.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password. Use with basicAuthUsername.',
             },
           },
           required: ['urls'],
@@ -1012,6 +1032,8 @@ async function createServer(): Promise<Server> {
                   | 'domcontentloaded'
                   | undefined,
                 timeout: args?.timeout as number | undefined,
+                basicAuthUsername: args?.basicAuthUsername as string | undefined,
+                basicAuthPassword: args?.basicAuthPassword as string | undefined,
               }),
             {
               maxRetries: 2, // Fewer retries for single URL audits
@@ -1054,6 +1076,8 @@ async function createServer(): Promise<Server> {
                   continueOnError: args?.continueOnError as boolean | undefined,
                   tags: args?.tags as string[] | undefined,
                   engine: args?.engine as 'axe' | 'ace' | undefined,
+                  basicAuthUsername: args?.basicAuthUsername as string | undefined,
+                  basicAuthPassword: args?.basicAuthPassword as string | undefined,
                 },
                 progressCallback
               ),

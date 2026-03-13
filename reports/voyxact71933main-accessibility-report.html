@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility Audit Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+    .metadata {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .metadata h2 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    .metadata p {
+      margin: 5px 0;
+    }
+    .summary {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .summary h2 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    .summary p {
+      margin: 10px 0;
+      font-size: 1.1em;
+    }
+    .charts {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .issues {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .issues h2 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th {
+      background-color: #667eea;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    code {
+      background-color: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      background-color: #f4f4f4;
+      padding: 10px;
+      border-radius: 3px;
+      overflow-x: auto;
+      font-size: 0.85em;
+    }
+    .impact-critical, .impact-violation {
+      background-color: #ff4444;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    .impact-serious, .impact-potentialviolation {
+      background-color: #ff8800;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    .impact-moderate, .impact-potentialrecommendation, .impact-manual {
+      background-color: #ffbb00;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    .impact-minor, .impact-recommendation, .impact-pass {
+      background-color: #88cc00;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    [class^="impact-"] {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+  </style>
+  
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const categoryCtx = document.getElementById('categoryChart');
+          if (categoryCtx) {
+            new Chart(categoryCtx, {
+              type: 'bar',
+              data: {
+                labels: ["error"],
+                datasets: [{
+                  label: 'Issues by Category',
+                  data: [47],
+                  backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  y: { beginAtZero: true }
+                }
+              }
+            });
+          }
+          const impactCtx = document.getElementById('impactChart');
+          if (impactCtx) {
+            new Chart(impactCtx, {
+              type: 'doughnut',
+              data: {
+                labels: ["violation","potentialviolation"],
+                datasets: [{
+                  data: [18,29],
+                  backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(255, 159, 64, 0.5)',
+                    'rgba(255, 205, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)'
+                  ]
+                }]
+              },
+              options: {
+                responsive: true
+              }
+            });
+          }
+        });
+      </script>
+    
+</head>
+<body>
+  <div class="header">
+    <h1>Accessibility Audit Report</h1>
+  </div>
+  
+  <div class="metadata">
+    <h2>Test Information</h2>
+    <p><strong>Test Engine:</strong> IBM Equal Access v4.x</p>
+    <p><strong>Test Runner:</strong> accessibility-checker</p>
+    <p><strong>Test URL:</strong> <a href="http://voyxact71933main.dev-otsuka.acsitefactory.com/" target="_blank">http://voyxact71933main.dev-otsuka.acsitefactory.com/</a></p>
+    <p><strong>Timestamp:</strong> 2026-03-13T12:26:54.261Z</p>
+    <p><strong>User Agent:</strong> accessibility-checker</p>
+    <p><strong>Window Size:</strong> 1280x720</p>
+  </div>
+  
+  
+      <div class="summary">
+        <h2>Summary</h2>
+        <p>Total Issues: <strong>47</strong></p>
+        <p>Accessibility Score: <strong>0/100</strong></p>
+        <p>WCAG Level A Compliance: <strong>100%</strong></p>
+        <p>WCAG Level AA Compliance: <strong>0%</strong></p>
+        <p>WCAG Level AAA Compliance: <strong>100%</strong></p>
+      </div>
+      
+      <div class="charts">
+        <div style="width: 50%; display: inline-block;">
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <div style="width: 50%; display: inline-block;">
+          <canvas id="impactChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="issues">
+        <h2>Issues</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Rule ID</th>
+              <th>Category</th>
+              <th>Impact</th>
+              <th>WCAG Level</th>
+              <th>Description</th>
+              <th>Element</th>
+              <th>User Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+      <td>aria_form_label_unique</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Multiple elements with "form" role do not have unique labels</td>
+      <td><code>form#checkboxes-form-0.personalization_accordion__form</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_form_label_unique</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Multiple elements with "form" role do not have unique labels</td>
+      <td><code>form#checkboxes-form-1.personalization_accordion__form</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>input_checkboxes_grouped</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Checkbox input and others with the name "confirm_18" are not grouped together</td>
+      <td><code>input#edit-confirm-18.form-checkbox.required.form-check-input.analytic-tags-processed.data-analytics-click-link</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>button.btn-close.data-analytics-link</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>input#edit-first-name--2.form-control.placeholder-error.form-text.required</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>input#edit-last-name--2.form-control.placeholder-error.form-text.required</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>input#edit-email-address--2.form-control.placeholder-error.form-email.required</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>span.select2-selection.select2-selection--single</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>input#edit-date-of-birth-visible--2.form-control.form-text-date.js-webform-input-mask.form-text</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>input#edit-confirm-18--2.form-checkbox.required.form-check-input.analytic-tags-processed.data-analytics-click-link</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>a.text-decoration-none</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>a</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>a</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>iframe</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>input#edit-actions-submit--2.webform-button--submit...</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>button.btn-close.data-analytics-link</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>button#externalLinkPopupModalContinueButton...</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>aria_hidden_nontabbable</td>
+      <td>error</td>
+      <td><span class="impact-violation">violation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Element "button" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'</td>
+      <td><code>button#externalLinkPopupModalCloseButton...</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>style_color_misuse</td>
+      <td>error</td>
+      <td><span class="impact-potentialviolation">potentialviolation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>Verify color is not used as the only visual means of conveying information</td>
+      <td><code>style#onetrust-style</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr>
+      <td>input_label_visible</td>
+      <td>error</td>
+      <td><span class="impact-potentialviolation">potentialviolation</span></td>
+      <td>WCAG 2.2 AA</td>
+      <td>The input element does not have an associated visible label</td>
+      <td><code>button.btn.navbar-toggler...</code></td>
+      <td>This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.</td>
+    </tr>
+    <tr><td colspan="7">… plus 27 more issues (input_label_visible, text_block_heading, text_sensory_misuse, element_tabbable_visible, aria_descendant_valid, frame_src_valid). Full table in report.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    
+</body>
+</html>

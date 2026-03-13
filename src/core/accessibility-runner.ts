@@ -61,6 +61,8 @@ export interface AccessibilityRunnerResult {
     tags?: AccessibilityTag[]
     originalIssueCount?: number
   }
+  /** HTTP status code of the main document response (e.g. 200, 401). Undefined when no navigation. */
+  responseStatus?: number
 }
 
 /** Default axe-core tags for WCAG 2.1 AA */
@@ -170,21 +172,24 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Navigate to URL and wait for page to be ready
+   * Navigate to URL and wait for page to be ready.
+   * @returns HTTP status code of the main document response (e.g. 200, 401), or undefined if unavailable.
    */
   private async navigateAndWait(
     page: Page,
     url: string,
     waitStrategy: WaitStrategy = 'networkidle',
     timeout: number = 30000
-  ): Promise<void> {
+  ): Promise<number | undefined> {
     debugLog(`Navigating to ${url}...`)
     const startTime = Date.now()
 
-    await page.goto(url, {
+    const response = await page.goto(url, {
       waitUntil: 'domcontentloaded',
       timeout,
     })
+    const status = response?.status()
+    if (status != null) debugLog(`Page response status: ${status}`)
     debugLog('Page navigation started')
 
     const remainingTime = timeout - (Date.now() - startTime)
@@ -230,6 +235,7 @@ export class AccessibilityRunner {
     debugLog(
       `Page loading completed in ${Date.now() - startTime}ms - proceeding with accessibility analysis`
     )
+    return status
   }
 
   /**
@@ -357,11 +363,13 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Run IBM Equal Access (accessibility-checker) analysis for a URL.
-   * WCAG level/policy is configured via setConfig before the scan — tags are
-   * engine settings here, not a post-scan filter.
+   * Run IBM Equal Access (accessibility-checker) analysis on HTML content.
+   * ACE never fetches URLs; the caller loads the page in Playwright and passes the final HTML
+   * (including everything changed by JavaScript). This avoids ACE's internal Puppeteer launch.
+   * WCAG level/policy is configured via setConfig before the scan — tags are engine settings.
    */
   private async runACEAnalysis(
+    htmlContent: string,
     url: string,
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
@@ -373,7 +381,7 @@ export class AccessibilityRunner {
 
     try {
       await aChecker.setConfig({ policies, ruleArchive: 'latest' })
-      const result = await aChecker.getCompliance(url, label)
+      const result = await aChecker.getCompliance(htmlContent, label)
       const report = result.report as unknown as ACEReport
       return this.aceToAccessibilityResults(report, url)
     } finally {
@@ -472,7 +480,8 @@ export class AccessibilityRunner {
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
     if (engine === 'ace') {
-      return this.runACEAnalysis(url, tags)
+      const html = await page.content()
+      return this.runACEAnalysis(html, url, tags)
     }
 
     const axeResult = await this.runAxeAnalysis(page, tags)
@@ -622,20 +631,22 @@ export class AccessibilityRunner {
 
     try {
       if (engine === 'ace') {
-        // ACE is scoped at scan time via setConfig({ policies }) — WCAG level is an
-        // engine setting, not a post-scan filter. Never apply filterByTags on ACE
-        // results because ACE rules carry tags:[] and post-filtering would drop everything.
-        debugLog(`Running IBM Equal Access (ACE) analysis on ${url}...`)
-        const accessibilityResults = await this.runACEAnalysis(url, tags)
+        // Always load the page in Playwright and pass the final HTML to ACE (no separate ACE browser).
+        // This gives us JS-rendered content and supports Basic Auth; ACE only analyzes the HTML string.
+        const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
+        const html = await page.content()
+        debugLog(`Running IBM Equal Access (ACE) analysis on page content (${url})...`)
+        const accessibilityResults = await this.runACEAnalysis(html, url, tags)
 
         return {
           accessibilityResults,
           filteredResults: undefined,
           appliedFilters: tags && tags.length > 0 ? { tags } : undefined,
+          responseStatus,
         }
       }
 
-      await this.navigateAndWait(page, url, waitForLoad, timeout)
+      const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
       debugLog(`Running axe-core analysis on ${url}...`)
 
       const accessibilityResults = await this.runAccessibilityAnalysis(
@@ -662,6 +673,7 @@ export class AccessibilityRunner {
         accessibilityResults,
         filteredResults,
         appliedFilters,
+        responseStatus,
       }
     } catch (error) {
       console.error('Error running accessibility test:', error)

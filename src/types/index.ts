@@ -240,6 +240,8 @@ export interface AuditResult {
   criticalBlockers: CriticalBlocker[]
   metadata?: TestMetadata
   rawResults?: AccessibilityResults // Optional: preserve original accessibility results
+  /** HTTP status of the audited page (e.g. 200, 401). Set when Basic Auth or response is checked. */
+  responseStatus?: number
 }
 
 // ============================================================================
@@ -318,6 +320,10 @@ export interface AuditUrlInput {
   waitForLoad?: WaitStrategy
   timeout?: number // Timeout in seconds
   engine?: AccessibilityEngine // 'axe' (default) or 'ace'
+  /** HTTP Basic Auth username. Use with basicAuthPassword for sites that require Basic Authentication. */
+  basicAuthUsername?: string
+  /** HTTP Basic Auth password. Use with basicAuthUsername for sites that require Basic Authentication. */
+  basicAuthPassword?: string
 }
 
 /**
@@ -330,6 +336,10 @@ export interface AuditMultipleUrlsInput {
   continueOnError?: boolean
   tags?: string[] // Applied to all URLs
   engine?: AccessibilityEngine // 'axe' (default) or 'ace'
+  /** HTTP Basic Auth username for all URLs. Use with basicAuthPassword when sites require Basic Authentication. */
+  basicAuthUsername?: string
+  /** HTTP Basic Auth password. Use with basicAuthUsername. */
+  basicAuthPassword?: string
 }
 
 /**

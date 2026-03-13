@@ -3,7 +3,7 @@
  * Implements: audit_url, audit_multiple_urls, audit_site
  */
 
-import type { Browser, Page } from 'playwright'
+import type { Browser, BrowserContext, Page } from 'playwright'
 import { launchChromium } from '../core/playwright-bootstrap.js'
 import { AccessibilityRunner } from '../core/accessibility-runner.js'
 import { ResultProcessor, getWcagLabelFromTags } from '../core/result-processor.js'
@@ -13,6 +13,7 @@ import {
   formatErrorMessage,
 } from '../core/error-handler.js'
 import { getConfig, getAxeTagsFromConfig } from '../core/config.js'
+import { parseUrlCredentials, getBasicAuthHeader } from '../core/basic-auth.js'
 import type {
   AuditUrlInput,
   AuditResult,
@@ -82,7 +83,16 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
     waitForLoad = 'networkidle',
     timeout = 30,
     engine: inputEngine,
+    basicAuthUsername: inputBasicUser,
+    basicAuthPassword: inputBasicPass,
   } = input
+
+  // Resolve URL and optional Basic Auth (from URL user:password@host or explicit params)
+  const fullUrlRaw = normalizeUrl(url, domain)
+  const parsedFromUrl = parseUrlCredentials(fullUrlRaw)
+  const fullUrl = parsedFromUrl.urlWithoutAuth
+  const basicAuthUsername = inputBasicUser ?? parsedFromUrl.username
+  const basicAuthPassword = inputBasicPass ?? parsedFromUrl.password
 
   const engine = inputEngine ?? config.engine
 
@@ -94,9 +104,6 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
   const tags = userProvidedTags
     ? (inputTags as AccessibilityTag[])
     : (getAxeTagsFromConfig() as AccessibilityTag[])
-
-  // Normalize URL
-  const fullUrl = normalizeUrl(url, domain)
 
   // Validate tags if provided
   if (tags && tags.length > 0) {
@@ -111,7 +118,14 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
   }
 
   let browser: Browser | null = null
+  let context: BrowserContext | null = null
   let page: Page | null = null
+
+  const userAgent =
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+
+  const basicAuthHeader = getBasicAuthHeader(basicAuthUsername, basicAuthPassword)
+  if (basicAuthHeader) debugLog('Using HTTP Basic Authentication')
 
   try {
     // Launch browser with retry logic
@@ -133,11 +147,19 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       }
     )
 
-    // Create page
-    page = await browser.newPage({
-      userAgent:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    })
+    // Create context (with Basic Auth header when provided) and page
+    if (basicAuthHeader) {
+      context = await browser.newContext({
+        userAgent,
+        extraHTTPHeaders: {
+          Authorization: basicAuthHeader,
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+      })
+      page = await context.newPage()
+    } else {
+      page = await browser.newPage({ userAgent })
+    }
 
     // Set viewport from config (first screen size)
     const viewport = config.screenSizes[0]
@@ -148,10 +170,23 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       })
     }
 
-    // Set extra HTTP headers
-    await page.setExtraHTTPHeaders({
-      'Accept-Language': 'en-US,en;q=0.9',
-    })
+    // When using Basic Auth, add route so every request (including first navigation) has the header
+    if (basicAuthHeader) {
+      const authHeaderValue = basicAuthHeader
+      await page.route('**/*', (route) => {
+        const req = route.request()
+        const reqHeaders = req.headers() as Record<string, string>
+        const withAuth: Record<string, string> = {}
+        for (const [k, v] of Object.entries(reqHeaders)) {
+          if (v != null && typeof v === 'string') withAuth[k] = v
+        }
+        withAuth['Authorization'] = authHeaderValue
+        void route.continue({ headers: withAuth })
+      })
+      await page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 5000 })
+    } else {
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' })
+    }
 
     // Initialize AccessibilityRunner
     const accessibilityRunner = new AccessibilityRunner()
@@ -177,6 +212,14 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       }
     )
 
+    const responseStatus = accessibilityResult.responseStatus
+    const usedBasicAuth = basicAuthUsername != null && basicAuthPassword != null
+    if (usedBasicAuth && responseStatus != null && (responseStatus === 401 || responseStatus === 403)) {
+      throw new Error(
+        `HTTP ${responseStatus}: Basic Auth failed. The server rejected the credentials (or did not accept Basic Auth). Check username and password.`
+      )
+    }
+
     // Process results
     const resultProcessor = new ResultProcessor()
 
@@ -195,16 +238,23 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       `Audit complete: ${auditResult.summary.totalIssues} issues found, score: ${auditResult.summary.score}/100`
     )
 
-    return auditResult
+    return {
+      ...auditResult,
+      ...(responseStatus != null && { responseStatus }),
+    }
   } catch (error) {
     const errorInfo = handleErrorGracefully(error, `audit_url: ${fullUrl}`)
     console.error(`Error during audit: ${formatErrorMessage(error, `audit_url: ${fullUrl}`)}`)
     throw new Error(errorInfo.error)
   } finally {
-    // Cleanup with error handling
     if (page) {
       await page.close().catch((err) => {
         console.warn(`Warning: Error closing page: ${err}`)
+      })
+    }
+    if (context) {
+      await context.close().catch((err) => {
+        console.warn(`Warning: Error closing context: ${err}`)
       })
     }
     if (browser) {
@@ -223,7 +273,9 @@ async function processSingleUrl(
   domain: string | undefined,
   tags: string[] | undefined,
   continueOnError: boolean = true,
-  engine?: 'axe' | 'ace'
+  engine?: 'axe' | 'ace',
+  basicAuthUsername?: string,
+  basicAuthPassword?: string
 ): Promise<{ url: string; result?: AuditResult; error?: string }> {
   try {
     const result = await retryWithBackoff(
@@ -233,6 +285,8 @@ async function processSingleUrl(
           domain,
           tags,
           engine,
+          basicAuthUsername,
+          basicAuthPassword,
         })
       },
       {
@@ -264,7 +318,9 @@ async function processBatchParallel(
   parallel: number,
   continueOnError: boolean,
   onProgress?: (progress: BatchAuditProgress) => void,
-  engine?: 'axe' | 'ace'
+  engine?: 'axe' | 'ace',
+  basicAuthUsername?: string,
+  basicAuthPassword?: string
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
     []
@@ -276,7 +332,7 @@ async function processBatchParallel(
   for (let i = 0; i < urlArray.length; i += parallel) {
     const batch = urlArray.slice(i, i + parallel)
     const batchPromises = batch.map((url) =>
-      processSingleUrl(url, domain, tags, continueOnError, engine)
+      processSingleUrl(url, domain, tags, continueOnError, engine, basicAuthUsername, basicAuthPassword)
     )
 
     // Wait for batch to complete
@@ -367,7 +423,9 @@ async function processBatchSequential(
   tags: string[] | undefined,
   continueOnError: boolean,
   onProgress?: (progress: BatchAuditProgress) => void,
-  engine?: 'axe' | 'ace'
+  engine?: 'axe' | 'ace',
+  basicAuthUsername?: string,
+  basicAuthPassword?: string
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
     []
@@ -377,7 +435,7 @@ async function processBatchSequential(
 
   for (let i = 0; i < urlArray.length; i++) {
     const url = urlArray[i]
-    const result = await processSingleUrl(url, domain, tags, continueOnError, engine)
+    const result = await processSingleUrl(url, domain, tags, continueOnError, engine, basicAuthUsername, basicAuthPassword)
     results.push(result)
 
     if (result.result) {
@@ -543,6 +601,8 @@ export async function auditMultipleUrls(
     continueOnError = true,
     tags,
     engine: inputEngine,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
   const engine = inputEngine ?? config.engine
 
@@ -569,7 +629,9 @@ export async function auditMultipleUrls(
           parallel,
           continueOnError,
           onProgress,
-          engine as 'axe' | 'ace'
+          engine as 'axe' | 'ace',
+          basicAuthUsername,
+          basicAuthPassword
         )
       : await processBatchSequential(
           urlArray,
@@ -577,7 +639,9 @@ export async function auditMultipleUrls(
           tags,
           continueOnError,
           onProgress,
-          engine as 'axe' | 'ace'
+          engine as 'axe' | 'ace',
+          basicAuthUsername,
+          basicAuthPassword
         )
 
   // Calculate aggregated summary

@@ -674,6 +674,10 @@ export interface ExportToCsvInput {
   includeMetadata?: boolean // Include test information and environment data (default: true)
   includeViolations?: boolean // Include detailed violation rows (default: true)
   format?: 'standard' | 'detailed' | 'minimal' // Export format (default: "standard")
+  /** HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can be in URL as https://user:password@host/. */
+  basicAuthUsername?: string
+  /** HTTP Basic Auth password when results is a URL. Use with basicAuthUsername. */
+  basicAuthPassword?: string
 }
 
 /**

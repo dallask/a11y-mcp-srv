@@ -3,6 +3,7 @@
  * Implements: export_to_csv, export_to_excel, export_to_json, export_to_html_report
  */
 
+import { resolveBasicAuth } from '../core/basic-auth.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -90,15 +91,20 @@ export async function exportToCsv(
     includeMetadata = true,
     includeViolations = true,
     format = 'standard',
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = results
   }

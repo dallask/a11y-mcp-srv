@@ -616,6 +616,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Export format: "standard" (default), "detailed" (includes all fields), or "minimal" (essential fields only).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can be embedded in URL as https://user:password@host/.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
+            },
           },
           required: ['results'],
         },
@@ -1302,6 +1312,8 @@ async function createServer(): Promise<Server> {
             includeMetadata: args?.includeMetadata as boolean | undefined,
             includeViolations: args?.includeViolations as boolean | undefined,
             format: args?.format as 'standard' | 'detailed' | 'minimal' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {

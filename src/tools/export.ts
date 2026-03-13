@@ -230,15 +230,20 @@ export async function exportToExcel(
     results,
     includeCharts = false,
     formatting = true,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = results
   }
@@ -376,15 +381,20 @@ export async function exportToJson(
     results,
     pretty = true,
     includeRaw = false,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = results
   }
@@ -843,15 +853,20 @@ export async function exportToHtmlReport(
     results,
     template = 'default',
     includeCharts = true,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = results
   }

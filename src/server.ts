@@ -662,6 +662,16 @@ async function createServer(): Promise<Server> {
               default: true,
               description: 'Apply colors, headers, and styling (default: true).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can be embedded in URL as https://user:password@host/.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
+            },
           },
           required: ['results'],
         },
@@ -697,6 +707,16 @@ async function createServer(): Promise<Server> {
               default: false,
               description:
                 'Include raw accessibility engine results (default: false).',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can be embedded in URL as https://user:password@host/.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
           },
           required: ['results'],
@@ -734,6 +754,16 @@ async function createServer(): Promise<Server> {
               type: 'boolean',
               default: true,
               description: 'Include visual charts (default: true).',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can be embedded in URL as https://user:password@host/.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
           },
           required: ['results'],
@@ -1331,6 +1361,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             includeCharts: args?.includeCharts as boolean | undefined,
             formatting: args?.formatting as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1348,6 +1380,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             pretty: args?.pretty as boolean | undefined,
             includeRaw: args?.includeRaw as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1365,6 +1399,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             template: args?.template as 'default' | 'minimal' | 'detailed' | undefined,
             includeCharts: args?.includeCharts as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {

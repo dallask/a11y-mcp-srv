@@ -698,6 +698,8 @@ export interface ExportToExcelInput {
   results: AuditResult | string // Audit result object or URL string
   includeCharts?: boolean // Generate charts for score trends and category breakdown (default: false)
   formatting?: boolean // Apply colors, headers, and styling (default: true)
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**
@@ -718,6 +720,8 @@ export interface ExportToJsonInput {
   results: AuditResult | string // Audit result object or URL string
   pretty?: boolean // Pretty-print JSON (default: true)
   includeRaw?: boolean // Include raw accessibility engine results (default: false)
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**
@@ -737,6 +741,8 @@ export interface ExportToHtmlInput {
   results: AuditResult | string // Audit result object or URL string
   template?: 'default' | 'minimal' | 'detailed' // Report template (default: "default")
   includeCharts?: boolean // Include visual charts (default: true)
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**

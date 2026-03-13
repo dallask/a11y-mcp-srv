@@ -3,6 +3,7 @@
  * Implements: compare_accessibility, track_accessibility
  */
 
+import { resolveBasicAuth } from '../core/basic-auth.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -209,20 +210,32 @@ export async function compareAccessibility(
     before,
     after,
     format = 'summary',
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  // Get audit results - if strings, run audits first
+  // Get audit results - if strings, run audits first (with optional Basic Auth, same as audit_url)
   let beforeResult: AuditResult
   let afterResult: AuditResult
 
   if (typeof before === 'string') {
-    beforeResult = await auditUrl({ url: before })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      before,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    beforeResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     beforeResult = before
   }
 
   if (typeof after === 'string') {
-    afterResult = await auditUrl({ url: after })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      after,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    afterResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     afterResult = after
   }
@@ -546,20 +559,28 @@ export async function trackAccessibility(
     url,
     timeframe = '30d',
     metric = 'score',
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  // Run current audit
-  const currentResult = await auditUrl({ url })
+  const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+    url,
+    basicAuthUsername,
+    basicAuthPassword
+  )
+
+  // Run current audit (with optional Basic Auth, same as audit_url)
+  const currentResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
 
   // Get current metric value
   const currentValue = extractMetric(currentResult, metric)
 
-  // Store in historical data
-  if (!historicalDataStore.has(url)) {
-    historicalDataStore.set(url, [])
+  // Store in historical data (key by urlWithoutAuth for consistency)
+  if (!historicalDataStore.has(urlWithoutAuth)) {
+    historicalDataStore.set(urlWithoutAuth, [])
   }
 
-  const historicalData = historicalDataStore.get(url)!
+  const historicalData = historicalDataStore.get(urlWithoutAuth)!
   
   // Add current result
   historicalData.push({
@@ -607,7 +628,7 @@ export async function trackAccessibility(
   }
 
   return {
-    url,
+    url: urlWithoutAuth,
     historicalData: trendData,
     currentValue,
     trend,

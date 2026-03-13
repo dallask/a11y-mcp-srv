@@ -3,6 +3,7 @@
  * Implements: get_accessibility_score, prioritize_issues, explain_issue, get_quick_fixes
  */
 
+import { resolveBasicAuth } from '../core/basic-auth.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -169,11 +170,14 @@ export async function getAccessibilityScore(
 ): Promise<ScoreResult> {
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof input.results === 'string') {
-    auditResult = await auditUrl({
-      url: input.results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      input.results,
+      input.basicAuthUsername,
+      input.basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = input.results
   }
@@ -898,15 +902,20 @@ export async function getQuickFixes(
     results,
     format = 'json',
     includeCode = true,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = results
   }
@@ -1398,12 +1407,14 @@ export async function getWCAGCompliance(
 ): Promise<WCAGComplianceResult> {
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof input.results === 'string') {
-    const { auditUrl } = await import('./audit.js')
-    auditResult = await auditUrl({
-      url: input.results,
-    })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      input.results,
+      input.basicAuthUsername,
+      input.basicAuthPassword
+    )
+    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
     auditResult = input.results
   }

@@ -1143,20 +1143,32 @@ export async function generateSummaryReport(
     results,
     format = 'markdown',
     level = 'executive',
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   let auditResults: AuditResult | AuditResult[]
 
-  // If input is a URL string, run an audit first
+  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
   if (typeof results === 'string') {
-    const singleResult = await auditUrl({ url: results })
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword
+    )
+    const singleResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
     auditResults = singleResult
   } else if (Array.isArray(results)) {
-    // If array contains URLs, audit them
+    // If array contains URLs, audit them (each with optional Basic Auth)
     const urlResults = await Promise.all(
       results.map(async (r) => {
         if (typeof r === 'string') {
-          return await auditUrl({ url: r })
+          const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+            r,
+            basicAuthUsername,
+            basicAuthPassword
+          )
+          return await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
         }
         return r
       })

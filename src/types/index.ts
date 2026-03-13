@@ -369,6 +369,8 @@ export interface AuditWithSessionInput {
 export interface ScoreInput {
   results: AuditResult | string // Audit results or URL to score
   weights?: Record<string, number> // Custom weights for different issue types
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**
@@ -436,6 +438,8 @@ export interface QuickFixesInput {
   results: AuditResult | string
   format?: 'markdown' | 'html' | 'json'
   includeCode?: boolean
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**
@@ -468,6 +472,8 @@ export interface CompareAccessibilityInput {
   before: AuditResult | string // Previous audit results or URL
   after: AuditResult | string // Current audit results or URL
   format?: 'summary' | 'detailed' | 'diff'
+  basicAuthUsername?: string // HTTP Basic Auth when before/after are URLs
+  basicAuthPassword?: string
 }
 
 /**
@@ -499,6 +505,8 @@ export interface TrackAccessibilityInput {
   url: string
   timeframe?: TrackingTimeframe
   metric?: TrackingMetric
+  basicAuthUsername?: string // HTTP Basic Auth for url
+  basicAuthPassword?: string
 }
 
 /**
@@ -571,6 +579,8 @@ export interface ComplianceReport {
 export interface WCAGComplianceInput {
   results: AuditResult | string
   level?: WCAGLevel
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**
@@ -921,6 +931,8 @@ export interface GenerateSummaryReportInput {
   results: AuditResult | AuditResult[] | string | string[] // Audit result object(s) or URL string(s)
   format?: SummaryReportFormat // Output format (default: "markdown")
   level?: SummaryReportLevel // Detail level (default: "executive")
+  basicAuthUsername?: string // HTTP Basic Auth when results is a URL
+  basicAuthPassword?: string
 }
 
 /**

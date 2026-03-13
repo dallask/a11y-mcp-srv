@@ -878,6 +878,10 @@ export interface GenerateDashboardInput {
   results: AuditResult | AuditResult[] | string | string[] // Audit result object(s) or URL string(s)
   format?: DashboardFormat // Output format (default: "markdown")
   includeCharts?: boolean // Include ASCII/text charts (default: true)
+  /** HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can also be embedded in URL as https://user:password@host/. */
+  basicAuthUsername?: string
+  /** HTTP Basic Auth password when results is a URL. Use with basicAuthUsername. */
+  basicAuthPassword?: string
 }
 
 /**

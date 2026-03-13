@@ -949,6 +949,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Include ASCII/text charts in the dashboard (default: true).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword. Can be embedded in URL as https://user:password@host/.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
+            },
           },
           required: ['results'],
         },
@@ -1428,6 +1438,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult | AuditResult[] | string | string[]
             format: args?.format as 'text' | 'markdown' | 'html' | 'json' | undefined,
             includeCharts: args?.includeCharts as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {

@@ -15,6 +15,7 @@ import type {
   AccessibilityEngine,
   WaitStrategy,
 } from '../types/index.js'
+import { IMPACT_ORDER } from '../types/index.js'
 import type { DOMInfo } from '../types/index.js'
 
 /**
@@ -119,6 +120,40 @@ interface ACEReport {
     }
   }
   results: ACEResultItem[]
+}
+
+/**
+ * Parse tagName, className, and id from HTML snippet or path.dom string.
+ * Used to populate domInfo so Element and Class selector columns are accurate.
+ */
+function parseDomFromSnippet(
+  snippet: string | null | undefined,
+  pathDom?: string
+): { tagName: string; className: string | null; id: string | null } {
+  let tagName = ''
+  let className: string | null = null
+  let id: string | null = null
+
+  if (snippet) {
+    const tagMatch = snippet.match(/<\s*(\w+)[\s>]/)
+    if (tagMatch) tagName = tagMatch[1].toLowerCase()
+    const classMatch = snippet.match(/class\s*=\s*["']([^"']*)["']/)
+    if (classMatch) className = classMatch[1].trim() || null
+    const idMatch = snippet.match(/\bid\s*=\s*["']([^"']*)["']/)
+    if (idMatch) id = idMatch[1].trim() || null
+  }
+
+  if (!tagName && pathDom) {
+    const segments = pathDom.split(/[/.]/)
+    const last = segments[segments.length - 1]
+    if (last) {
+      const tagPart = last.replace(/\[\d+\]$/, '').trim()
+      if (tagPart) tagName = tagPart.toLowerCase()
+    }
+  }
+
+  if (!tagName) tagName = 'element'
+  return { tagName, className, id }
 }
 
 /**
@@ -266,21 +301,21 @@ export class AccessibilityRunner {
       const xpaths = (v.nodes || []).map(
         (n) => (n.target && n.target[0]) || ''
       )
-      const domInfo: DOMInfo[] = (v.nodes || []).map((n) => ({
-        innerHTML: n.html ? n.html.substring(0, 200) : null,
-        selector: n.target && n.target[0],
-      }))
+      const domInfo: DOMInfo[] = (v.nodes || []).map((n) => {
+        const selector = n.target && n.target[0]
+        const { tagName, className, id } = parseDomFromSnippet(n.html ?? null, selector)
+        return {
+          innerHTML: n.html ? n.html.substring(0, 200) : null,
+          selector,
+          tagName,
+          className,
+          id,
+        }
+      })
 
-      // Map axe-core impact levels to IBM Equal Access severity levels.
-      // Axe violations are definite failures → 'violation'.
-      // (Axe "incomplete" items would be 'needs-review' but we only process violations here.)
-      const axeImpact = v.impact?.toLowerCase()
+      // Use axe-core native impact levels (critical, serious, moderate, minor)
       const impact: AccessibilityRuleData['impact'] =
-        axeImpact === 'critical' || axeImpact === 'serious'
-          ? 'violation'
-          : axeImpact === 'moderate'
-            ? 'needs-review'
-            : 'recommendation'
+        (v.impact?.toLowerCase() as AccessibilityRuleData['impact']) ?? 'moderate'
 
       const ruleData: AccessibilityRuleData = {
         count: v.nodes?.length ?? 0,
@@ -306,16 +341,38 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Run IBM Equal Access (accessibility-checker) analysis for a URL
+   * Map axe-style WCAG tags to IBM Equal Access policy IDs.
+   * ACE is scoped at scan time via setConfig({ policies }) — not post-filtered.
+   *   wcag22* → WCAG_2_2
+   *   wcag21* → WCAG_2_1
+   *   wcag2*  → WCAG_2_0
+   *   best-practice / (default) → IBM_Accessibility
+   */
+  private acePolicesFromTags(tags?: AccessibilityTag[]): string[] {
+    if (!tags || tags.length === 0) return ['IBM_Accessibility']
+    if (tags.some((t) => t.startsWith('wcag22'))) return ['WCAG_2_2']
+    if (tags.some((t) => t.startsWith('wcag21'))) return ['WCAG_2_1']
+    if (tags.some((t) => t.startsWith('wcag2'))) return ['WCAG_2_0']
+    return ['IBM_Accessibility']
+  }
+
+  /**
+   * Run IBM Equal Access (accessibility-checker) analysis for a URL.
+   * WCAG level/policy is configured via setConfig before the scan — tags are
+   * engine settings here, not a post-scan filter.
    */
   private async runACEAnalysis(
     url: string,
-    _tags?: AccessibilityTag[]
+    tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
     const aChecker = await import('accessibility-checker')
     const label = `audit-${Date.now()}`
 
+    const policies = this.acePolicesFromTags(tags)
+    debugLog(`ACE policies: ${policies.join(', ')}`)
+
     try {
+      await aChecker.setConfig({ policies, ruleArchive: 'latest' })
       const result = await aChecker.getCompliance(url, label)
       const report = result.report as unknown as ACEReport
       return this.aceToAccessibilityResults(report, url)
@@ -325,40 +382,17 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Map ACE report level to IBM Equal Access severity levels.
-   * Matches the IBM browser tool exactly:
-   *   violation              → 'violation'      (🚫 red)
-   *   potentialviolation     → 'needs-review'   (⚠️ yellow)
-   *   potentialrecommendation→ 'needs-review'   (⚠️ yellow)
-   *   recommendation         → 'recommendation' (ℹ️ blue)
-   *   manual                 → 'needs-review'   (⚠️ yellow – manual check required)
-   *   pass / ignored         → 'minor'
-   */
-  private aceLevelToImpact(level: string): AccessibilityRuleData['impact'] {
-    const l = level.toLowerCase()
-    if (l === 'violation') return 'violation'
-    if (l === 'potentialviolation' || l === 'potentialrecommendation' || l === 'manual') return 'needs-review'
-    if (l === 'recommendation') return 'recommendation'
-    return 'minor'
-  }
-
-  /**
    * Compare impact severity (higher = worse). Used to take the worst impact per rule.
+   * Uses IMPACT_ORDER for both axe and ACE native levels.
    */
   private impactRank(a: AccessibilityRuleData['impact']): number {
     if (!a) return 0
-    const r: Record<NonNullable<AccessibilityRuleData['impact']>, number> = {
-      violation: 4,
-      'needs-review': 3,
-      recommendation: 2,
-      minor: 1,
-    }
-    return r[a] ?? 0
+    return IMPACT_ORDER[a.toLowerCase()] ?? 2
   }
 
   /**
    * Convert ACE report to our AccessibilityResults format.
-   * Preserves ACE severity (critical/serious/moderate) so output matches the IBM browser tool.
+   * Uses ACE native levels (violation, potentialviolation, recommendation, etc.).
    */
   private aceToAccessibilityResults(
     report: ACEReport,
@@ -372,12 +406,14 @@ export class AccessibilityRunner {
         r.level === 'violation' ||
         r.level === 'potentialviolation' ||
         r.level === 'recommendation' ||
-        r.level === 'potentialrecommendation'
+        r.level === 'potentialrecommendation' ||
+        r.level === 'manual'
     )
 
     violationItems.forEach((item: ACEResultItem) => {
       const ruleId = item.ruleId
-      const itemImpact = this.aceLevelToImpact(item.level)
+      // Use ACE native level (violation, potentialviolation, recommendation, etc.)
+      const itemImpact = item.level.toLowerCase() as AccessibilityRuleData['impact']
       if (!violations.error!.items[ruleId]) {
         violations.error!.items[ruleId] = {
           count: 0,
@@ -392,9 +428,16 @@ export class AccessibilityRunner {
       const rule = violations.error!.items[ruleId]
       rule.count += 1
       rule.xpaths.push(item.path.dom || '')
+      const { tagName, className, id } = parseDomFromSnippet(
+        item.snippet ?? null,
+        item.path.dom
+      )
       rule.domInfo!.push({
         innerHTML: item.snippet ? item.snippet.substring(0, 200) : null,
         selector: item.path.dom,
+        tagName,
+        className,
+        id,
       })
       if (itemImpact && this.impactRank(itemImpact) > this.impactRank(rule.impact)) {
         rule.impact = itemImpact
@@ -503,7 +546,10 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Check if a rule matches any of the specified tags
+   * Check if a rule matches any of the specified tags.
+   * Only uses ruleData.tags when the array is non-empty; otherwise falls back to
+   * the static mapping and finally defaults to true (include the rule).
+   * This prevents rules with tags:[] from being silently dropped.
    */
   private ruleMatchesTags(
     ruleId: string,
@@ -511,7 +557,7 @@ export class AccessibilityRunner {
     tags: AccessibilityTag[]
   ): boolean {
     if (!tags || tags.length === 0) return true
-    if (ruleData.tags && Array.isArray(ruleData.tags)) {
+    if (ruleData.tags && Array.isArray(ruleData.tags) && ruleData.tags.length > 0) {
       return ruleData.tags.some((tag) => tags.includes(tag as AccessibilityTag))
     }
     const mapping = this.getRuleTagMapping()
@@ -576,25 +622,16 @@ export class AccessibilityRunner {
 
     try {
       if (engine === 'ace') {
+        // ACE is scoped at scan time via setConfig({ policies }) — WCAG level is an
+        // engine setting, not a post-scan filter. Never apply filterByTags on ACE
+        // results because ACE rules carry tags:[] and post-filtering would drop everything.
         debugLog(`Running IBM Equal Access (ACE) analysis on ${url}...`)
         const accessibilityResults = await this.runACEAnalysis(url, tags)
-        const originalIssueCount = this.countTotalIssues(accessibilityResults.violations)
-
-        let filteredResults: AccessibilityResults | undefined
-        let appliedFilters: AccessibilityRunnerResult['appliedFilters']
-
-        if (applyTagFilter && tags && tags.length > 0) {
-          filteredResults = this.filterByTags(accessibilityResults, tags)
-          appliedFilters = { tags, originalIssueCount }
-          debugLog(
-            `Filtered results: ${originalIssueCount} -> ${this.countTotalIssues(filteredResults.violations)} issues`
-          )
-        }
 
         return {
           accessibilityResults,
-          filteredResults,
-          appliedFilters,
+          filteredResults: undefined,
+          appliedFilters: tags && tags.length > 0 ? { tags } : undefined,
         }
       }
 

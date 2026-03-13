@@ -135,14 +135,9 @@ function formatDashboardAsMarkdown(
     }
   }
 
-  // Impact breakdown
+  // Impact breakdown (axe: critical/serious/moderate/minor; ACE: violation/potentialviolation/...)
   if (isMultiple) {
-    const impactCounts: Record<string, number> = {
-      critical: 0,
-      serious: 0,
-      moderate: 0,
-      minor: 0,
-    }
+    const impactCounts: Record<string, number> = {}
     resultsArray.forEach((result) => {
       Object.entries(result.summary.byImpact).forEach(([impact, count]) => {
         impactCounts[impact] = (impactCounts[impact] || 0) + count
@@ -330,14 +325,9 @@ function formatDashboardAsText(
     }
   }
 
-  // Impact breakdown
+  // Impact breakdown (axe/ACE native levels)
   if (isMultiple) {
-    const impactCounts: Record<string, number> = {
-      critical: 0,
-      serious: 0,
-      moderate: 0,
-      minor: 0,
-    }
+    const impactCounts: Record<string, number> = {}
     resultsArray.forEach((result) => {
       Object.entries(result.summary.byImpact).forEach(([impact, count]) => {
         impactCounts[impact] = (impactCounts[impact] || 0) + count
@@ -520,14 +510,9 @@ function formatDashboardAsHTML(
     }
   }
 
-  // Impact breakdown
+  // Impact breakdown (axe/ACE native levels)
   if (isMultiple) {
-    const impactCounts: Record<string, number> = {
-      critical: 0,
-      serious: 0,
-      moderate: 0,
-      minor: 0,
-    }
+    const impactCounts: Record<string, number> = {}
     resultsArray.forEach((result) => {
       Object.entries(result.summary.byImpact).forEach(([impact, count]) => {
         impactCounts[impact] = (impactCounts[impact] || 0) + count
@@ -746,10 +731,10 @@ function generateExecutiveSummary(
       parts.push(`- Average Accessibility Score: ${Math.round(avgScore)}/100`)
       parts.push(`- Total Issues Found: ${totalIssues}`)
 
-      const criticalCount = resultsArray.reduce(
-        (sum, r) => sum + (r.summary.byImpact.critical || 0),
-        0
-      )
+      const criticalCount = resultsArray.reduce((sum, r) => {
+        const byImpact = r.summary.byImpact
+        return sum + (byImpact.critical ?? 0) + (byImpact.violation ?? 0) + (byImpact.serious ?? 0) + (byImpact.potentialviolation ?? 0)
+      }, 0)
       if (criticalCount > 0) {
         parts.push(
           `- Critical Issues: ${criticalCount} (must be addressed before launch)`
@@ -834,13 +819,8 @@ function generateExecutiveSummary(
         `- WCAG Compliance: Level A: ${Math.round(avgWCAG.A)}%, Level AA: ${Math.round(avgWCAG.AA)}%, Level AAA: ${Math.round(avgWCAG.AAA)}%`
       )
 
-      // Impact breakdown
-      const impactCounts: Record<string, number> = {
-        critical: 0,
-        serious: 0,
-        moderate: 0,
-        minor: 0,
-      }
+      // Impact breakdown (axe/ACE native levels)
+      const impactCounts: Record<string, number> = {}
       resultsArray.forEach((result) => {
         Object.entries(result.summary.byImpact).forEach(([impact, count]) => {
           impactCounts[impact] = (impactCounts[impact] || 0) + count
@@ -871,10 +851,10 @@ function generateExecutiveSummary(
           parts.push(`- ${category}: ${count}`)
         })
 
-      const criticalCount = resultsArray.reduce(
-        (sum, r) => sum + (r.summary.byImpact.critical || 0),
-        0
-      )
+      const criticalCount = resultsArray.reduce((sum, r) => {
+        const byImpact = r.summary.byImpact
+        return sum + (byImpact.critical ?? 0) + (byImpact.violation ?? 0) + (byImpact.serious ?? 0) + (byImpact.potentialviolation ?? 0)
+      }, 0)
       const quickWinsCount = resultsArray.reduce(
         (sum, r) => sum + r.quickWins.length,
         0

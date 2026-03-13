@@ -15,6 +15,8 @@ import type {
   StatisticsBreakdown,
   BreakdownDimension,
 } from '../types/index.js'
+import { IMPACT_ORDER } from '../types/index.js'
+import { wcagLevelMatches } from '../core/result-processor.js'
 
 /** Safely get prioritizedIssues from a result (handles missing or non-array from external tools). */
 function getPrioritizedIssues(result: unknown): PrioritizedIssue[] {
@@ -40,9 +42,9 @@ function calculateWCAGCompliance(issues: PrioritizedIssue[]): WCAGCompliance {
     return { A: 100, AA: 100, AAA: 100 }
   }
 
-  const levelA = issues.filter((i) => i.wcagLevel === 'A')
-  const levelAA = issues.filter((i) => i.wcagLevel === 'AA')
-  const levelAAA = issues.filter((i) => i.wcagLevel === 'AAA')
+  const levelA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'A'))
+  const levelAA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'AA'))
+  const levelAAA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'AAA'))
 
   const totalIssues = issues.length
   const complianceA = totalIssues > 0
@@ -72,20 +74,11 @@ function calculateScore(issues: PrioritizedIssue[]): number {
 
   let score = 100
   issues.forEach((issue) => {
-    switch (issue.impact) {
-      case 'violation':
-        score -= 5
-        break
-      case 'needs-review':
-        score -= 3
-        break
-      case 'recommendation':
-        score -= 1
-        break
-      case 'minor':
-        score -= 0.5
-        break
-    }
+    const rank = IMPACT_ORDER[issue.impact?.toLowerCase() ?? ''] ?? 2
+    if (rank >= 5) score -= 5
+    else if (rank >= 4) score -= 3
+    else if (rank >= 3) score -= 1
+    else score -= 0.5
   })
 
   return Math.max(0, Math.round(score))

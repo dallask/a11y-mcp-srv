@@ -14,7 +14,6 @@ import type {
   PrioritizedIssue,
   QuickWin,
   CriticalBlocker,
-  ImpactLevel,
   ExplainIssueInput,
   IssueExplanation,
   QuickFixesInput,
@@ -29,15 +28,28 @@ import type {
   WCAGComplianceResult,
   WCAGCriterion,
 } from '../types/index.js'
+import { IMPACT_ORDER } from '../types/index.js'
+import { wcagLevelMatches, wcagLevelOrder } from '../core/result-processor.js'
+
+function impactRank(impact: string): number {
+  return IMPACT_ORDER[impact.toLowerCase()] ?? 2
+}
 
 /**
- * Default weights for different issue types when calculating scores
+ * Default weights for different issue types when calculating scores (axe + ACE native levels)
  */
 const DEFAULT_WEIGHTS: Record<string, number> = {
   critical: 5.0,
   serious: 3.0,
   moderate: 1.0,
   minor: 0.5,
+  violation: 5.0,
+  potentialviolation: 4.0,
+  potentialrecommendation: 3.0,
+  recommendation: 2.0,
+  manual: 3.0,
+  pass: 0.5,
+  ignored: 0,
   // Category-based weights
   error: 5.0,
   contrast: 3.0,
@@ -89,9 +101,9 @@ function calculateWCAGCompliance(issues: PrioritizedIssue[]): WCAGCompliance {
   }
 
   // Count issues by WCAG level
-  const levelA = issues.filter((i) => i.wcagLevel === 'A')
-  const levelAA = issues.filter((i) => i.wcagLevel === 'AA')
-  const levelAAA = issues.filter((i) => i.wcagLevel === 'AAA')
+  const levelA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'A'))
+  const levelAA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'AA'))
+  const levelAAA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'AAA'))
 
   // Calculate compliance as percentage
   // This is a simplified calculation - assumes each issue represents a criterion violation
@@ -208,15 +220,9 @@ function prioritizeByCriteria(
 
   switch (criteria) {
     case 'impact': {
-      // Sort by impact level (critical > serious > moderate > minor)
-      const impactOrder: Record<ImpactLevel, number> = {
-        violation: 4,
-        'needs-review': 3,
-        recommendation: 2,
-        minor: 1,
-      }
+      // Sort by impact level (axe: critical/serious/moderate/minor; ACE: violation/...)
       sorted.sort((a, b) => {
-        const impactDiff = impactOrder[b.impact] - impactOrder[a.impact]
+        const impactDiff = impactRank(b.impact) - impactRank(a.impact)
         if (impactDiff !== 0) return impactDiff
         return b.priority - a.priority
       })
@@ -225,22 +231,10 @@ function prioritizeByCriteria(
 
     case 'wcag': {
       // Sort by WCAG level (A > AA > AAA) - Level A violations are legal requirements
-      const levelOrder: Record<string, number> = {
-        A: 3,
-        AA: 2,
-        AAA: 1,
-        'N/A': 0,
-      }
       sorted.sort((a, b) => {
-        const levelDiff = levelOrder[b.wcagLevel] - levelOrder[a.wcagLevel]
+        const levelDiff = wcagLevelOrder(b.wcagLevel) - wcagLevelOrder(a.wcagLevel)
         if (levelDiff !== 0) return levelDiff
-        const impactOrder: Record<ImpactLevel, number> = {
-          violation: 4,
-          'needs-review': 3,
-          recommendation: 2,
-          minor: 1,
-        }
-        return impactOrder[b.impact] - impactOrder[a.impact]
+        return impactRank(b.impact) - impactRank(a.impact)
       })
       break
     }
@@ -262,25 +256,11 @@ function prioritizeByCriteria(
     }
 
     case 'user-impact': {
-      // Sort by user impact (critical > serious > moderate > minor)
-      // This is similar to impact but emphasizes user experience
-      const impactOrder: Record<ImpactLevel, number> = {
-        violation: 4,
-        'needs-review': 3,
-        recommendation: 2,
-        minor: 1,
-      }
+      // Sort by user impact (axe/ACE native levels)
       sorted.sort((a, b) => {
-        const impactDiff = impactOrder[b.impact] - impactOrder[a.impact]
+        const impactDiff = impactRank(b.impact) - impactRank(a.impact)
         if (impactDiff !== 0) return impactDiff
-        // Secondary sort by WCAG level
-        const levelOrder: Record<string, number> = {
-          A: 3,
-          AA: 2,
-          AAA: 1,
-          'N/A': 0,
-        }
-        return levelOrder[b.wcagLevel] - levelOrder[a.wcagLevel]
+        return wcagLevelOrder(b.wcagLevel) - wcagLevelOrder(a.wcagLevel)
       })
       break
     }
@@ -309,9 +289,7 @@ function identifyQuickWins(issues: PrioritizedIssue[]): QuickWin[] {
     // 1. Have high impact (critical or serious)
     // 2. Have clear fix suggestions (suggested code differs from current)
     // 3. Affect multiple elements (batch fix opportunity)
-    const highImpactIssues = groupIssues.filter(
-      (i) => i.impact === 'violation' || i.impact === 'needs-review'
-    )
+    const highImpactIssues = groupIssues.filter((i) => impactRank(i.impact) >= 5)
 
     if (highImpactIssues.length > 0) {
       const firstIssue = groupIssues[0]
@@ -337,13 +315,7 @@ function identifyQuickWins(issues: PrioritizedIssue[]): QuickWin[] {
 
   // Sort by impact and number of affected elements
   quickWins.sort((a, b) => {
-    const impactOrder: Record<ImpactLevel, number> = {
-      violation: 4,
-      'needs-review': 3,
-      recommendation: 2,
-      minor: 1,
-    }
-    const impactDiff = impactOrder[b.impact] - impactOrder[a.impact]
+    const impactDiff = impactRank(b.impact) - impactRank(a.impact)
     if (impactDiff !== 0) return impactDiff
     return b.affectedElements - a.affectedElements
   })
@@ -368,10 +340,10 @@ function identifyCriticalBlockers(issues: PrioritizedIssue[]): CriticalBlocker[]
 
   ruleGroups.forEach((groupIssues, ruleId) => {
     // Critical blockers are:
-    // 1. Critical impact issues
+    // 1. High impact (axe: critical/serious; ACE: violation/potentialviolation)
     // 2. WCAG Level A violations (legal requirement)
-    const criticalIssues = groupIssues.filter((i) => i.impact === 'violation')
-    const levelAIssues = groupIssues.filter((i) => i.wcagLevel === 'A')
+    const criticalIssues = groupIssues.filter((i) => impactRank(i.impact) >= 5)
+    const levelAIssues = groupIssues.filter((i) => wcagLevelMatches(i.wcagLevel, 'A'))
 
     if (criticalIssues.length > 0 || levelAIssues.length > 0) {
       const firstIssue = groupIssues[0]
@@ -381,29 +353,18 @@ function identifyCriticalBlockers(issues: PrioritizedIssue[]): CriticalBlocker[]
         impact: firstIssue.impact,
         userImpact: firstIssue.userImpact,
         affectedElements: groupIssues.length,
-        wcagLevel: (firstIssue.wcagLevel === 'A' || firstIssue.wcagLevel === 'AA' || firstIssue.wcagLevel === 'AAA')
+        wcagLevel: (wcagLevelMatches(firstIssue.wcagLevel, 'A') || wcagLevelMatches(firstIssue.wcagLevel, 'AA') || wcagLevelMatches(firstIssue.wcagLevel, 'AAA'))
           ? firstIssue.wcagLevel
-          : 'A', // Default to A if not a valid WCAG level
+          : 'N/A',
       })
     }
   })
 
   // Sort by WCAG level (A first) and impact
   blockers.sort((a, b) => {
-    const levelOrder: Record<string, number> = {
-      A: 3,
-      AA: 2,
-      AAA: 1,
-    }
-    const levelDiff = levelOrder[b.wcagLevel] - levelOrder[a.wcagLevel]
+    const levelDiff = wcagLevelOrder(b.wcagLevel) - wcagLevelOrder(a.wcagLevel)
     if (levelDiff !== 0) return levelDiff
-    const impactOrder: Record<ImpactLevel, number> = {
-      violation: 4,
-      'needs-review': 3,
-      recommendation: 2,
-      minor: 1,
-    }
-    return impactOrder[b.impact] - impactOrder[a.impact]
+    return impactRank(b.impact) - impactRank(a.impact)
   })
 
   return blockers
@@ -424,7 +385,7 @@ function generatePrioritizationReasoning(
 
   if (blockers.length > 0) {
     parts.push(`\n🚨 Found ${blockers.length} critical blocker(s) that must be fixed before launch.`)
-    parts.push(`These are WCAG Level A violations or critical impact issues that prevent users with disabilities from accessing content.`)
+    parts.push(`These are WCAG Level A violations or high-impact issues (e.g. axe critical/serious, ACE violation) that prevent users with disabilities from accessing content.`)
   }
 
   if (quickWins.length > 0) {
@@ -432,34 +393,23 @@ function generatePrioritizationReasoning(
     parts.push(`These issues can be fixed quickly and will significantly improve accessibility.`)
   }
 
-  // Breakdown by impact
-  const impactCounts: Record<ImpactLevel, number> = {
-    violation: 0,
-    'needs-review': 0,
-    recommendation: 0,
-    minor: 0,
-  }
+  // Breakdown by impact (axe/ACE native levels)
+  const impactCounts: Record<string, number> = {}
   prioritized.forEach((issue) => {
-    impactCounts[issue.impact]++
+    impactCounts[issue.impact] = (impactCounts[issue.impact] || 0) + 1
   })
-
-  if (impactCounts['violation'] > 0) {
-    parts.push(`\n🚫 Violations: ${impactCounts['violation']}`)
-  }
-  if (impactCounts['needs-review'] > 0) {
-    parts.push(`⚠️  Needs review: ${impactCounts['needs-review']}`)
-  }
-  if (impactCounts['recommendation'] > 0) {
-    parts.push(`ℹ️  Recommendations: ${impactCounts['recommendation']}`)
-  }
-  if (impactCounts['minor'] > 0) {
-    parts.push(`Minor issues: ${impactCounts['minor']}`)
-  }
+  const impactEntries = Object.entries(impactCounts).sort(
+    (a, b) => impactRank(b[0]) - impactRank(a[0])
+  )
+  impactEntries.forEach(([level, count]) => {
+    const icon = impactRank(level) >= 5 ? '🚫' : impactRank(level) >= 4 ? '⚠️' : 'ℹ️'
+    parts.push(`\n${icon} ${level}: ${count}`)
+  })
 
   // Explain the criteria used
   switch (criteria) {
     case 'impact':
-      parts.push(`\nIssues are sorted by impact level (critical → serious → moderate → minor).`)
+      parts.push(`\nIssues are sorted by impact level (axe: critical/serious/moderate/minor; ACE: violation/potentialviolation/...).`)
       break
     case 'wcag':
       parts.push(`\nIssues are sorted by WCAG compliance level (Level A violations first, as they are legal requirements).`)
@@ -903,12 +853,13 @@ function issuesToQuickFixes(
 
   ruleGroups.forEach((groupIssues, ruleId) => {
     const firstIssue = groupIssues[0]
+    const r = impactRank(firstIssue.impact)
     const impactEstimate =
-      firstIssue.impact === 'violation'
+      r >= 5
         ? 'Critical - Must fix immediately'
-        : firstIssue.impact === 'needs-review'
+        : r >= 4
           ? 'Serious - High priority'
-          : firstIssue.impact === 'recommendation'
+          : r >= 3
             ? 'Moderate - Should fix soon'
             : 'Minor - Consider fixing'
 
@@ -924,15 +875,9 @@ function issuesToQuickFixes(
   })
 
   // Sort by impact (critical first)
-  quickFixes.sort((a, b) => {
-    const impactOrder: Record<string, number> = {
-      'Critical - Must fix immediately': 4,
-      'Serious - High priority': 3,
-      'Moderate - Should fix soon': 2,
-      'Minor - Consider fixing': 1,
-    }
-    return impactOrder[b.impactEstimate] - impactOrder[a.impactEstimate]
-  })
+  const estimateRank = (e: string) =>
+    e === 'Critical - Must fix immediately' ? 4 : e === 'Serious - High priority' ? 3 : e === 'Moderate - Should fix soon' ? 2 : 1
+  quickFixes.sort((a, b) => estimateRank(b.impactEstimate) - estimateRank(a.impactEstimate))
 
   return quickFixes
 }
@@ -1067,16 +1012,14 @@ function calculateCriterionStatus(violations: PrioritizedIssue[]): ComplianceSta
     return 'pass'
   }
 
-  // If all violations are minor, consider it partial compliance
-  const allMinor = violations.every((v) => v.impact === 'minor')
-  if (allMinor) {
+  // If all violations are low impact, consider it partial compliance
+  const allLowImpact = violations.every((v) => impactRank(v.impact) <= 2)
+  if (allLowImpact) {
     return 'partial'
   }
 
-  // If there are critical or serious violations, it's a fail
-  const hasCriticalOrSerious = violations.some(
-    (v) => v.impact === 'violation' || v.impact === 'needs-review'
-  )
+  // If there are high-impact violations (axe: critical/serious; ACE: violation/potentialviolation), it's a fail
+  const hasCriticalOrSerious = violations.some((v) => impactRank(v.impact) >= 5)
   if (hasCriticalOrSerious) {
     return 'fail'
   }

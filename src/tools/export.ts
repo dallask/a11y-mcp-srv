@@ -125,7 +125,7 @@ export async function exportToCsv(
         'Description',
         'Element',
         'XPath',
-        'Selector',
+        'Class selector',
         'User Impact',
         'Fix Explanation',
         'Current Code',
@@ -142,6 +142,7 @@ export async function exportToCsv(
         'Description',
         'Element',
         'XPath',
+        'Class selector',
         'User Impact',
         'Fix Explanation',
       ]
@@ -170,6 +171,7 @@ export async function exportToCsv(
           issue.description,
           issue.element,
           issue.xpath,
+          issue.classSelector ?? '',
           issue.userImpact,
           issue.fix.explanation,
           issue.fix.current,
@@ -186,6 +188,7 @@ export async function exportToCsv(
           issue.description,
           issue.element,
           issue.xpath,
+          issue.classSelector ?? '',
           issue.userImpact,
           issue.fix.explanation
         )
@@ -290,7 +293,7 @@ export async function exportToExcel(
   }
   XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary')
 
-  // Create violations sheet
+  // Create violations sheet (WCAG Level = full label e.g. "WCAG 2.2 AA"; Element = tag name; Class selector after XPath)
   const violationsData = [
     [
       'Rule ID',
@@ -300,6 +303,7 @@ export async function exportToExcel(
       'Description',
       'Element',
       'XPath',
+      'Class selector',
       'User Impact',
       'Fix Explanation',
     ],
@@ -314,6 +318,7 @@ export async function exportToExcel(
       issue.description,
       issue.element,
       issue.xpath,
+      issue.classSelector ?? '',
       issue.userImpact,
       issue.fix.explanation,
     ])
@@ -326,10 +331,11 @@ export async function exportToExcel(
       { wch: 20 }, // Rule ID
       { wch: 15 }, // Category
       { wch: 12 }, // Impact
-      { wch: 12 }, // WCAG Level
+      { wch: 14 }, // WCAG Level
       { wch: 40 }, // Description
       { wch: 30 }, // Element
       { wch: 50 }, // XPath
+      { wch: 28 }, // Class selector
       { wch: 50 }, // User Impact
       { wch: 50 }, // Fix Explanation
     ]
@@ -572,6 +578,7 @@ function generateHtmlReport(
               <th>Description</th>
               <th>Element</th>
               <th>XPath</th>
+              <th>Class selector</th>
               <th>User Impact</th>
               <th>Fix Explanation</th>
               <th>Current Code</th>
@@ -590,6 +597,7 @@ function generateHtmlReport(
                 <td>${escapeHtml(issue.description)}</td>
                 <td><code>${escapeHtml(issue.element)}</code></td>
                 <td><code>${escapeHtml(issue.xpath)}</code></td>
+                <td><code>${escapeHtml(issue.classSelector ?? '')}</code></td>
                 <td>${escapeHtml(issue.userImpact)}</td>
                 <td>${escapeHtml(issue.fix.explanation)}</td>
                 <td><pre>${escapeHtml(issue.fix.current)}</pre></td>
@@ -752,7 +760,8 @@ function generateHtmlReport(
       overflow-x: auto;
       font-size: 0.85em;
     }
-    .impact-critical {
+    /* axe: critical, serious, moderate, minor. ACE: violation, potentialviolation, etc. */
+    .impact-critical, .impact-violation {
       background-color: #ff4444;
       color: white;
       padding: 4px 8px;
@@ -760,7 +769,7 @@ function generateHtmlReport(
       font-weight: bold;
       font-size: 0.85em;
     }
-    .impact-serious {
+    .impact-serious, .impact-potentialviolation {
       background-color: #ff8800;
       color: white;
       padding: 4px 8px;
@@ -768,7 +777,7 @@ function generateHtmlReport(
       font-weight: bold;
       font-size: 0.85em;
     }
-    .impact-moderate {
+    .impact-moderate, .impact-potentialrecommendation, .impact-manual {
       background-color: #ffbb00;
       color: white;
       padding: 4px 8px;
@@ -776,12 +785,17 @@ function generateHtmlReport(
       font-weight: bold;
       font-size: 0.85em;
     }
-    .impact-minor {
+    .impact-minor, .impact-recommendation, .impact-pass {
       background-color: #88cc00;
       color: white;
       padding: 4px 8px;
       border-radius: 4px;
       font-weight: bold;
+      font-size: 0.85em;
+    }
+    [class^="impact-"] {
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.85em;
     }
   </style>

@@ -7,7 +7,7 @@ import type { Browser, BrowserContext, Page } from 'playwright'
 import { launchChromium } from '../core/playwright-bootstrap.js'
 import { SessionManager } from '../core/session-manager.js'
 import { AccessibilityRunner } from '../core/accessibility-runner.js'
-import { ResultProcessor } from '../core/result-processor.js'
+import { ResultProcessor, getWcagLabelFromTags } from '../core/result-processor.js'
 import {
   retryWithBackoff,
   handleErrorGracefully,
@@ -284,9 +284,11 @@ export async function auditWithSession(
     const resultsToProcess =
       accessibilityResult.filteredResults || accessibilityResult.accessibilityResults
 
+    const auditWcagLabel = getWcagLabelFromTags((tags || []) as string[])
     const auditResult = resultProcessor.process(
       resultsToProcess,
-      accessibilityResult.appliedFilters
+      accessibilityResult.appliedFilters,
+      { auditWcagLabel: auditWcagLabel !== 'N/A' ? auditWcagLabel : undefined }
     )
 
     console.log(

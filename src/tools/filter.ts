@@ -11,8 +11,8 @@ import type {
   SearchIssuesInput,
   SearchIssuesResult,
   ImpactLevel,
-  WCAGLevel,
 } from '../types/index.js'
+import { wcagLevelMatches } from '../core/result-processor.js'
 
 /**
  * filter_issues - Filter issues from audit results by various criteria
@@ -80,14 +80,12 @@ export function filterIssues(
   }
 
   if (filters.wcagLevels && filters.wcagLevels.length > 0) {
+    const matchesWcag = (issue: PrioritizedIssue) =>
+      filters.wcagLevels!.some((level) => wcagLevelMatches(issue.wcagLevel, level as 'A' | 'AA' | 'AAA'))
     if (mode === 'include') {
-      filteredIssues = filteredIssues.filter((issue) =>
-        filters.wcagLevels!.includes(issue.wcagLevel as WCAGLevel)
-      )
+      filteredIssues = filteredIssues.filter(matchesWcag)
     } else {
-      filteredIssues = filteredIssues.filter(
-        (issue) => !filters.wcagLevels!.includes(issue.wcagLevel as WCAGLevel)
-      )
+      filteredIssues = filteredIssues.filter((issue) => !matchesWcag(issue))
     }
   }
 
@@ -138,9 +136,9 @@ export function filterIssues(
 
   // Calculate WCAG compliance (simplified - based on issues found)
   const totalIssues = filteredIssues.length
-  const levelA = filteredIssues.filter((i) => i.wcagLevel === 'A').length
-  const levelAA = filteredIssues.filter((i) => i.wcagLevel === 'AA').length
-  const levelAAA = filteredIssues.filter((i) => i.wcagLevel === 'AAA').length
+  const levelA = filteredIssues.filter((i) => wcagLevelMatches(i.wcagLevel, 'A')).length
+  const levelAA = filteredIssues.filter((i) => wcagLevelMatches(i.wcagLevel, 'AA')).length
+  const levelAAA = filteredIssues.filter((i) => wcagLevelMatches(i.wcagLevel, 'AAA')).length
 
   wcagCompliance.A = totalIssues > 0
     ? Math.max(0, Math.round(100 - (levelA / totalIssues) * 100))

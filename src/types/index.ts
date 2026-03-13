@@ -11,22 +11,12 @@
  * Accessibility rule data structure from the accessibility engine
  */
 /**
- * Impact/severity level for an issue (aligns with IBM Equal Access and axe-core)
- */
-/**
- * Severity levels aligned with IBM Equal Access Accessibility Checker browser tool:
- * - violation     → definite failure (🚫 red)
- * - needs-review  → potential violation requiring manual review (⚠️ yellow)
- * - recommendation → best-practice suggestion (ℹ️ blue)
- * - minor         → informational / low priority
+ * Impact/severity level for an issue. Uses each engine's native levels (no mapping).
  *
- * Axe-core native levels (critical / serious / moderate) are mapped into this set.
+ * axe-core: critical | serious | moderate | minor
+ * ACE (IBM Equal Access): violation | potentialviolation | potentialrecommendation | recommendation | manual | pass
  */
-export type ImpactLevel =
-  | 'violation'
-  | 'needs-review'
-  | 'recommendation'
-  | 'minor'
+export type ImpactLevel = string
 
 export interface AccessibilityRuleData {
   count: number
@@ -38,8 +28,28 @@ export interface AccessibilityRuleData {
   domInfo?: DOMInfo[]
   contrastdata?: any[]
   tags?: string[] // Accessibility tags (e.g., "wcag2a", "wcag2aa", "best-practice")
-  /** Engine-reported impact; used when present (e.g. from ACE) to match browser tool breakdown */
+  /** Engine-reported impact (axe: critical/serious/moderate/minor; ACE: violation/potentialviolation/...) */
   impact?: ImpactLevel
+}
+
+/**
+ * Default impact order for sorting and scoring (higher = worse).
+ * axe: critical, serious, moderate, minor. ACE: violation, potentialviolation, potentialrecommendation, recommendation, manual, pass.
+ */
+export const IMPACT_ORDER: Record<string, number> = {
+  // axe-core
+  critical: 6,
+  serious: 5,
+  moderate: 4,
+  minor: 3,
+  // ACE (IBM Equal Access)
+  violation: 6,
+  potentialviolation: 5,
+  potentialrecommendation: 4,
+  recommendation: 3,
+  manual: 4,
+  pass: 1,
+  ignored: 0,
 }
 
 /**
@@ -156,6 +166,8 @@ export interface PrioritizedIssue {
   tags: string[] // Array of tags this violation matches (e.g., ["wcag2a", "wcag2aa"])
   element: string
   xpath: string
+  /** CSS class selector for the element (e.g. ".isi-btn.jsIsiMinimize") */
+  classSelector?: string
   fix: FixSuggestion
   userImpact: string
   priority: number
@@ -184,7 +196,7 @@ export interface CriticalBlocker {
   impact: ImpactLevel
   userImpact: string
   affectedElements: number
-  wcagLevel: WCAGLevel
+  wcagLevel: string
 }
 
 /**

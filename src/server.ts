@@ -735,11 +735,9 @@ async function createServer(): Promise<Server> {
                 },
                 impactLevels: {
                   type: 'array',
-                  items: {
-                    type: 'string',
-                    enum: ['critical', 'serious', 'moderate', 'minor'],
-                  },
-                  description: 'Array of impact levels to filter by.',
+                  items: { type: 'string' },
+                  description:
+                    'Array of impact levels to filter by. axe: critical, serious, moderate, minor. ACE: violation, potentialviolation, potentialrecommendation, recommendation, manual, pass.',
                 },
                 wcagLevels: {
                   type: 'array',

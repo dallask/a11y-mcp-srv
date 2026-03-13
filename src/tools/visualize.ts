@@ -637,16 +637,27 @@ export async function generateDashboard(
 
   let auditResults: AuditResult | AuditResult[]
 
+  const basicAuthUsername = input.basicAuthUsername
+  const basicAuthPassword = input.basicAuthPassword
+
   // If input is a URL string, run an audit first
   if (typeof results === 'string') {
-    const singleResult = await auditUrl({ url: results })
+    const singleResult = await auditUrl({
+      url: results,
+      basicAuthUsername,
+      basicAuthPassword,
+    })
     auditResults = singleResult
   } else if (Array.isArray(results)) {
     // If array contains URLs, audit them
     const urlResults = await Promise.all(
       results.map(async (r) => {
         if (typeof r === 'string') {
-          return await auditUrl({ url: r })
+          return await auditUrl({
+            url: r,
+            basicAuthUsername,
+            basicAuthPassword,
+          })
         }
         return r
       })
@@ -1134,16 +1145,27 @@ export async function generateSummaryReport(
 
   let auditResults: AuditResult | AuditResult[]
 
+  const basicAuthUsername = input.basicAuthUsername
+  const basicAuthPassword = input.basicAuthPassword
+
   // If input is a URL string, run an audit first
   if (typeof results === 'string') {
-    const singleResult = await auditUrl({ url: results })
+    const singleResult = await auditUrl({
+      url: results,
+      basicAuthUsername,
+      basicAuthPassword,
+    })
     auditResults = singleResult
   } else if (Array.isArray(results)) {
     // If array contains URLs, audit them
     const urlResults = await Promise.all(
       results.map(async (r) => {
         if (typeof r === 'string') {
-          return await auditUrl({ url: r })
+          return await auditUrl({
+            url: r,
+            basicAuthUsername,
+            basicAuthPassword,
+          })
         }
         return r
       })

@@ -130,6 +130,8 @@ export interface TestMetadata {
   testEnvironment: TestEnvironment
   timestamp: string
   url: string
+  /** HTTP status code of the page response (e.g. 200, 401). Undefined when no navigation (e.g. ACE URL-only). */
+  responseStatus?: number
 }
 
 // ============================================================================
@@ -240,6 +242,8 @@ export interface AuditResult {
   criticalBlockers: CriticalBlocker[]
   metadata?: TestMetadata
   rawResults?: AccessibilityResults // Optional: preserve original accessibility results
+  /** HTTP status code of the page response (e.g. 200, 401). Shown when available so clients can detect auth failure. */
+  responseStatus?: number
 }
 
 // ============================================================================
@@ -318,6 +322,10 @@ export interface AuditUrlInput {
   waitForLoad?: WaitStrategy
   timeout?: number // Timeout in seconds
   engine?: AccessibilityEngine // 'axe' (default) or 'ace'
+  /** HTTP Basic Auth username. When set with basicAuthPassword, sends Authorization header. */
+  basicAuthUsername?: string
+  /** HTTP Basic Auth password. When set with basicAuthUsername, sends Authorization header. */
+  basicAuthPassword?: string
 }
 
 /**
@@ -330,6 +338,8 @@ export interface AuditMultipleUrlsInput {
   continueOnError?: boolean
   tags?: string[] // Applied to all URLs
   engine?: AccessibilityEngine // 'axe' (default) or 'ace'
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -351,6 +361,8 @@ export interface AuditWithSessionInput {
   url: string
   domain?: string
   tags?: string[]
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -359,6 +371,8 @@ export interface AuditWithSessionInput {
 export interface ScoreInput {
   results: AuditResult | string // Audit results or URL to score
   weights?: Record<string, number> // Custom weights for different issue types
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -426,6 +440,8 @@ export interface QuickFixesInput {
   results: AuditResult | string
   format?: 'markdown' | 'html' | 'json'
   includeCode?: boolean
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -458,6 +474,8 @@ export interface CompareAccessibilityInput {
   before: AuditResult | string // Previous audit results or URL
   after: AuditResult | string // Current audit results or URL
   format?: 'summary' | 'detailed' | 'diff'
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -489,6 +507,8 @@ export interface TrackAccessibilityInput {
   url: string
   timeframe?: TrackingTimeframe
   metric?: TrackingMetric
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -561,6 +581,8 @@ export interface ComplianceReport {
 export interface WCAGComplianceInput {
   results: AuditResult | string
   level?: WCAGLevel
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -664,6 +686,8 @@ export interface ExportToCsvInput {
   includeMetadata?: boolean // Include test information and environment data (default: true)
   includeViolations?: boolean // Include detailed violation rows (default: true)
   format?: 'standard' | 'detailed' | 'minimal' // Export format (default: "standard")
+  basicAuthUsername?: string // When results is a URL: HTTP Basic Auth username
+  basicAuthPassword?: string // When results is a URL: HTTP Basic Auth password
 }
 
 /**
@@ -684,6 +708,8 @@ export interface ExportToExcelInput {
   results: AuditResult | string // Audit result object or URL string
   includeCharts?: boolean // Generate charts for score trends and category breakdown (default: false)
   formatting?: boolean // Apply colors, headers, and styling (default: true)
+  basicAuthUsername?: string // When results is a URL, use for HTTP Basic Auth
+  basicAuthPassword?: string // When results is a URL, use for HTTP Basic Auth
 }
 
 /**
@@ -704,6 +730,8 @@ export interface ExportToJsonInput {
   results: AuditResult | string // Audit result object or URL string
   pretty?: boolean // Pretty-print JSON (default: true)
   includeRaw?: boolean // Include raw accessibility engine results (default: false)
+  basicAuthUsername?: string // When results is a URL: HTTP Basic Auth username
+  basicAuthPassword?: string // When results is a URL: HTTP Basic Auth password
 }
 
 /**
@@ -723,6 +751,8 @@ export interface ExportToHtmlInput {
   results: AuditResult | string // Audit result object or URL string
   template?: 'default' | 'minimal' | 'detailed' // Report template (default: "default")
   includeCharts?: boolean // Include visual charts (default: true)
+  basicAuthUsername?: string // When results is a URL: HTTP Basic Auth username
+  basicAuthPassword?: string // When results is a URL: HTTP Basic Auth password
 }
 
 /**
@@ -868,6 +898,8 @@ export interface GenerateDashboardInput {
   results: AuditResult | AuditResult[] | string | string[] // Audit result object(s) or URL string(s)
   format?: DashboardFormat // Output format (default: "markdown")
   includeCharts?: boolean // Include ASCII/text charts (default: true)
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -897,6 +929,8 @@ export interface GenerateSummaryReportInput {
   results: AuditResult | AuditResult[] | string | string[] // Audit result object(s) or URL string(s)
   format?: SummaryReportFormat // Output format (default: "markdown")
   level?: SummaryReportLevel // Detail level (default: "executive")
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**

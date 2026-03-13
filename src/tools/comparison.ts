@@ -216,13 +216,21 @@ export async function compareAccessibility(
   let afterResult: AuditResult
 
   if (typeof before === 'string') {
-    beforeResult = await auditUrl({ url: before })
+    beforeResult = await auditUrl({
+      url: before,
+      basicAuthUsername: input.basicAuthUsername,
+      basicAuthPassword: input.basicAuthPassword,
+    })
   } else {
     beforeResult = before
   }
 
   if (typeof after === 'string') {
-    afterResult = await auditUrl({ url: after })
+    afterResult = await auditUrl({
+      url: after,
+      basicAuthUsername: input.basicAuthUsername,
+      basicAuthPassword: input.basicAuthPassword,
+    })
   } else {
     afterResult = after
   }
@@ -549,7 +557,11 @@ export async function trackAccessibility(
   } = input
 
   // Run current audit
-  const currentResult = await auditUrl({ url })
+  const currentResult = await auditUrl({
+    url,
+    basicAuthUsername: input.basicAuthUsername,
+    basicAuthPassword: input.basicAuthPassword,
+  })
 
   // Get current metric value
   const currentValue = extractMetric(currentResult, metric)

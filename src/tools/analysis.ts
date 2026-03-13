@@ -173,6 +173,8 @@ export async function getAccessibilityScore(
   if (typeof input.results === 'string') {
     auditResult = await auditUrl({
       url: input.results,
+      basicAuthUsername: input.basicAuthUsername,
+      basicAuthPassword: input.basicAuthPassword,
     })
   } else {
     auditResult = input.results
@@ -906,6 +908,8 @@ export async function getQuickFixes(
   if (typeof results === 'string') {
     auditResult = await auditUrl({
       url: results,
+      basicAuthUsername: input.basicAuthUsername,
+      basicAuthPassword: input.basicAuthPassword,
     })
   } else {
     auditResult = results
@@ -1403,6 +1407,8 @@ export async function getWCAGCompliance(
     const { auditUrl } = await import('./audit.js')
     auditResult = await auditUrl({
       url: input.results,
+      basicAuthUsername: input.basicAuthUsername,
+      basicAuthPassword: input.basicAuthPassword,
     })
   } else {
     auditResult = input.results

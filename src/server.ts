@@ -120,6 +120,16 @@ async function createServer(): Promise<Server> {
               default: 30,
               description: 'Timeout in seconds (default: 30).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username. Use with basicAuthPassword for sites that require Basic Authentication.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password. Use with basicAuthUsername for sites that require Basic Authentication.',
+            },
           },
           required: ['url'],
         },
@@ -189,6 +199,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Testing engine: "axe" or "ace". Overrides env A11Y_ENGINE when provided.',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username for all URLs. Use with basicAuthPassword for sites that require Basic Authentication.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password. Use with basicAuthUsername for sites that require Basic Authentication.',
+            },
           },
           required: ['urls'],
         },
@@ -249,8 +269,18 @@ async function createServer(): Promise<Server> {
               description:
                 'Custom session identifier. If not provided, one is generated.',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username for the domain. Use with basicAuthPassword when the site requires Basic Authentication.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password. Use with basicAuthUsername when the site requires Basic Authentication.',
+            },
           },
-          required: ['domain', 'username', 'password'],
+          required: ['domain'],
         },
       },
       {
@@ -292,6 +322,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Specific accessibility tags to check. If not provided, all tags are checked.',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username for the audit URL. Use with basicAuthPassword when the page requires Basic Authentication.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password. Use with basicAuthUsername when the page requires Basic Authentication.',
+            },
           },
           required: ['sessionId', 'url'],
         },
@@ -324,6 +364,16 @@ async function createServer(): Promise<Server> {
               },
               description:
                 'Custom weights for different issue types (e.g., {"critical": 5.0, "serious": 3.0}). If not provided, default weights are used.',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'When results is a URL: HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'When results is a URL: HTTP Basic Auth password.',
             },
           },
           required: ['results'],
@@ -411,6 +461,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Include before/after code examples in the fixes (default: true).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'When results is a URL: HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'When results is a URL: HTTP Basic Auth password.',
+            },
           },
           required: ['results'],
         },
@@ -457,6 +517,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Output format: "summary" for concise comparison, "detailed" or "diff" for comprehensive diff visualization (default: summary).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'When before/after are URLs: HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'When before/after are URLs: HTTP Basic Auth password.',
+            },
           },
           required: ['before', 'after'],
         },
@@ -485,6 +555,16 @@ async function createServer(): Promise<Server> {
               default: 'score',
               description:
                 'Metric to track: "score" (accessibility score 0-100), "issues" (total number of issues), or "wcag-compliance" (average WCAG compliance percentage). Default: score.',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username for the URL.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password for the URL.',
             },
           },
           required: ['url'],
@@ -553,6 +633,16 @@ async function createServer(): Promise<Server> {
               description:
                 'WCAG compliance level to check: "A", "AA", or "AAA". Default: AA.',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'When results is a URL: HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'When results is a URL: HTTP Basic Auth password.',
+            },
           },
           required: ['results'],
         },
@@ -595,6 +685,14 @@ async function createServer(): Promise<Server> {
               default: 'standard',
               description:
                 'Export format: "standard" (default), "detailed" (includes all fields), or "minimal" (essential fields only).',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description: 'When results is a URL, HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description: 'When results is a URL, HTTP Basic Auth password.',
             },
           },
           required: ['results'],
@@ -668,6 +766,14 @@ async function createServer(): Promise<Server> {
               description:
                 'Include raw accessibility engine results (default: false).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description: 'When results is a URL, HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description: 'When results is a URL, HTTP Basic Auth password.',
+            },
           },
           required: ['results'],
         },
@@ -704,6 +810,14 @@ async function createServer(): Promise<Server> {
               type: 'boolean',
               default: true,
               description: 'Include visual charts (default: true).',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description: 'When results is a URL, HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description: 'When results is a URL, HTTP Basic Auth password.',
             },
           },
           required: ['results'],
@@ -929,6 +1043,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Include ASCII/text charts in the dashboard (default: true).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'When results is URL(s): HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'When results is URL(s): HTTP Basic Auth password.',
+            },
           },
           required: ['results'],
         },
@@ -981,6 +1105,16 @@ async function createServer(): Promise<Server> {
               description:
                 'Detail level: "executive" (high-level summary for executives), "detailed" (comprehensive summary with breakdowns), or "technical" (technical details for developers). Default: "executive".',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'When results is URL(s): HTTP Basic Auth username.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'When results is URL(s): HTTP Basic Auth password.',
+            },
           },
           required: ['results'],
         },
@@ -1012,6 +1146,8 @@ async function createServer(): Promise<Server> {
                   | 'domcontentloaded'
                   | undefined,
                 timeout: args?.timeout as number | undefined,
+                basicAuthUsername: args?.basicAuthUsername as string | undefined,
+                basicAuthPassword: args?.basicAuthPassword as string | undefined,
               }),
             {
               maxRetries: 2, // Fewer retries for single URL audits
@@ -1054,6 +1190,8 @@ async function createServer(): Promise<Server> {
                   continueOnError: args?.continueOnError as boolean | undefined,
                   tags: args?.tags as string[] | undefined,
                   engine: args?.engine as 'axe' | 'ace' | undefined,
+                  basicAuthUsername: args?.basicAuthUsername as string | undefined,
+                  basicAuthPassword: args?.basicAuthPassword as string | undefined,
                 },
                 progressCallback
               ),
@@ -1111,6 +1249,8 @@ async function createServer(): Promise<Server> {
             url: args?.url as string,
             domain: args?.domain as string | undefined,
             tags: args?.tags as string[] | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1127,6 +1267,8 @@ async function createServer(): Promise<Server> {
           const scoreResult = await getAccessibilityScore({
             results: args?.results as any, // Can be AuditResult or string URL
             weights: args?.weights as Record<string, number> | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1182,6 +1324,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             format: args?.format as 'markdown' | 'html' | 'json' | undefined,
             includeCode: args?.includeCode as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1199,6 +1343,8 @@ async function createServer(): Promise<Server> {
             before: args?.before as any, // AuditResult or string URL
             after: args?.after as any, // AuditResult or string URL
             format: args?.format as 'summary' | 'detailed' | 'diff' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1216,6 +1362,8 @@ async function createServer(): Promise<Server> {
             url: args?.url as string,
             timeframe: args?.timeframe as '7d' | '30d' | '90d' | 'all' | undefined,
             metric: args?.metric as 'score' | 'issues' | 'wcag-compliance' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1250,6 +1398,8 @@ async function createServer(): Promise<Server> {
           const wcagComplianceResult = await getWCAGCompliance({
             results: args?.results as any, // AuditResult or string URL
             level: args?.level as 'A' | 'AA' | 'AAA' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1268,6 +1418,8 @@ async function createServer(): Promise<Server> {
             includeMetadata: args?.includeMetadata as boolean | undefined,
             includeViolations: args?.includeViolations as boolean | undefined,
             format: args?.format as 'standard' | 'detailed' | 'minimal' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1285,6 +1437,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             includeCharts: args?.includeCharts as boolean | undefined,
             formatting: args?.formatting as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1302,6 +1456,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             pretty: args?.pretty as boolean | undefined,
             includeRaw: args?.includeRaw as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1319,6 +1475,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult or string URL
             template: args?.template as 'default' | 'minimal' | 'detailed' | undefined,
             includeCharts: args?.includeCharts as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1404,6 +1562,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult | AuditResult[] | string | string[]
             format: args?.format as 'text' | 'markdown' | 'html' | 'json' | undefined,
             includeCharts: args?.includeCharts as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1421,6 +1581,8 @@ async function createServer(): Promise<Server> {
             results: args?.results as any, // AuditResult | AuditResult[] | string | string[]
             format: args?.format as 'text' | 'markdown' | 'html' | undefined,
             level: args?.level as 'executive' | 'detailed' | 'technical' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {

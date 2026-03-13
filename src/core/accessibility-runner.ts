@@ -46,6 +46,8 @@ export interface AccessibilityRunnerConfig {
    *  Set to true only when the user explicitly requested specific tags.
    *  When false, tags are passed to the engine for scoping but all returned issues are shown. */
   applyTagFilter?: boolean
+  /** When true and engine is ACE, load the page in the browser first and pass its HTML to ACE (for Basic Auth). */
+  usePageContentForACE?: boolean
 }
 
 /**
@@ -61,6 +63,8 @@ export interface AccessibilityRunnerResult {
     tags?: AccessibilityTag[]
     originalIssueCount?: number
   }
+  /** HTTP status code of the main document response. Undefined when no browser navigation (e.g. ACE URL-only fetch). */
+  responseStatus?: number
 }
 
 /** Default axe-core tags for WCAG 2.1 AA */
@@ -170,21 +174,24 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Navigate to URL and wait for page to be ready
+   * Navigate to URL and wait for page to be ready.
+   * @returns HTTP status code of the main document response (e.g. 200, 401), or undefined if unavailable.
    */
   private async navigateAndWait(
     page: Page,
     url: string,
     waitStrategy: WaitStrategy = 'networkidle',
     timeout: number = 30000
-  ): Promise<void> {
+  ): Promise<number | undefined> {
     debugLog(`Navigating to ${url}...`)
     const startTime = Date.now()
 
-    await page.goto(url, {
+    const response = await page.goto(url, {
       waitUntil: 'domcontentloaded',
       timeout,
     })
+    const status = response?.status()
+    if (status != null) debugLog(`Page response status: ${status}`)
     debugLog('Page navigation started')
 
     const remainingTime = timeout - (Date.now() - startTime)
@@ -230,6 +237,7 @@ export class AccessibilityRunner {
     debugLog(
       `Page loading completed in ${Date.now() - startTime}ms - proceeding with accessibility analysis`
     )
+    return status
   }
 
   /**
@@ -357,11 +365,14 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Run IBM Equal Access (accessibility-checker) analysis for a URL.
+   * Run IBM Equal Access (accessibility-checker) analysis.
    * WCAG level/policy is configured via setConfig before the scan — tags are
    * engine settings here, not a post-scan filter.
+   * @param content - URL string (to fetch) or HTML string (page content for Basic Auth).
+   * @param url - Used for report metadata (original URL).
    */
   private async runACEAnalysis(
+    content: string,
     url: string,
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
@@ -373,7 +384,7 @@ export class AccessibilityRunner {
 
     try {
       await aChecker.setConfig({ policies, ruleArchive: 'latest' })
-      const result = await aChecker.getCompliance(url, label)
+      const result = await aChecker.getCompliance(content, label)
       const report = result.report as unknown as ACEReport
       return this.aceToAccessibilityResults(report, url)
     } finally {
@@ -472,7 +483,7 @@ export class AccessibilityRunner {
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
     if (engine === 'ace') {
-      return this.runACEAnalysis(url, tags)
+      return this.runACEAnalysis(url, url, tags)
     }
 
     const axeResult = await this.runAxeAnalysis(page, tags)
@@ -622,12 +633,23 @@ export class AccessibilityRunner {
 
     try {
       if (engine === 'ace') {
-        // ACE is scoped at scan time via setConfig({ policies }) — WCAG level is an
-        // engine setting, not a post-scan filter. Never apply filterByTags on ACE
-        // results because ACE rules carry tags:[] and post-filtering would drop everything.
+        // When usePageContentForACE (e.g. Basic Auth), load page in browser then pass HTML to ACE
+        const usePageContentForACE = config.usePageContentForACE === true
+        if (usePageContentForACE) {
+          const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
+          const html = await page.content()
+          debugLog(`Running IBM Equal Access (ACE) analysis on page content (${url})...`)
+          const accessibilityResults = await this.runACEAnalysis(html, url, tags)
+          return {
+            accessibilityResults,
+            filteredResults: undefined,
+            appliedFilters: tags && tags.length > 0 ? { tags } : undefined,
+            responseStatus,
+          }
+        }
+        // ACE fetches URL itself (no auth support)
         debugLog(`Running IBM Equal Access (ACE) analysis on ${url}...`)
-        const accessibilityResults = await this.runACEAnalysis(url, tags)
-
+        const accessibilityResults = await this.runACEAnalysis(url, url, tags)
         return {
           accessibilityResults,
           filteredResults: undefined,
@@ -635,7 +657,7 @@ export class AccessibilityRunner {
         }
       }
 
-      await this.navigateAndWait(page, url, waitForLoad, timeout)
+      const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
       debugLog(`Running axe-core analysis on ${url}...`)
 
       const accessibilityResults = await this.runAccessibilityAnalysis(
@@ -662,6 +684,7 @@ export class AccessibilityRunner {
         accessibilityResults,
         filteredResults,
         appliedFilters,
+        responseStatus,
       }
     } catch (error) {
       console.error('Error running accessibility test:', error)

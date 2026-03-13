@@ -3,6 +3,7 @@
  * Implements: export_to_csv, export_to_excel, export_to_json, export_to_html_report
  */
 
+import { resolveBasicAuth } from '../core/basic-auth.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -15,6 +16,30 @@ import type {
   ExportToHtmlInput,
   ExportToHtmlResult,
 } from '../types/index.js'
+import type { BasicAuthParams } from '../core/basic-auth.js'
+
+/**
+ * Resolve results to an AuditResult: if a URL, run audit (with optional Basic Auth); otherwise return the object.
+ * Uses shared basic-auth so URL-embedded credentials (user:pass@host) and explicit basicAuth params are supported.
+ */
+async function resolveAuditResult(
+  results: AuditResult | string,
+  options?: BasicAuthParams
+): Promise<AuditResult> {
+  if (typeof results === 'string') {
+    const { urlWithoutAuth, basicAuthUsername, basicAuthPassword } = resolveBasicAuth(
+      results,
+      options?.basicAuthUsername,
+      options?.basicAuthPassword
+    )
+    return await auditUrl({
+      url: urlWithoutAuth,
+      basicAuthUsername,
+      basicAuthPassword,
+    })
+  }
+  return results
+}
 
 /**
  * Escape CSV field - handles quotes, commas, and newlines
@@ -90,18 +115,14 @@ export async function exportToCsv(
     includeMetadata = true,
     includeViolations = true,
     format = 'standard',
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  // If input is a URL string, run an audit first
-  if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
-  } else {
-    auditResult = results
-  }
+  const auditResult = await resolveAuditResult(results, {
+    basicAuthUsername,
+    basicAuthPassword,
+  })
 
   const csvRows: string[] = []
 
@@ -224,18 +245,14 @@ export async function exportToExcel(
     results,
     includeCharts = false,
     formatting = true,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  // If input is a URL string, run an audit first
-  if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
-  } else {
-    auditResult = results
-  }
+  const auditResult = await resolveAuditResult(results, {
+    basicAuthUsername,
+    basicAuthPassword,
+  })
 
   // Try to import xlsx, but handle gracefully if not available
   let XLSX: any
@@ -370,18 +387,14 @@ export async function exportToJson(
     results,
     pretty = true,
     includeRaw = false,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  // If input is a URL string, run an audit first
-  if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
-  } else {
-    auditResult = results
-  }
+  const auditResult = await resolveAuditResult(results, {
+    basicAuthUsername,
+    basicAuthPassword,
+  })
 
   // Prepare export data
   const exportData: any = {
@@ -837,18 +850,14 @@ export async function exportToHtmlReport(
     results,
     template = 'default',
     includeCharts = true,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  // If input is a URL string, run an audit first
-  if (typeof results === 'string') {
-    auditResult = await auditUrl({
-      url: results,
-    })
-  } else {
-    auditResult = results
-  }
+  const auditResult = await resolveAuditResult(results, {
+    basicAuthUsername,
+    basicAuthPassword,
+  })
 
   const htmlContent = generateHtmlReport(auditResult, template, includeCharts)
 

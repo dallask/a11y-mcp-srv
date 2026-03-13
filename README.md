@@ -124,6 +124,29 @@ You can configure the server via your MCP client’s `env` section (e.g. Cursor 
 
 Tool parameters (e.g. `engine`, `tags`) override these defaults when provided in a request.
 
+### Troubleshooting: 500 when using `audit_url` (e.g. with CodeMie bridge)
+
+If you get a **500 Internal Server Error** from an MCP bridge (e.g. CodeMie `codemie-mcp-connect-service`) when calling `audit_url` with a long `timeout` (e.g. 60s), **engine: "ace"**, or Basic Auth, the bridge is likely **timing out** before the server responds. The audit can take 60+ seconds (browser launch, load page, run ACE, process results).
+
+- **Fix:** Increase the **bridge/client HTTP timeout** to at least your `timeout` + 15–30 seconds (e.g. 75–90s for `timeout: 60`).
+- **Workaround:** Use a shorter `timeout` (e.g. 30–45s) to see if the request succeeds; if it does, the issue is the bridge timeout.
+- The server returns a structured error (with `isError: true`) when the audit fails; a 500 from the bridge usually means the bridge gave up waiting, not that the server returned an error.
+
+### "Failed to launch the browser process" (Docker / Linux / CodeMie)
+
+If `audit_url` returns a **browser** error like *"Failed to launch the browser process"*, Chromium is missing or its **system dependencies** are not installed in the environment where the MCP server runs (e.g. Docker, Kubernetes, CodeMie, headless Linux).
+
+- **Fix:** In the **same environment** where the server runs (container, pod, or host), install Chromium and system deps:
+  ```bash
+  npx playwright install --with-deps chromium
+  ```
+  On Linux/Docker this may require root or a base image that has `apt`/`yum` (e.g. `node:18-bookworm`). If you build a custom image, add:
+  ```dockerfile
+  RUN npx playwright install --with-deps chromium
+  ```
+- **Without root:** Use `npx playwright install chromium` (no `--with-deps`); the server will still try `--with-deps` on first launch failure. If the image already has the right libs, the binary alone may be enough.
+- The server auto-runs `playwright install chromium --with-deps` on first launch failure; if that fails (e.g. no package manager or permissions), you must run the command manually in the environment.
+
 ## 🎉 Awesome Things You Can Do
 
 ### 🔍 **Comprehensive Accessibility Auditing**

@@ -95,10 +95,14 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
   const basicAuthPassword = inputBasicPass ?? parsedFromUrl.password
 
   const engine = inputEngine ?? config.engine
-  const usePageContentForACE =
-    basicAuthUsername != null && basicAuthPassword != null && engine === 'ace'
+  // Always load the page in Playwright and pass the HTML to ACE (regardless of Basic Auth).
+  // ACE internally uses Puppeteer which may fail to launch in restricted environments
+  // (Docker, CodeMie, headless Linux) because it has no sandbox args. By pre-loading in
+  // our Playwright instance (which uses robust launch args + auto-install) and passing
+  // the HTML to ACE we bypass ACE's own browser launch entirely.
+  const usePageContentForACE = engine === 'ace'
   if (usePageContentForACE) {
-    debugLog('ACE with Basic Auth: will load page in browser and pass HTML to ACE')
+    debugLog('ACE engine: will load page in Playwright browser and pass HTML to ACE (avoids ACE internal Puppeteer launch)')
   }
 
   // Determine tags to pass to the engine:

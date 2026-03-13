@@ -382,8 +382,19 @@ export class AccessibilityRunner {
     const policies = this.acePolicesFromTags(tags)
     debugLog(`ACE policies: ${policies.join(', ')}`)
 
+    // Pass sandbox args so that if ACE internally launches Puppeteer (e.g. when content is
+    // a URL string), it doesn't fail in restricted environments (Docker, CodeMie, CI).
+    // puppeteerArgs is on the internal config type; cast to any to avoid TS error.
+    const puppeteerArgs = [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+    ]
+
     try {
-      await aChecker.setConfig({ policies, ruleArchive: 'latest' })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await aChecker.setConfig({ policies, ruleArchive: 'latest', puppeteerArgs } as any)
       const result = await aChecker.getCompliance(content, label)
       const report = result.report as unknown as ACEReport
       return this.aceToAccessibilityResults(report, url)
@@ -633,7 +644,11 @@ export class AccessibilityRunner {
 
     try {
       if (engine === 'ace') {
-        // When usePageContentForACE (e.g. Basic Auth), load page in browser then pass HTML to ACE
+        // Always load the page in Playwright and pass HTML content to ACE.
+        // Previously, when usePageContentForACE was false, ACE fetched the URL using its own
+        // bundled Puppeteer. Puppeteer fails to launch in restricted environments (Docker,
+        // CodeMie, CI) without sandbox args. By pre-loading in Playwright (robust args +
+        // auto-install) and handing HTML to ACE we bypass ACE's Puppeteer launch entirely.
         const usePageContentForACE = config.usePageContentForACE === true
         if (usePageContentForACE) {
           const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
@@ -647,7 +662,7 @@ export class AccessibilityRunner {
             responseStatus,
           }
         }
-        // ACE fetches URL itself (no auth support)
+        // Fallback: ACE fetches URL itself (only reached if usePageContentForACE is explicitly false)
         debugLog(`Running IBM Equal Access (ACE) analysis on ${url}...`)
         const accessibilityResults = await this.runACEAnalysis(url, url, tags)
         return {

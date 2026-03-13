@@ -118,7 +118,8 @@ async function createServer(): Promise<Server> {
             timeout: {
               type: 'number',
               default: 30,
-              description: 'Timeout in seconds (default: 30).',
+              description:
+                'Timeout in seconds (default: 30). For ACE or Basic Auth audits, use 45–60s if the page is slow. If using an MCP bridge (e.g. CodeMie), ensure the bridge HTTP/client timeout is greater than this value to avoid 500 errors.',
             },
             basicAuthUsername: {
               type: 'string',
@@ -1133,6 +1134,12 @@ async function createServer(): Promise<Server> {
     try {
       switch (name) {
         case 'audit_url': {
+          const timeoutSeconds = typeof args?.timeout === 'number' ? args.timeout : undefined
+          if (timeoutSeconds != null && timeoutSeconds > 45) {
+            console.error(
+              `[audit_url] Long timeout (${timeoutSeconds}s). If the request fails with 500, increase the MCP bridge/client timeout to at least ${timeoutSeconds + 15}s.`
+            )
+          }
           const auditResult = await retryWithBackoff(
             async () =>
               await auditUrl({
@@ -1145,7 +1152,7 @@ async function createServer(): Promise<Server> {
                   | 'load'
                   | 'domcontentloaded'
                   | undefined,
-                timeout: args?.timeout as number | undefined,
+                timeout: timeoutSeconds ?? (args?.timeout as number | undefined),
                 basicAuthUsername: args?.basicAuthUsername as string | undefined,
                 basicAuthPassword: args?.basicAuthPassword as string | undefined,
               }),

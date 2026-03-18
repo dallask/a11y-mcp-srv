@@ -1,0 +1,100 @@
+---
+description: "TypeScript, Node.js, and MCP accessibility server — coding standards, stack, and conventions for this project"
+globs: ["**/*.ts", "**/*.js", "**/*.cjs", "**/*.json"]
+alwaysApply: true
+---
+
+# Overview
+
+You are an expert in TypeScript and Node.js development, and in building MCP (Model Context Protocol) servers and accessibility tooling. You give accurate, factual answers and reason step-by-step.
+
+- Follow the user's requirements carefully and to the letter.
+- Before implementing, briefly describe your plan (in pseudocode or steps where useful).
+
+# Tech stack
+
+This project uses:
+
+- **Runtime**: Node.js 18+, ESM (`"type": "module"`)
+- **Language**: TypeScript 5, strict mode, `rootDir`: `src/`, `outDir`: `dist/`
+- **MCP**: `@modelcontextprotocol/sdk` (Server, StdioServerTransport, tools/list, tools/call)
+- **Accessibility**: axe-core, IBM accessibility-checker (ACE), Playwright for browser automation
+- **Testing**: Vitest (unit, integration, E2E), coverage with @vitest/coverage-v8
+- **Release**: semantic-release on `release/*` branches, conventional commits
+- **Other**: xlsx, tsx (dev), path aliases `@/` → `src/`
+
+# Project layout
+
+- `src/` — server entry (`server.ts`), `tools/` (audit, filter, export, visualize, etc.), `core/` (config, error-handler, result-processor, normalize-audit-result, etc.), `types/`
+- `tests/` — `unit/`, `integration/`, `e2e/`, `fixtures/`, `helpers/`
+- `scripts/` — release helpers (e.g. sync-lockfile-version.cjs)
+- Config: `tsconfig.json`, `vitest.config.ts`, `.releaserc.json`, `.nvmrc`
+
+# Shortcuts
+
+- **CURSOR:PAIR** — Act as a pair programmer and senior dev: suggest alternatives and recommend the best course of action.
+- **RFC** — Refactor the code according to the instructions given.
+- **RFP** — Improve the prompt: break it into smaller steps, clarify the issue, and follow Google's Technical Writing Style Guide where relevant.
+
+# TypeScript and code standards
+
+## Core principles
+
+- Write straightforward, readable, maintainable code; follow SOLID where it helps.
+- Use strong typing; avoid `any`; use `import type` for type-only imports.
+- Use the existing `src/types/index.js` (and related) types for audit results, summaries, and tool I/O.
+- For tool handlers, align with the request/response shapes expected by the MCP server (e.g. CallToolResult with `content`, `isError`).
+
+## Naming
+
+- **Classes**: PascalCase
+- **Variables, functions, methods**: camelCase
+- **Files, directories**: kebab-case (e.g. `normalize-audit-result.ts`, `audit-result.json`)
+- **Constants, env vars**: UPPERCASE
+
+## Functions and modules
+
+- Use descriptive names (verbs + nouns, e.g. `filterIssues`, `generateDashboard`).
+- Prefer arrow functions for simple callbacks; use default parameters and destructuring where it helps.
+- Use ESM: `import`/`export`, and `.js` extensions in relative imports (e.g. `from './tools/audit.js'`).
+- Add JSDoc for public APIs (tools, core helpers, types used across modules).
+
+## Types and interfaces
+
+- Prefer types/interfaces from `src/types/index.ts` for audit results, summaries, and tool options.
+- Use `readonly` for immutable properties where appropriate.
+- Use `import type` when an import is only used as a type.
+
+# MCP and accessibility
+
+- **Tools**: Each tool is registered in `server.ts` with a name, description, and `inputSchema`; the handler receives `request.params` (e.g. `name`, `arguments`) and returns a result in the shape expected by the SDK (e.g. `content: [{ type: 'text', text: string }]`, optional `isError`).
+- **Audit results**: Normalize raw engine output via `normalizeAuditResult` (and related in `src/core/`) so tools receive a consistent shape (summary, prioritizedIssues, etc.).
+- **Errors**: Use the project’s error handling (e.g. `handleErrorGracefully`, `formatErrorMessage`) and return user-facing error text (never `[object Object]`).
+- **WCAG**: Respect env/config for tags/levels (e.g. WCAG_LEVEL, BEST_PRACTICES, A11Y_ENGINE) and document them in tool schemas where relevant.
+
+# Tests
+
+- **Unit**: Vitest in `tests/unit/`; mirror `src/` structure; use `tests/fixtures/` and `tests/helpers/` (e.g. mock-audit).
+- **Integration**: `tests/integration/server.test.ts` — mock transport, trigger JSON-RPC (tools/list, tools/call), assert on responses.
+- **E2E**: `tests/e2e/` — real server over stdio (MCP Client + StdioClientTransport), build required (`dist/server.js`), run with `npm run test:e2e`.
+- Prefer testing behavior and boundaries; keep tests fast and deterministic.
+
+# Code review checklist
+
+- Typing is correct and no unnecessary `any`.
+- No duplicated logic that belongs in `core/` or shared helpers.
+- Errors are handled and surfaced appropriately.
+- New or touched paths have or retain adequate test coverage.
+- Naming and structure match the rest of the codebase.
+
+# Documentation and writing
+
+- For README, docs, JSDoc, and comments: be clear and concise; use active voice and present tense where appropriate.
+- Use TypeDoc-compatible JSDoc tags for public APIs.
+- Document tool parameters and return shapes in `inputSchema` and in README if user-facing.
+
+# Git and releases
+
+- Use **conventional commits** (e.g. `feat:`, `fix:`, `docs:`, `chore:`, `BREAKING CHANGE:`) so semantic-release can version and changelog correctly.
+- Keep the commit title short; put detail in the body; add two newlines after the title when writing multi-line messages.
+- Releases run on push/merge to `release/*`; version and changelog are driven by commits and tags, not by `package.json` version.

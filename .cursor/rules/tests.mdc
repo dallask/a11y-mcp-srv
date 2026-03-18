@@ -1,0 +1,15 @@
+---
+description: "Vitest unit, integration, and E2E test conventions and patterns for this project"
+globs: ["tests/**/*.ts", "tests/**/*.js"]
+alwaysApply: false
+---
+
+# Test rules
+
+- **Runner**: Vitest; config in `vitest.config.ts` (node env, `tests/**/*.test.ts`, path alias `@/`).
+- **Structure**: `tests/unit/` (mirror `src/`), `tests/integration/`, `tests/e2e/`, `tests/fixtures/`, `tests/helpers/`.
+- **Fixtures**: Use `tests/fixtures/` (e.g. `audit-result.json`, `raw-accessibility.json`) and `tests/helpers/` (e.g. `mock-audit.ts`); avoid hardcoding large payloads in test files.
+- **Naming**: `*.test.ts`; describe/it blocks clear and scoped.
+- **E2E**: Use MCP Client + StdioClientTransport; spawn real `dist/server.js`; require build before E2E run; use timeouts/hookTimeouts where needed (e.g. 20_000 ms).
+- **Assertions**: Prefer `expect()` on shape and key fields; for MCP tool responses, parse JSON from `content[0].text` and assert on parsed result and `isError` where relevant.
+- **Isolation**: No shared mutable state between tests; use `beforeEach`/`beforeAll` for setup.

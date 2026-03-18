@@ -172,6 +172,20 @@ export function normalizeAuditResult(value: unknown): AuditResult | null {
     }
   }
 
+  // Full request params passed as results: { arguments: { results: <audit>, format?, ... } }
+  const innerArgs = obj.arguments
+  if (
+    innerArgs != null &&
+    typeof innerArgs === 'object' &&
+    !Array.isArray(innerArgs) &&
+    'results' in innerArgs
+  ) {
+    const fromArgs = (innerArgs as Record<string, unknown>).results
+    if (fromArgs != null) {
+      return normalizeAuditResult(fromArgs)
+    }
+  }
+
   // Batch result from audit_multiple_urls: { results: AuditResult[], ... }
   const resultsArray = obj.results
   if (Array.isArray(resultsArray) && resultsArray.length > 0) {

@@ -1124,7 +1124,20 @@ export async function createServer(): Promise<Server> {
 
   // Handle tool calls
   server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
-    const { name, arguments: args } = request.params
+    let { name, arguments: rawArgs } = request.params
+    // Some MCP clients send arguments as a JSON string; normalize to an object so args?.results etc. work
+    let args: Record<string, unknown> =
+      typeof rawArgs === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(rawArgs) as Record<string, unknown>
+            } catch {
+              return {}
+            }
+          })()
+        : rawArgs != null && typeof rawArgs === 'object'
+          ? (rawArgs as Record<string, unknown>)
+          : {}
 
     try {
       switch (name) {

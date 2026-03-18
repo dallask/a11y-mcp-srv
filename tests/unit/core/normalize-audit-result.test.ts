@@ -128,4 +128,39 @@ describe('normalizeAuditResult', () => {
     expect(result!.metadata!.testEnvironment.windowWidth).toBe(1280)
     expect(result!.metadata!.testEnvironment.windowHeight).toBe(720)
   })
+
+  it('normalizes generate_dashboard-style payload (audit + format/includeCharts) with correct summary and url', () => {
+    const dashboardPayload = {
+      summary: {
+        totalIssues: 18,
+        score: 10,
+        wcagCompliance: { A: 100, AA: 0, AAA: 100 },
+        byCategory: { error: 18 },
+        byImpact: { violation: 6, potentialviolation: 12 },
+      },
+      prioritizedIssues: [{ ruleId: 'aria_hidden_nontabbable', impact: 'violation' }],
+      metadata: {
+        testEngine: { name: 'IBM Equal Access', version: '4.x' },
+        testRunner: { name: 'accessibility-checker' },
+        testEnvironment: { userAgent: 'accessibility-checker', windowWidth: 1280, windowHeight: 720 },
+        timestamp: '2026-03-18T10:37:05.088Z',
+        url: 'https://voyacthcp69259main.dev.oapi.com/',
+      },
+      format: 'markdown',
+      includeCharts: true,
+    }
+    const result = normalizeAuditResult(dashboardPayload)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(18)
+    expect(result!.summary.score).toBe(10)
+    expect(result!.metadata?.url).toBe('https://voyacthcp69259main.dev.oapi.com/')
+  })
+
+  it('unwraps full request params { arguments: { results: audit } } when passed as results', () => {
+    const audit = { summary: { totalIssues: 5, score: 50, wcagCompliance: { A: 0, AA: 0, AAA: 0 }, byCategory: {}, byImpact: {} }, prioritizedIssues: [] }
+    const fullParams = { arguments: { results: audit, format: 'markdown', includeCharts: true } }
+    const result = normalizeAuditResult(fullParams)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(5)
+  })
 })

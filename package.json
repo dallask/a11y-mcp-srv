@@ -15,6 +15,7 @@
     "test:run": "vitest run",
     "test:e2e": "npm run build && vitest run tests/e2e",
     "test:coverage": "vitest run --coverage",
+    "release": "semantic-release",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -43,8 +44,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.0.4",
+    "@semantic-release/npm": "^11.0.0",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^4.1.0",
+    "semantic-release": "^24.2.0",
     "tsx": "^4.7.0",
     "typescript": "^5.0.0",
     "vitest": "^4.1.0"

@@ -1304,6 +1304,17 @@ This project is derived from [alii13/accessibility-mcp-server](https://github.co
 
 MIT License - feel free to use in your projects!
 
+## 🚀 Releasing
+
+Releases are automated with [semantic-release](https://github.com/semantic-release/semantic-release) and run on **push or merge to any `release/*` branch**.
+
+- **Branch**: Push or merge to a branch matching `release/*` (e.g. `release/1.x`, `release/2.0`).
+- **Version**: Determined from commit messages (e.g. `fix:`, `feat:`, `BREAKING CHANGE:`).
+- **Artifacts**: GitHub Release is created; `CHANGELOG.md` and `package.json` are updated and pushed back to the branch.
+- **npm**: If you publish to npm, add an `NPM_TOKEN` secret in the repo settings (Settings → Secrets and variables → Actions). The workflow uses it to publish after a successful release.
+
+Local dry run (no publish): `npx semantic-release --dry-run`. Note: dry-run may fail locally if no `release/*` branch exists on the remote, since semantic-release validates branches against the repo; in CI it runs only when the workflow is triggered by a push to `release/*`.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please ensure all code follows the existing style and includes appropriate tests.

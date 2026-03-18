@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.3.0...v2.4.0) (2026-03-18)
+
+
+### Features
+
+* implement resolveAuditInput function for improved audit result handling ([e74f452](https://github.com/dallask/a11y-mcp-srv/commit/e74f452e2c0d955bf77ba217d7caffa13189a7ca))
+
 # [2.3.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.2.0...v2.3.0) (2026-03-18)
 
 

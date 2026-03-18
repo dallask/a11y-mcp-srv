@@ -98,4 +98,34 @@ describe('normalizeAuditResult', () => {
     expect(result!.prioritizedIssues).toEqual([])
     expect(result!.conversationalSummary).toBe('')
   })
+
+  it('unwraps { results: singleAuditObject } into same canonical shape', () => {
+    const wrapped = { results: auditResultFixture, format: 'standard', includeMetadata: true }
+    const result = normalizeAuditResult(wrapped)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(2)
+    expect(result!.prioritizedIssues).toHaveLength(2)
+  })
+
+  it('produces canonical metadata from top-level url/timestamp and ACE-style metadata', () => {
+    const aceStyle = {
+      url: 'https://example.com',
+      timestamp: '2025-05-15T12:00:00.000Z',
+      summary: { totalIssues: 1, score: 80, wcagCompliance: { A: 100, AA: 80, AAA: 60 }, byCategory: {}, byImpact: {} },
+      prioritizedIssues: [],
+      metadata: {
+        testEngine: 'IBM Equal Access (ACE)',
+        testDate: '2025-05-15T12:00:00.000Z',
+        viewport: '1280x720',
+      },
+    }
+    const result = normalizeAuditResult(aceStyle)
+    expect(result).not.toBeNull()
+    expect(result!.metadata).toBeDefined()
+    expect(result!.metadata!.url).toBe('https://example.com')
+    expect(result!.metadata!.timestamp).toBe('2025-05-15T12:00:00.000Z')
+    expect(result!.metadata!.testEngine).toEqual({ name: 'IBM Equal Access (ACE)', version: '' })
+    expect(result!.metadata!.testEnvironment.windowWidth).toBe(1280)
+    expect(result!.metadata!.testEnvironment.windowHeight).toBe(720)
+  })
 })

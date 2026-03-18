@@ -228,7 +228,10 @@ export interface AppliedFilters {
 }
 
 /**
- * Complete audit result structure
+ * Canonical audit result structure. This is the universal shape returned by the audit_url
+ * tool and consumed by all tools that accept "results" (export, dashboard, filter, etc.).
+ * Tools receive this same shape via normalizeAuditResult() when passed a URL, a previous
+ * audit result, or a wrapped/MCP response.
  */
 export interface AuditResult {
   summary: AuditSummary

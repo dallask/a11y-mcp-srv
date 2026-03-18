@@ -3,8 +3,7 @@
  * Implements: get_accessibility_score, prioritize_issues, explain_issue, get_quick_fixes
  */
 
-import { resolveBasicAuth } from '../core/basic-auth.js'
-import { normalizeAuditResult } from '../core/normalize-audit-result.js'
+import { normalizeAuditResult, resolveAuditInput } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -171,17 +170,11 @@ export async function getAccessibilityScore(
 ): Promise<ScoreResult> {
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof input.results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      input.results,
-      input.basicAuthUsername,
-      input.basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(input.results, input.basicAuthUsername, input.basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(input.results)
-    auditResult = normalized ?? (input.results as AuditResult)
+    auditResult = resolved.result
   }
 
   const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
@@ -251,14 +244,14 @@ function prioritizeByCriteria(
       // Sort by fixability (issues with clear fixes first)
       // Estimate fixability based on whether fix suggestion has actual code changes
       sorted.sort((a, b) => {
-        const aHasFix = a.fix.suggested !== a.fix.current && a.fix.suggested.length > 0
-        const bHasFix = b.fix.suggested !== b.fix.current && b.fix.suggested.length > 0
-        
+        const aHasFix = a.fix?.suggested != null && a.fix?.current != null && a.fix.suggested !== a.fix.current && a.fix.suggested.length > 0
+        const bHasFix = b.fix?.suggested != null && b.fix?.current != null && b.fix.suggested !== b.fix.current && b.fix.suggested.length > 0
+
         if (aHasFix && !bHasFix) return -1
         if (!aHasFix && bHasFix) return 1
-        
+
         // If both have fixes or both don't, sort by priority
-        return b.priority - a.priority
+        return (b.priority ?? 0) - (a.priority ?? 0)
       })
       break
     }
@@ -301,10 +294,13 @@ function identifyQuickWins(issues: PrioritizedIssue[]): QuickWin[] {
 
     if (highImpactIssues.length > 0) {
       const firstIssue = groupIssues[0]
-      const hasClearFix = 
-        firstIssue.fix.suggested !== firstIssue.fix.current &&
-        firstIssue.fix.suggested.length > 0 &&
-        firstIssue.fix.explanation.length > 0
+      const fix = firstIssue.fix
+      const hasClearFix =
+        fix?.suggested != null &&
+        fix?.current != null &&
+        fix.suggested !== fix.current &&
+        fix.suggested.length > 0 &&
+        (fix.explanation?.length ?? 0) > 0
 
       // Consider it a quick win if:
       // - High impact AND (has clear fix OR affects multiple elements)
@@ -313,7 +309,7 @@ function identifyQuickWins(issues: PrioritizedIssue[]): QuickWin[] {
           ruleId,
           description: firstIssue.description,
           impact: firstIssue.impact,
-          fix: firstIssue.fix,
+          fix: fix ?? { current: '', suggested: '', explanation: '' },
           estimatedTime: `${Math.ceil(groupIssues.length * 2)} minutes`,
           affectedElements: groupIssues.length,
         })
@@ -876,9 +872,9 @@ function issuesToQuickFixes(
     quickFixes.push({
       ruleId,
       description: firstIssue.description,
-      currentCode: includeCode ? firstIssue.fix.current : undefined,
-      fixedCode: includeCode ? firstIssue.fix.suggested : undefined,
-      explanation: firstIssue.fix.explanation || firstIssue.userImpact,
+      currentCode: includeCode ? firstIssue.fix?.current : undefined,
+      fixedCode: includeCode ? firstIssue.fix?.suggested : undefined,
+      explanation: firstIssue.fix?.explanation || firstIssue.userImpact || '',
       impactEstimate,
       affectedElements: groupIssues.length,
     })
@@ -914,17 +910,11 @@ export async function getQuickFixes(
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResult = normalized ?? (results as AuditResult)
+    auditResult = resolved.result
   }
 
   const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
@@ -1417,17 +1407,11 @@ export async function getWCAGCompliance(
 ): Promise<WCAGComplianceResult> {
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof input.results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      input.results,
-      input.basicAuthUsername,
-      input.basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(input.results, input.basicAuthUsername, input.basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(input.results)
-    auditResult = normalized ?? (input.results as AuditResult)
+    auditResult = resolved.result
   }
 
   const level = input.level || 'AA'

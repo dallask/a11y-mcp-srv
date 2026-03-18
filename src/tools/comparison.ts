@@ -4,7 +4,7 @@
  */
 
 import { resolveBasicAuth } from '../core/basic-auth.js'
-import { normalizeAuditResult } from '../core/normalize-audit-result.js'
+import { resolveAuditInput } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -215,32 +215,21 @@ export async function compareAccessibility(
     basicAuthPassword,
   } = input
 
-  // Get audit results - if strings, run audits first (with optional Basic Auth, same as audit_url)
   let beforeResult: AuditResult
   let afterResult: AuditResult
 
-  if (typeof before === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      before,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    beforeResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolvedBefore = resolveAuditInput(before, basicAuthUsername, basicAuthPassword)
+  if (resolvedBefore.kind === 'url') {
+    beforeResult = await auditUrl({ url: resolvedBefore.urlWithoutAuth, basicAuthUsername: resolvedBefore.basicAuthUsername, basicAuthPassword: resolvedBefore.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(before)
-    beforeResult = normalized ?? (before as AuditResult)
+    beforeResult = resolvedBefore.result
   }
 
-  if (typeof after === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      after,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    afterResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolvedAfter = resolveAuditInput(after, basicAuthUsername, basicAuthPassword)
+  if (resolvedAfter.kind === 'url') {
+    afterResult = await auditUrl({ url: resolvedAfter.urlWithoutAuth, basicAuthUsername: resolvedAfter.basicAuthUsername, basicAuthPassword: resolvedAfter.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(after)
-    afterResult = normalized ?? (after as AuditResult)
+    afterResult = resolvedAfter.result
   }
 
   const beforeIssues = Array.isArray(beforeResult?.prioritizedIssues) ? beforeResult.prioritizedIssues : []

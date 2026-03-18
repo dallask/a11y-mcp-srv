@@ -11,6 +11,52 @@ import type {
   WCAGCompliance,
 } from '../types/index.js'
 
+import { resolveBasicAuth } from './basic-auth.js'
+
+/**
+ * Resolved audit input: either a normalized AuditResult, or a URL that still needs auditing.
+ */
+export type ResolvedAuditInput =
+  | { kind: 'result'; result: AuditResult }
+  | { kind: 'url'; urlWithoutAuth: string; basicAuthUsername?: string; basicAuthPassword?: string }
+
+/**
+ * Resolve an audit results parameter to either a normalized AuditResult or a URL to audit.
+ *
+ * All tools that accept a `results` parameter (which can be an AuditResult object, a JSON
+ * string of an AuditResult, an MCP response wrapper, or a URL string) should use this
+ * function instead of manually checking `typeof results === 'string'`.
+ *
+ * This ensures JSON strings of audit results are parsed (not mistaken for URLs) and that
+ * all object shapes are normalized through `normalizeAuditResult`.
+ */
+export function resolveAuditInput(
+  results: unknown,
+  basicAuthUsername?: string,
+  basicAuthPassword?: string,
+): ResolvedAuditInput {
+  const normalized = normalizeAuditResult(results)
+  if (normalized) {
+    return { kind: 'result', result: normalized }
+  }
+
+  if (typeof results === 'string') {
+    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
+      results,
+      basicAuthUsername,
+      basicAuthPassword,
+    )
+    return { kind: 'url', urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p }
+  }
+
+  // Last resort: treat as AuditResult-like object even though normalizer couldn't parse it
+  if (results != null && typeof results === 'object') {
+    return { kind: 'result', result: results as AuditResult }
+  }
+
+  return { kind: 'result', result: normalizeObject({}) }
+}
+
 const DEFAULT_SUMMARY: AuditSummary = {
   totalIssues: 0,
   score: 0,

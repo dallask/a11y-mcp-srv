@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-import { normalizeAuditResult } from '../../../src/core/normalize-audit-result.js'
+import { normalizeAuditResult, resolveAuditInput } from '../../../src/core/normalize-audit-result.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const auditResultFixture = JSON.parse(
@@ -162,5 +162,108 @@ describe('normalizeAuditResult', () => {
     const result = normalizeAuditResult(fullParams)
     expect(result).not.toBeNull()
     expect(result!.summary.totalIssues).toBe(5)
+  })
+
+  it('normalizes real dashboard fixture from JSON file', () => {
+    const fixture = JSON.parse(
+      readFileSync(join(__dirname, '../../fixtures/dashboard-input-results.json'), 'utf-8')
+    )
+    const result = normalizeAuditResult(fixture)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(18)
+    expect(result!.summary.score).toBe(10)
+    expect(result!.metadata?.url).toBe('https://voyacthcp69259main.dev.oapi.com/')
+    expect(result!.prioritizedIssues).toHaveLength(18)
+  })
+
+  it('normalizes real dashboard fixture passed as JSON string', () => {
+    const fixture = readFileSync(join(__dirname, '../../fixtures/dashboard-input-results.json'), 'utf-8')
+    const result = normalizeAuditResult(fixture)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(18)
+    expect(result!.metadata?.url).toBe('https://voyacthcp69259main.dev.oapi.com/')
+  })
+
+  it('normalizes real prioritize fixture from JSON file', () => {
+    const fixture = JSON.parse(
+      readFileSync(join(__dirname, '../../fixtures/prioritize-input-results.json'), 'utf-8')
+    )
+    const result = normalizeAuditResult(fixture)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(23)
+    expect(result!.prioritizedIssues).toHaveLength(7)
+  })
+})
+
+describe('resolveAuditInput', () => {
+  it('resolves a URL string to kind=url', () => {
+    const resolved = resolveAuditInput('https://example.com')
+    expect(resolved.kind).toBe('url')
+    if (resolved.kind === 'url') {
+      expect(resolved.urlWithoutAuth).toBe('https://example.com')
+    }
+  })
+
+  it('resolves a URL string with embedded credentials', () => {
+    const resolved = resolveAuditInput('https://user:pass@example.com/page')
+    expect(resolved.kind).toBe('url')
+    if (resolved.kind === 'url') {
+      expect(resolved.basicAuthUsername).toBe('user')
+      expect(resolved.basicAuthPassword).toBe('pass')
+    }
+  })
+
+  it('resolves explicit Basic Auth over URL-embedded credentials', () => {
+    const resolved = resolveAuditInput('https://user:pass@example.com', 'admin', 'secret')
+    expect(resolved.kind).toBe('url')
+    if (resolved.kind === 'url') {
+      expect(resolved.basicAuthUsername).toBe('admin')
+      expect(resolved.basicAuthPassword).toBe('secret')
+    }
+  })
+
+  it('resolves an audit result object to kind=result', () => {
+    const resolved = resolveAuditInput(auditResultFixture)
+    expect(resolved.kind).toBe('result')
+    if (resolved.kind === 'result') {
+      expect(resolved.result.summary.totalIssues).toBe(2)
+    }
+  })
+
+  it('resolves a JSON string of audit result to kind=result (not kind=url)', () => {
+    const json = JSON.stringify(auditResultFixture)
+    const resolved = resolveAuditInput(json)
+    expect(resolved.kind).toBe('result')
+    if (resolved.kind === 'result') {
+      expect(resolved.result.summary.totalIssues).toBe(2)
+      expect(resolved.result.prioritizedIssues).toHaveLength(2)
+    }
+  })
+
+  it('resolves MCP wrapper to kind=result', () => {
+    const wrapped = { content: [{ type: 'text', text: JSON.stringify(auditResultFixture) }] }
+    const resolved = resolveAuditInput(wrapped)
+    expect(resolved.kind).toBe('result')
+    if (resolved.kind === 'result') {
+      expect(resolved.result.summary.totalIssues).toBe(2)
+    }
+  })
+
+  it('resolves null/undefined to kind=result with empty defaults', () => {
+    const resolved = resolveAuditInput(null)
+    expect(resolved.kind).toBe('result')
+    if (resolved.kind === 'result') {
+      expect(resolved.result.summary.totalIssues).toBe(0)
+    }
+  })
+
+  it('resolves real dashboard fixture as JSON string to kind=result with 18 issues', () => {
+    const fixture = readFileSync(join(__dirname, '../../fixtures/dashboard-input-results.json'), 'utf-8')
+    const resolved = resolveAuditInput(fixture)
+    expect(resolved.kind).toBe('result')
+    if (resolved.kind === 'result') {
+      expect(resolved.result.summary.totalIssues).toBe(18)
+      expect(resolved.result.metadata?.url).toBe('https://voyacthcp69259main.dev.oapi.com/')
+    }
   })
 })

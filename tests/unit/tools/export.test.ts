@@ -66,6 +66,17 @@ describe('exportToCsv', () => {
     expect(result.csv).toContain('Test Information')
     expect(result.csv).toContain('axe')
   })
+
+  it('accepts results as JSON string (normalized via resolveAuditInput)', async () => {
+    const result = await exportToCsv({
+      results: JSON.stringify(auditResultFixture),
+      includeMetadata: false,
+      includeViolations: true,
+    })
+    expect(result.csv).toBeDefined()
+    expect(result.totalIssues).toBe(2)
+    expect(result.csv).toContain('image-alt')
+  })
 })
 
 describe('exportToExcel', () => {

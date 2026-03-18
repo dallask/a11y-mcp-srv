@@ -90,6 +90,25 @@ describe(
       expect(result.isError).toBeFalsy()
     })
 
+    it('calls filter_issues with results as JSON string (normalized input over wire)', async () => {
+      const result = await client.callTool({
+        name: 'filter_issues',
+        arguments: {
+          results: JSON.stringify(auditResultFixture),
+          filters: { ruleIds: ['image-alt'] },
+          mode: 'include',
+        },
+      })
+      expect(result.content).toBeDefined()
+      const text = result.content![0].type === 'text' ? result.content![0].text : undefined
+      expect(text).toBeDefined()
+      const parsed = JSON.parse(text!)
+      expect(parsed.filtered).toBeDefined()
+      expect(parsed.filteredCount).toBe(1)
+      expect(parsed.originalCount).toBe(2)
+      expect(result.isError).toBeFalsy()
+    })
+
     it('calls explain_issue and returns explanation', async () => {
       const result = await client.callTool({
         name: 'explain_issue',
@@ -121,6 +140,26 @@ describe(
       expect(typeof parsed.dashboard).toBe('string')
       expect(parsed.dashboard).toMatch(/accessibility|Accessibility|dashboard|score/i)
       expect(parsed.format).toBe('markdown')
+      expect(result.isError).toBeFalsy()
+    })
+
+    it('calls generate_dashboard with results as JSON string (normalized input over wire)', async () => {
+      const result = await client.callTool({
+        name: 'generate_dashboard',
+        arguments: {
+          results: JSON.stringify(auditResultFixture),
+          format: 'markdown',
+          includeCharts: true,
+        },
+      })
+      expect(result.content).toBeDefined()
+      const text = result.content![0].type === 'text' ? result.content![0].text : undefined
+      expect(text).toBeDefined()
+      const parsed = JSON.parse(text!)
+      expect(parsed.dashboard).toBeDefined()
+      expect(typeof parsed.dashboard).toBe('string')
+      expect(parsed.format).toBe('markdown')
+      expect(parsed.totalResults).toBe(1)
       expect(result.isError).toBeFalsy()
     })
 

@@ -41,6 +41,16 @@ describe('generateDashboard', () => {
     })
     expect(result.totalResults).toBe(2)
   })
+
+  it('accepts results as JSON string (normalized via resolveAuditInput)', async () => {
+    const result = await generateDashboard({
+      results: JSON.stringify(auditResultFixture),
+      format: 'markdown',
+    })
+    expect(result.dashboard).toBeDefined()
+    expect(result.totalResults).toBe(1)
+    expect(result.format).toBe('markdown')
+  })
 })
 
 describe('generateSummaryReport', () => {

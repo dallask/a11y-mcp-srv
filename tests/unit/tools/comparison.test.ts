@@ -64,6 +64,18 @@ describe('compareAccessibility', () => {
     expect(result.summary).toBeDefined()
     expect(typeof result.summary).toBe('string')
   })
+
+  it('accepts before/after as JSON strings (normalized via resolveAuditInput)', async () => {
+    const before = { ...auditResultFixture, summary: { ...auditResultFixture.summary, score: 80 } }
+    const after = { ...auditResultFixture, prioritizedIssues: [auditResultFixture.prioritizedIssues[0]], summary: { ...auditResultFixture.summary, totalIssues: 1, score: 90 } }
+    const result = await compareAccessibility({
+      before: JSON.stringify(before),
+      after: JSON.stringify(after),
+    })
+    expect(result.issuesFixed).toBeDefined()
+    expect(result.remainingIssues).toBeDefined()
+    expect(result.summary).toBeDefined()
+  })
 })
 
 describe('trackAccessibility', () => {

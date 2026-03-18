@@ -37,6 +37,20 @@ describe('getAccessibilityScore', () => {
     })
     expect(result.overallScore).toBeDefined()
   })
+
+  it('accepts results as JSON string (normalized via resolveAuditInput)', async () => {
+    const result = await getAccessibilityScore({
+      results: JSON.stringify(auditResultFixture),
+    })
+    expect(result.overallScore).toBeGreaterThanOrEqual(0)
+    expect(result.overallScore).toBeLessThanOrEqual(100)
+    expect(result.breakdown).toBeDefined()
+    expect(result.wcagCompliance).toMatchObject({
+      A: expect.any(Number),
+      AA: expect.any(Number),
+      AAA: expect.any(Number),
+    })
+  })
 })
 
 describe('prioritizeIssues', () => {

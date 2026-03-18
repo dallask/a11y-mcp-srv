@@ -1,0 +1,186 @@
+{
+  "summary": {
+    "totalIssues": 23,
+    "score": 0,
+    "wcagCompliance": {
+      "A": 100,
+      "AA": 0,
+      "AAA": 100
+    },
+    "byCategory": {
+      "error": 23
+    },
+    "byImpact": {
+      "violation": 6,
+      "potentialviolation": 17
+    }
+  },
+  "prioritizedIssues": [
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with 'aria-hidden' attribute",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "button.btn.btn-close",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/div[1]/button[1]",
+      "fix": {
+        "current": "<button class=\"btn btn-close\" type=\"button\" data-bs-dismiss=\"modal\" aria-label=\"Close\">",
+        "suggested": "Remove tabindex or ensure parent does not have aria-hidden=\"true\"",
+        "explanation": "Interactive elements inside aria-hidden containers should not be keyboard accessible. Either remove aria-hidden from parent or make the button non-focusable."
+      },
+      "userImpact": "Keyboard users may focus on elements that are supposed to be hidden, causing confusion",
+      "priority": 1
+    },
+    {
+      "ruleId": "input_label_visible",
+      "impact": "potentialviolation",
+      "description": "Input elements do not have an associated visible label",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "button.navbar-toggler",
+      "xpath": "/html[1]/body[1]/div[1]/nav[1]/div[1]/button[1]",
+      "fix": {
+        "current": "<button class=\"navbar-toggler\" type=\"button\">",
+        "suggested": "Add aria-label or visible text label",
+        "explanation": "Add aria-label=\"Menu\" or include visible text within the button for screen reader users."
+      },
+      "userImpact": "Screen reader users may not understand the purpose of unlabeled controls",
+      "priority": 2
+    },
+    {
+      "ruleId": "element_tabbable_unobscured",
+      "impact": "potentialviolation",
+      "description": "Element may be covered when it receives focus, potentially obscuring it from view",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "div.simplebar-content-wrapper",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[2]/div[1]/div[1]",
+      "fix": {
+        "current": "<div class=\"simplebar-content-wrapper\" tabindex=\"0\">",
+        "suggested": "Ensure element is fully visible when focused, adjust z-index or scrolling behavior",
+        "explanation": "When this element receives focus, ensure it's not covered by overlays or other positioned elements."
+      },
+      "userImpact": "Keyboard users may not see what element has focus",
+      "priority": 3
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Verify the word 'Upper' is not used to indicate visual position rather than logical position",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "tspan",
+      "xpath": "/html[1]/body[1]/div[1]/section[3]/div[1]/div[1]/div[1]/svg[1]/text[1]/tspan[1]",
+      "fix": {
+        "current": "Text contains 'Upper'",
+        "suggested": "Use semantic/logical descriptions instead of visual position words",
+        "explanation": "Replace spatial references like 'Upper' with logical descriptions like 'First' or semantic structure."
+      },
+      "userImpact": "Users with cognitive disabilities or screen readers may not understand visual position references",
+      "priority": 4
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Verify the word 'Upper' is not used to indicate visual position rather than logical position",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "p",
+      "xpath": "/html[1]/body[1]/div[1]/section[7]/div[1]/div[1]/div[1]/div[1]/p[1]",
+      "fix": {
+        "current": "Text contains 'Upper'",
+        "suggested": "Use semantic/logical descriptions instead of visual position words",
+        "explanation": "Replace spatial references like 'Upper' with logical descriptions."
+      },
+      "userImpact": "Users with cognitive disabilities or screen readers may not understand visual position references",
+      "priority": 4
+    },
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with 'aria-hidden' attribute",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "button.btn.btn-close",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/div[1]/button[1]",
+      "fix": {
+        "current": "<button class=\"btn btn-close\" type=\"button\" data-bs-dismiss=\"modal\" aria-label=\"Close\">",
+        "suggested": "Remove tabindex or ensure parent does not have aria-hidden=\"true\"",
+        "explanation": "Interactive elements inside aria-hidden containers should not be keyboard accessible."
+      },
+      "userImpact": "Keyboard users may focus on elements that are supposed to be hidden",
+      "priority": 1
+    },
+    {
+      "ruleId": "input_label_visible",
+      "impact": "potentialviolation",
+      "description": "Input elements do not have an associated visible label",
+      "wcagLevel": "AA",
+      "tags": [
+        "wcag22aa"
+      ],
+      "element": "button.btn.btn-close",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/div[1]/button[1]",
+      "fix": {
+        "current": "<button class=\"btn btn-close\" aria-label=\"Close\">",
+        "suggested": "Add visible text label or ensure aria-label is sufficient",
+        "explanation": "While aria-label is present, consider adding visible text for better usability."
+      },
+      "userImpact": "Some users may not understand icon-only buttons",
+      "priority": 2
+    }
+  ],
+  "conversationalSummary": "The website has 23 accessibility issues with a critical score of 0/100. Main concerns include buttons within aria-hidden elements, missing visible labels, and sensory characteristic misuse.",
+  "quickWins": [
+    {
+      "issue": "aria_hidden_nontabbable violations",
+      "count": 6,
+      "estimatedTime": "12 minutes",
+      "impact": "High"
+    },
+    {
+      "issue": "text_sensory_misuse issues",
+      "count": 5,
+      "estimatedTime": "10 minutes",
+      "impact": "Medium"
+    },
+    {
+      "issue": "input_label_visible issues",
+      "count": 4,
+      "estimatedTime": "8 minutes",
+      "impact": "Medium"
+    }
+  ],
+  "criticalBlockers": [
+    {
+      "issue": "aria_hidden_nontabbable",
+      "description": "Focusable buttons within aria-hidden containers",
+      "count": 6,
+      "wcagLevel": "AA"
+    },
+    {
+      "issue": "input_label_visible",
+      "description": "Missing visible labels on inputs",
+      "count": 4,
+      "wcagLevel": "AA"
+    }
+  ],
+  "metadata": {
+    "url": "https://voyacthcp69259main.dev.oapi.com/",
+    "engine": "ace",
+    "timestamp": "2026-03-18T10:30:00Z"
+  }
+}

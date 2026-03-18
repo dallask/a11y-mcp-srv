@@ -69,6 +69,17 @@ describe('filterIssues', () => {
     expect(result.filtersApplied).toEqual({ ruleIds: ['image-alt'] })
     expect(result.mode).toBe('include')
   })
+
+  it('accepts results as JSON string (normalized input)', () => {
+    const result = filterIssues({
+      results: JSON.stringify(auditResultFixture),
+      filters: { ruleIds: ['image-alt'] },
+      mode: 'include',
+    })
+    expect(result.filteredCount).toBe(1)
+    expect(result.originalCount).toBe(2)
+    expect(result.filtered.prioritizedIssues[0].ruleId).toBe('image-alt')
+  })
 })
 
 describe('searchIssues', () => {
@@ -142,5 +153,14 @@ describe('searchIssues', () => {
     const upper = searchIssues({ results: auditResultFixture, query: 'IMAGE', caseSensitive: true })
     expect(lower.totalMatches).toBeGreaterThanOrEqual(0)
     expect(upper.totalMatches).toBe(0)
+  })
+
+  it('accepts results as JSON string (normalized input)', () => {
+    const result = searchIssues({
+      results: JSON.stringify(auditResultFixture),
+      query: 'alternate text',
+    })
+    expect(result.totalMatches).toBeGreaterThanOrEqual(0)
+    expect(result.matches).toBeDefined()
   })
 })

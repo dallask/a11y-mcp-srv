@@ -1,0 +1,478 @@
+{
+  "summary": {
+    "totalIssues": 18,
+    "score": 10,
+    "wcagCompliance": {
+      "A": 100,
+      "AA": 0,
+      "AAA": 100
+    },
+    "byCategory": {
+      "error": 18
+    },
+    "byImpact": {
+      "violation": 6,
+      "potentialviolation": 12
+    }
+  },
+  "prioritizedIssues": [
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[8]/div[1]/div[1]/div[1]/button[1]",
+      "classSelector": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-t",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-t",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 170,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "div.simplebar-content-wrapper",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[8]/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]",
+      "classSelector": "div.simplebar-content-wrapper",
+      "fix": {
+        "current": "<div style=\"height: auto; overflow: hidden;\" aria-label=\"scrollable content\" role=\"region\" tabindex=\"0\" class=\"simplebar-content-wrapper\">",
+        "suggested": "<div style=\"height: auto; overflow: hidden;\" aria-label=\"scrollable content\" role=\"region\" tabindex=\"0\" class=\"simplebar-content-wrapper\">",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 170,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.btn-close.d-lg-none.btn-close-modal.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[8]/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/button[1]",
+      "classSelector": "button.btn.btn-close.d-lg-none.btn-close-modal.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close d-lg-none btn-close-modal data-analytics",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close d-lg-none btn-close-modal data-analytics",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 170,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/button[1]",
+      "classSelector": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-test=\"mo",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-test=\"mo",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 170,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button#externalLinkPopupModalContinueButton.btn.modal-accept.btn-danger.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[3]/button[1]",
+      "classSelector": "button#externalLinkPopupModalContinueButton.btn.modal-accept.btn-danger.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Continue\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn modal-accept btn-danger data-analytics-link rounded-pi",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Continue\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn modal-accept btn-danger data-analytics-link rounded-pi",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 170,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "impact": "violation",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "a#externalLinkPopupModalCloseButton.modal-cancel",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[3]/a[1]",
+      "classSelector": "a#externalLinkPopupModalCloseButton.modal-cancel",
+      "fix": {
+        "current": "<a data-analytics-link=\"{\"name\":\"Back\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/\"}\" data-once=\"analytic-tags-processed\" href=\"\" data-test=\"modal-cancel\" tabi",
+        "suggested": "<a data-analytics-link=\"{\"name\":\"Back\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/\"}\" data-once=\"analytic-tags-processed\" href=\"\" data-test=\"modal-cancel\" tabi",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 170,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "input_label_visible",
+      "impact": "potentialviolation",
+      "description": "The input element does not have an associated visible label",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.navbar-toggler.data-analytics-click-link.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/header[1]/div[2]/nav[1]/div[1]/button[1]",
+      "classSelector": "button.btn.navbar-toggler.data-analytics-click-link.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Navbar Toggler\",\"position\":\"Header\",\"group\":\"header\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn navbar-toggler data-analytics-click-link data-a",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Navbar Toggler\",\"position\":\"Header\",\"group\":\"header\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn navbar-toggler data-analytics-click-link data-a",
+        "explanation": "Fix input_label_visible issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "input_label_visible",
+      "impact": "potentialviolation",
+      "description": "The input element does not have an associated visible label",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[8]/div[1]/div[1]/div[1]/button[1]",
+      "classSelector": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-t",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-t",
+        "explanation": "Fix input_label_visible issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "input_label_visible",
+      "impact": "potentialviolation",
+      "description": "The input element does not have an associated visible label",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.btn-close.d-lg-none.btn-close-modal.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[8]/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/button[1]",
+      "classSelector": "button.btn.btn-close.d-lg-none.btn-close-modal.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close d-lg-none btn-close-modal data-analytics",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close d-lg-none btn-close-modal data-analytics",
+        "explanation": "Fix input_label_visible issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "input_label_visible",
+      "impact": "potentialviolation",
+      "description": "The input element does not have an associated visible label",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "xpath": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/button[1]",
+      "classSelector": "button.btn.btn-close.data-analytics-link.rounded-pill",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-test=\"mo",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-test=\"mo",
+        "explanation": "Fix input_label_visible issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "element_tabbable_unobscured",
+      "impact": "potentialviolation",
+      "description": "Confirm that when the element receives focus, it is not covered or, if covered by user action, can be uncovered without moving focus",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "a.link.btn.btn-lg.btn-white.btn-white-text-dark.rounded-pill.mx-auto",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/a[1]",
+      "classSelector": "a.link.btn.btn-lg.btn-white.btn-white-text-dark.rounded-pill.mx-auto",
+      "fix": {
+        "current": "<a data-analytics-link=\"{\"name\":\"Understand the Why\",\"position\":\"Body\",\"group\":\"Card > card-l\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/why-voyxact\"}\" data-once=\"analytic-tags-processed\" href=\"",
+        "suggested": "<a data-analytics-link=\"{\"name\":\"Understand the Why\",\"position\":\"Body\",\"group\":\"Card > card-l\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/why-voyxact\"}\" data-once=\"analytic-tags-processed\" href=\"",
+        "explanation": "Fix element_tabbable_unobscured issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "element_tabbable_unobscured",
+      "impact": "potentialviolation",
+      "description": "Confirm that when the element receives focus, it is not covered or, if covered by user action, can be uncovered without moving focus",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "a.link.btn.btn-lg.btn-white.btn-white-text-dark.rounded-pill.mx-auto",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/a[1]",
+      "classSelector": "a.link.btn.btn-lg.btn-white.btn-white-text-dark.rounded-pill.mx-auto",
+      "fix": {
+        "current": "<a data-analytics-link=\"{\"name\":\"Download the Start Form\",\"position\":\"Body\",\"group\":\"Card > card-l\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/resources\"}\" data-once=\"analytic-tags-processed\" hre",
+        "suggested": "<a data-analytics-link=\"{\"name\":\"Download the Start Form\",\"position\":\"Body\",\"group\":\"Card > card-l\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/resources\"}\" data-once=\"analytic-tags-processed\" hre",
+        "explanation": "Fix element_tabbable_unobscured issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "tspan",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[4]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/svg[1]/text[3]/tspan[1]",
+      "classSelector": "tspan",
+      "fix": {
+        "current": "<tspan y=\"173.3\" x=\"42\">",
+        "suggested": "<tspan y=\"173.3\" x=\"42\">",
+        "explanation": "Fix text_sensory_misuse issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "tspan",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[4]/div[1]/div[2]/div[1]/div[1]/div[1]/div[2]/svg[1]/text[5]/tspan[1]",
+      "classSelector": "tspan",
+      "fix": {
+        "current": "<tspan y=\"187.6\" x=\"32\">",
+        "suggested": "<tspan y=\"187.6\" x=\"32\">",
+        "explanation": "Fix text_sensory_misuse issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "tspan",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[4]/div[1]/div[2]/div[1]/div[1]/div[1]/div[2]/svg[1]/text[6]/tspan[1]",
+      "classSelector": "tspan",
+      "fix": {
+        "current": "<tspan y=\"392.6\" x=\"32\">",
+        "suggested": "<tspan y=\"392.6\" x=\"32\">",
+        "explanation": "Fix text_sensory_misuse issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "p",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/section[1]/div[1]/div[2]/div[1]/div[1]/p[7]",
+      "classSelector": "p",
+      "fix": {
+        "current": "<p>",
+        "suggested": "<p>",
+        "explanation": "Fix text_sensory_misuse issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "impact": "potentialviolation",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "p",
+      "xpath": "/html[1]/body[1]/section[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/p[7]",
+      "classSelector": "p",
+      "fix": {
+        "current": "<p>",
+        "suggested": "<p>",
+        "explanation": "Fix text_sensory_misuse issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    },
+    {
+      "ruleId": "element_tabbable_visible",
+      "impact": "potentialviolation",
+      "description": "Confirm the element should be tabbable and if so, it becomes visible when it has keyboard focus",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": [],
+      "element": "div.simplebar-content-wrapper",
+      "xpath": "/html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/article[1]/div[1]/div[8]/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]",
+      "classSelector": "div.simplebar-content-wrapper",
+      "fix": {
+        "current": "<div style=\"height: auto; overflow: hidden;\" aria-label=\"scrollable content\" role=\"region\" tabindex=\"0\" class=\"simplebar-content-wrapper\">",
+        "suggested": "<div style=\"height: auto; overflow: hidden;\" aria-label=\"scrollable content\" role=\"region\" tabindex=\"0\" class=\"simplebar-content-wrapper\">",
+        "explanation": "Fix element_tabbable_visible issue. See accessibility documentation for specific guidance."
+      },
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "priority": 145,
+      "category": "error",
+      "helpUrl": "https://webaim.org/resources/help/"
+    }
+  ],
+  "appliedFilters": {
+    "tags": [
+      "wcag22aa",
+      "best-practice"
+    ]
+  },
+  "conversationalSummary": "Found 18 accessibility issues on this page.\nAccessibility score: 10/100 (Critical)\n\n\ud83d\udea8 5 critical blockers must be fixed before launch.\n\n\u2728 4 quick wins available - these are easy fixes that will have high impact.\n\n\ud83d\udeab Violations: 6\n\nWCAG Compliance: Level A: 100%, Level AA: 0%, Level AAA: 100%\n\nIssues by category: error: 18",
+  "issuesTable": "| # | Severity | Rule ID | Description | WCAG | Element |\n|---|---|---|---|---|---|\n| 1 | \ud83d\udeab violation | `aria_hidden_nontabbable` | Element \"button\" should not be focusable within the subtree of an element with \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 2 | \ud83d\udeab violation | `aria_hidden_nontabbable` | Element \"button\" should not be focusable within the subtree of an element with \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 3 | \ud83d\udeab violation | `aria_hidden_nontabbable` | Element \"button\" should not be focusable within the subtree of an element with \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 4 | \ud83d\udeab violation | `aria_hidden_nontabbable` | Element \"button\" should not be focusable within the subtree of an element with \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/button[1] |\n| 5 | \ud83d\udeab violation | `aria_hidden_nontabbable` | Element \"button\" should not be focusable within the subtree of an element with \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[3]/div[1]/div[1]/div[3]/button[1] |\n| 6 | \ud83d\udeab violation | `aria_hidden_nontabbable` | Element \"button\" should not be focusable within the subtree of an element with \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[3]/div[1]/div[1]/div[3]/a[1] |\n| 7 | \ud83d\udeab potentialviolation | `input_label_visible` | The input element does not have an associated visible label | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/header[1]/div[2]/nav[1]/div[\u2026 |\n| 8 | \ud83d\udeab potentialviolation | `input_label_visible` | The input element does not have an associated visible label | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 9 | \ud83d\udeab potentialviolation | `input_label_visible` | The input element does not have an associated visible label | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 10 | \ud83d\udeab potentialviolation | `input_label_visible` | The input element does not have an associated visible label | WCAG 2.2 AA | /html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/button[1] |\n| 11 | \ud83d\udeab potentialviolation | `element_tabbable_unobscured` | Confirm that when the element receives focus, it is not covered or, if covered \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 12 | \ud83d\udeab potentialviolation | `element_tabbable_unobscured` | Confirm that when the element receives focus, it is not covered or, if covered \u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 13 | \ud83d\udeab potentialviolation | `text_sensory_misuse` | Confirm the word(s) 'Upper' of the user instruction is used to indicate a logic\u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 14 | \ud83d\udeab potentialviolation | `text_sensory_misuse` | Confirm the word(s) 'Upper' of the user instruction is used to indicate a logic\u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 15 | \ud83d\udeab potentialviolation | `text_sensory_misuse` | Confirm the word(s) 'Upper' of the user instruction is used to indicate a logic\u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |\n| 16 | \ud83d\udeab potentialviolation | `text_sensory_misuse` | Confirm the word(s) 'Upper' of the user instruction is used to indicate a logic\u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/section[1]/di\u2026 |\n| 17 | \ud83d\udeab potentialviolation | `text_sensory_misuse` | Confirm the word(s) 'Upper' of the user instruction is used to indicate a logic\u2026 | WCAG 2.2 AA | /html[1]/body[1]/section[1]/div[2]/div[1]/div[1]/div[1]/div\u2026 |\n| 18 | \ud83d\udeab potentialviolation | `element_tabbable_visible` | Confirm the element should be tabbable and if so, it becomes visible when it ha\u2026 | WCAG 2.2 AA | /html[1]/body[1]/div[2]/div[1]/div[1]/main[1]/div[2]/articl\u2026 |",
+  "quickWins": [
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "impact": "violation",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-t",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Close Button\",\"position\":\"Overlay\",\"group\":\"body\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn btn-close data-analytics-link rounded-pill\" data-t",
+        "explanation": "Fix aria_hidden_nontabbable issue. See accessibility documentation for specific guidance."
+      },
+      "estimatedTime": "12 minutes",
+      "affectedElements": 6
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "impact": "potentialviolation",
+      "fix": {
+        "current": "<tspan y=\"173.3\" x=\"42\">",
+        "suggested": "<tspan y=\"173.3\" x=\"42\">",
+        "explanation": "Fix text_sensory_misuse issue. See accessibility documentation for specific guidance."
+      },
+      "estimatedTime": "10 minutes",
+      "affectedElements": 5
+    },
+    {
+      "ruleId": "input_label_visible",
+      "description": "The input element does not have an associated visible label",
+      "impact": "potentialviolation",
+      "fix": {
+        "current": "<button data-analytics-link=\"{\"name\":\"Navbar Toggler\",\"position\":\"Header\",\"group\":\"header\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn navbar-toggler data-analytics-click-link data-a",
+        "suggested": "<button data-analytics-link=\"{\"name\":\"Navbar Toggler\",\"position\":\"Header\",\"group\":\"header\",\"href\":\"n/a\"}\" data-once=\"analytic-tags-processed\" class=\"btn navbar-toggler data-analytics-click-link data-a",
+        "explanation": "Fix input_label_visible issue. See accessibility documentation for specific guidance."
+      },
+      "estimatedTime": "8 minutes",
+      "affectedElements": 4
+    },
+    {
+      "ruleId": "element_tabbable_unobscured",
+      "description": "Confirm that when the element receives focus, it is not covered or, if covered by user action, can be uncovered without moving focus",
+      "impact": "potentialviolation",
+      "fix": {
+        "current": "<a data-analytics-link=\"{\"name\":\"Understand the Why\",\"position\":\"Body\",\"group\":\"Card > card-l\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/why-voyxact\"}\" data-once=\"analytic-tags-processed\" href=\"",
+        "suggested": "<a data-analytics-link=\"{\"name\":\"Understand the Why\",\"position\":\"Body\",\"group\":\"Card > card-l\",\"href\":\"https://voyacthcp69259main.dev.oapi.com/why-voyxact\"}\" data-once=\"analytic-tags-processed\" href=\"",
+        "explanation": "Fix element_tabbable_unobscured issue. See accessibility documentation for specific guidance."
+      },
+      "estimatedTime": "4 minutes",
+      "affectedElements": 2
+    }
+  ],
+  "criticalBlockers": [
+    {
+      "ruleId": "aria_hidden_nontabbable",
+      "description": "Element \"button\" should not be focusable within the subtree of an element with an 'aria-hidden' attribute with value 'true'",
+      "impact": "violation",
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "affectedElements": 6,
+      "wcagLevel": "WCAG 2.2 AA"
+    },
+    {
+      "ruleId": "input_label_visible",
+      "description": "The input element does not have an associated visible label",
+      "impact": "potentialviolation",
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "affectedElements": 4,
+      "wcagLevel": "WCAG 2.2 AA"
+    },
+    {
+      "ruleId": "element_tabbable_unobscured",
+      "description": "Confirm that when the element receives focus, it is not covered or, if covered by user action, can be uncovered without moving focus",
+      "impact": "potentialviolation",
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "affectedElements": 2,
+      "wcagLevel": "WCAG 2.2 AA"
+    },
+    {
+      "ruleId": "text_sensory_misuse",
+      "description": "Confirm the word(s) 'Upper' of the user instruction is used to indicate a logical rather than visual position",
+      "impact": "potentialviolation",
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "affectedElements": 5,
+      "wcagLevel": "WCAG 2.2 AA"
+    },
+    {
+      "ruleId": "element_tabbable_visible",
+      "description": "Confirm the element should be tabbable and if so, it becomes visible when it has keyboard focus",
+      "impact": "potentialviolation",
+      "userImpact": "This is a definite or likely accessibility failure that prevents users with disabilities from accessing content or functionality.",
+      "affectedElements": 1,
+      "wcagLevel": "WCAG 2.2 AA"
+    }
+  ],
+  "metadata": {
+    "testEngine": {
+      "name": "IBM Equal Access",
+      "version": "4.x"
+    },
+    "testRunner": {
+      "name": "accessibility-checker"
+    },
+    "testEnvironment": {
+      "userAgent": "accessibility-checker",
+      "windowWidth": 1280,
+      "windowHeight": 720
+    },
+    "timestamp": "2026-03-18T10:53:44.372Z",
+    "url": "https://voyacthcp69259main.dev.oapi.com/"
+  }
+}

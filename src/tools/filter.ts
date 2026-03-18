@@ -244,33 +244,33 @@ export function searchIssues(
   issuesToSearch.forEach((issue) => {
     let found = false
 
-    // Search in specified fields
+    // Search in specified fields (guard against undefined for .toLowerCase / .includes)
     if (fields.includes('all') || fields.includes('description')) {
-      const description = caseSensitive
-        ? issue.description
-        : issue.description.toLowerCase()
+      const raw = issue.description ?? ''
+      const description = caseSensitive ? raw : raw.toLowerCase()
       if (description.includes(searchQuery)) {
         found = true
       }
     }
 
     if (fields.includes('all') || fields.includes('element')) {
-      const element = caseSensitive ? issue.element : issue.element.toLowerCase()
+      const raw = issue.element ?? ''
+      const element = caseSensitive ? raw : raw.toLowerCase()
       if (element.includes(searchQuery)) {
         found = true
       }
     }
 
     if (fields.includes('all') || fields.includes('xpath')) {
-      const xpath = caseSensitive ? issue.xpath : issue.xpath.toLowerCase()
+      const raw = issue.xpath ?? ''
+      const xpath = caseSensitive ? raw : raw.toLowerCase()
       if (xpath.includes(searchQuery)) {
         found = true
       }
     }
 
     if (fields.includes('all') || fields.includes('selector')) {
-      // Use xpath as selector since selector field doesn't exist in PrioritizedIssue
-      const selector = issue.xpath || ''
+      const selector = issue.xpath ?? ''
       const selectorLower = caseSensitive ? selector : selector.toLowerCase()
       if (selectorLower.includes(searchQuery)) {
         found = true
@@ -278,25 +278,24 @@ export function searchIssues(
     }
 
     if (fields.includes('all') || fields.includes('ruleId')) {
-      const ruleId = caseSensitive ? issue.ruleId : issue.ruleId.toLowerCase()
+      const raw = issue.ruleId ?? ''
+      const ruleId = caseSensitive ? raw : raw.toLowerCase()
       if (ruleId.includes(searchQuery)) {
         found = true
       }
     }
 
     if (fields.includes('all') || fields.includes('userImpact')) {
-      const userImpact = caseSensitive
-        ? issue.userImpact
-        : issue.userImpact.toLowerCase()
+      const raw = issue.userImpact ?? ''
+      const userImpact = caseSensitive ? raw : raw.toLowerCase()
       if (userImpact.includes(searchQuery)) {
         found = true
       }
     }
 
     if (fields.includes('all') || fields.includes('fix')) {
-      const fixExplanation = caseSensitive
-        ? issue.fix.explanation
-        : issue.fix.explanation.toLowerCase()
+      const raw = issue.fix?.explanation ?? ''
+      const fixExplanation = caseSensitive ? raw : raw.toLowerCase()
       if (fixExplanation.includes(searchQuery)) {
         found = true
       }

@@ -104,4 +104,13 @@ describe('getStatistics', () => {
     expect(result.byCategory).toBeUndefined()
     expect(result.breakdownDimensions).toEqual(['rule'])
   })
+
+  it('accepts results array with JSON string element (normalized per element)', () => {
+    const result = getStatistics({
+      results: [JSON.stringify(auditResultFixture)],
+    })
+    expect(result.totalIssues).toBe(2)
+    expect(result.totalResults).toBe(1)
+    expect(result.averageScore).toBeDefined()
+  })
 })

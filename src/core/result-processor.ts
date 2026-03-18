@@ -30,26 +30,29 @@ export interface ProcessOptions {
  */
 export function getWcagLabelFromTags(tags: string[]): string {
   if (!tags || tags.length === 0) return 'N/A'
-  const level = tags.some((t) => t.endsWith('aaa')) ? 'AAA'
-    : tags.some((t) => t.endsWith('aa')) ? 'AA'
-    : tags.some((t) => t.endsWith('a')) ? 'A'
+  const safe = (t: unknown): t is string => typeof t === 'string'
+  const level = tags.some((t) => safe(t) && t.endsWith('aaa')) ? 'AAA'
+    : tags.some((t) => safe(t) && t.endsWith('aa')) ? 'AA'
+    : tags.some((t) => safe(t) && t.endsWith('a')) ? 'A'
     : null
   if (!level) return 'N/A'
-  if (tags.some((t) => t.startsWith('wcag22'))) return `WCAG 2.2 ${level}`
-  if (tags.some((t) => t.startsWith('wcag21'))) return `WCAG 2.1 ${level}`
-  if (tags.some((t) => t.startsWith('wcag2'))) return `WCAG 2.0 ${level}`
+  if (tags.some((t) => safe(t) && t.startsWith('wcag22'))) return `WCAG 2.2 ${level}`
+  if (tags.some((t) => safe(t) && t.startsWith('wcag21'))) return `WCAG 2.1 ${level}`
+  if (tags.some((t) => safe(t) && t.startsWith('wcag2'))) return `WCAG 2.0 ${level}`
   return `WCAG ${level}`
 }
 
 /** True if wcagLevel string matches the given level (A, AA, AAA); supports full label e.g. "WCAG 2.2 AA". */
-export function wcagLevelMatches(level: string, target: 'A' | 'AA' | 'AAA'): boolean {
+export function wcagLevelMatches(level: string | undefined, target: 'A' | 'AA' | 'AAA'): boolean {
+  if (level == null || typeof level !== 'string') return false
   if (target === 'AAA') return level === 'AAA' || level.endsWith(' AAA')
   if (target === 'AA') return level === 'AA' || (level.endsWith(' AA') && !level.endsWith(' AAA'))
   return level === 'A' || (level.endsWith(' A') && !level.endsWith(' AA'))
 }
 
 /** Numeric order for sorting by WCAG level (A=3, AA=2, AAA=1). Supports full label e.g. "WCAG 2.2 AA". */
-export function wcagLevelOrder(level: string): number {
+export function wcagLevelOrder(level: string | undefined): number {
+  if (level == null || typeof level !== 'string') return 0
   if (wcagLevelMatches(level, 'A')) return 3
   if (wcagLevelMatches(level, 'AA')) return 2
   if (wcagLevelMatches(level, 'AAA')) return 1
@@ -97,9 +100,11 @@ export class ResultProcessor {
 
     // WCAG level weighting (AAA > AA > A); support full label e.g. "WCAG 2.2 AA"
     const level = issue.wcagLevel
-    if (level.endsWith('AAA')) priority += 30
-    else if (level.endsWith('AA')) priority += 20
-    else if (level.endsWith('A')) priority += 10
+    if (level != null && typeof level === 'string') {
+      if (level.endsWith('AAA')) priority += 30
+      else if (level.endsWith('AA')) priority += 20
+      else if (level.endsWith('A')) priority += 10
+    }
 
     return priority
   }

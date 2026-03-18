@@ -3,8 +3,7 @@
  * Implements: export_to_csv, export_to_excel, export_to_json, export_to_html_report
  */
 
-import { resolveBasicAuth } from '../core/basic-auth.js'
-import { normalizeAuditResult } from '../core/normalize-audit-result.js'
+import { resolveAuditInput } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -46,22 +45,30 @@ function generateMetadataSection(result: AuditResult): string {
     return ''
   }
 
+  const te = metadata.testEnvironment
   const orientationInfo =
-    metadata.testEnvironment.orientationAngle !== undefined
-      ? `${metadata.testEnvironment.orientationType} (${metadata.testEnvironment.orientationAngle}°)`
-      : metadata.testEnvironment.orientationType
+    te && te.orientationAngle !== undefined
+      ? `${te.orientationType ?? ''} (${te.orientationAngle}°)`
+      : te?.orientationType ?? 'N/A'
 
-  return [
+  const rows: string[] = [
     'Test Information',
-    `Test Engine,${escapeCSV(`${metadata.testEngine.name} v${metadata.testEngine.version}`)}`,
-    `Test Runner,${escapeCSV(metadata.testRunner.name)}`,
-    `Test URL,${escapeCSV(metadata.url)}`,
-    `Timestamp,${escapeCSV(metadata.timestamp)}`,
-    '',
-    'Environment Information',
-    `User Agent,${escapeCSV(metadata.testEnvironment.userAgent)}`,
-    `Window Size,${escapeCSV(`${metadata.testEnvironment.windowWidth}x${metadata.testEnvironment.windowHeight}`)}`,
-    `Orientation,${escapeCSV(orientationInfo || 'N/A')}`,
+    `Test URL,${escapeCSV(metadata.url ?? '')}`,
+  ]
+  if (metadata.testEngine) {
+    rows.push(`Test Engine,${escapeCSV(`${metadata.testEngine.name} v${metadata.testEngine.version}`)}`)
+    rows.push(`Test Runner,${escapeCSV(metadata.testRunner?.name ?? '')}`)
+  }
+  if (metadata.timestamp != null) {
+    rows.push(`Timestamp,${escapeCSV(metadata.timestamp)}`)
+  }
+  if (te) {
+    rows.push('', 'Environment Information')
+    rows.push(`User Agent,${escapeCSV(te.userAgent ?? '')}`)
+    rows.push(`Window Size,${escapeCSV(`${te.windowWidth ?? ''}x${te.windowHeight ?? ''}`)}`)
+    rows.push(`Orientation,${escapeCSV(orientationInfo)}`)
+  }
+  rows.push(
     '',
     'Summary',
     `Total Issues,${result.summary.totalIssues}`,
@@ -71,8 +78,9 @@ function generateMetadataSection(result: AuditResult): string {
     `WCAG Level AAA Compliance,${result.summary.wcagCompliance.AAA}%`,
     '',
     'Test Results',
-    '',
-  ].join('\n')
+    ''
+  )
+  return rows.join('\n')
 }
 
 /**
@@ -98,17 +106,11 @@ export async function exportToCsv(
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResult = normalized ?? (results as AuditResult)
+    auditResult = resolved.result
   }
 
   const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
@@ -182,9 +184,9 @@ export async function exportToCsv(
           issue.xpath,
           issue.classSelector ?? '',
           issue.userImpact,
-          issue.fix.explanation,
-          issue.fix.current,
-          issue.fix.suggested,
+          issue.fix?.explanation ?? '',
+          issue.fix?.current ?? '',
+          issue.fix?.suggested ?? '',
           String(issue.priority)
         )
       } else {
@@ -199,7 +201,7 @@ export async function exportToCsv(
           issue.xpath,
           issue.classSelector ?? '',
           issue.userImpact,
-          issue.fix.explanation
+          issue.fix?.explanation ?? ''
         )
       }
 
@@ -239,17 +241,11 @@ export async function exportToExcel(
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResult = normalized ?? (results as AuditResult)
+    auditResult = resolved.result
   }
 
   const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
@@ -336,7 +332,7 @@ export async function exportToExcel(
       issue.xpath,
       issue.classSelector ?? '',
       issue.userImpact,
-      issue.fix.explanation,
+      issue.fix?.explanation ?? '',
     ])
   })
 
@@ -392,17 +388,11 @@ export async function exportToJson(
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResult = normalized ?? (results as AuditResult)
+    auditResult = resolved.result
   }
 
   // Prepare export data
@@ -436,8 +426,12 @@ export async function exportToJson(
 /**
  * Escape HTML special characters
  */
-function escapeHtml(text: string): string {
-  return text
+function escapeHtml(text: string | null | undefined): string {
+  if (text === null || text === undefined) {
+    return ''
+  }
+  const s = String(text)
+  return s
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -622,9 +616,9 @@ function generateHtmlReport(
                 <td><code>${escapeHtml(issue.xpath)}</code></td>
                 <td><code>${escapeHtml(issue.classSelector ?? '')}</code></td>
                 <td>${escapeHtml(issue.userImpact)}</td>
-                <td>${escapeHtml(issue.fix.explanation)}</td>
-                <td><pre>${escapeHtml(issue.fix.current)}</pre></td>
-                <td><pre>${escapeHtml(issue.fix.suggested)}</pre></td>
+                <td>${escapeHtml(issue.fix?.explanation ?? '')}</td>
+                <td><pre>${escapeHtml(issue.fix?.current ?? '')}</pre></td>
+                <td><pre>${escapeHtml(issue.fix?.suggested ?? '')}</pre></td>
               </tr>
             `
               )
@@ -831,12 +825,11 @@ function generateHtmlReport(
   ${metadata ? `
   <div class="metadata">
     <h2>Test Information</h2>
-    <p><strong>Test Engine:</strong> ${metadata.testEngine.name} v${metadata.testEngine.version}</p>
-    <p><strong>Test Runner:</strong> ${metadata.testRunner.name}</p>
-    <p><strong>Test URL:</strong> <a href="${metadata.url}" target="_blank">${metadata.url}</a></p>
-    <p><strong>Timestamp:</strong> ${metadata.timestamp}</p>
-    <p><strong>User Agent:</strong> ${metadata.testEnvironment.userAgent}</p>
-    <p><strong>Window Size:</strong> ${metadata.testEnvironment.windowWidth}x${metadata.testEnvironment.windowHeight}</p>
+    ${metadata.testEngine ? `<p><strong>Test Engine:</strong> ${escapeHtml(metadata.testEngine.name)} v${escapeHtml(String(metadata.testEngine.version ?? ''))}</p>` : ''}
+    ${metadata.testRunner ? `<p><strong>Test Runner:</strong> ${escapeHtml(metadata.testRunner.name)}</p>` : ''}
+    ${metadata.url != null ? `<p><strong>Test URL:</strong> <a href="${escapeHtml(metadata.url)}" target="_blank">${escapeHtml(metadata.url)}</a></p>` : ''}
+    ${metadata.timestamp != null ? `<p><strong>Timestamp:</strong> ${escapeHtml(String(metadata.timestamp))}</p>` : ''}
+    ${metadata.testEnvironment ? `<p><strong>User Agent:</strong> ${escapeHtml(metadata.testEnvironment.userAgent ?? '')}</p><p><strong>Window Size:</strong> ${metadata.testEnvironment.windowWidth ?? ''}x${metadata.testEnvironment.windowHeight ?? ''}</p>` : ''}
   </div>
   ` : ''}
   ${mainContent}
@@ -866,17 +859,11 @@ export async function exportToHtmlReport(
 
   let auditResult: AuditResult
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResult = normalized ?? (results as AuditResult)
+    auditResult = resolved.result
   }
 
   const htmlContent = generateHtmlReport(auditResult, template, includeCharts)

@@ -3,8 +3,7 @@
  * Implements: generate_dashboard, generate_summary_report
  */
 
-import { resolveBasicAuth } from '../core/basic-auth.js'
-import { normalizeAuditResult } from '../core/normalize-audit-result.js'
+import { resolveAuditInput } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -641,35 +640,24 @@ export async function generateDashboard(
 
   let auditResults: AuditResult | AuditResult[]
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    const singleResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
-    auditResults = singleResult
-  } else if (Array.isArray(results)) {
-    // If array contains URLs, audit them; otherwise normalize each result object
+  if (Array.isArray(results)) {
     const urlResults = await Promise.all(
       results.map(async (r) => {
-        if (typeof r === 'string') {
-          const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-            r,
-            basicAuthUsername,
-            basicAuthPassword
-          )
-          return await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+        const resolved = resolveAuditInput(r, basicAuthUsername, basicAuthPassword)
+        if (resolved.kind === 'url') {
+          return await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
         }
-        const normalized = normalizeAuditResult(r)
-        return normalized ?? (r as AuditResult)
+        return resolved.result
       })
     )
     auditResults = urlResults
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResults = normalized ?? (results as AuditResult)
+    const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+    if (resolved.kind === 'url') {
+      auditResults = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
+    } else {
+      auditResults = resolved.result
+    }
   }
 
   // Format dashboard based on requested format
@@ -1152,35 +1140,24 @@ export async function generateSummaryReport(
 
   let auditResults: AuditResult | AuditResult[]
 
-  // If input is a URL string, run an audit first (with optional Basic Auth, same as audit_url)
-  if (typeof results === 'string') {
-    const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-      results,
-      basicAuthUsername,
-      basicAuthPassword
-    )
-    const singleResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
-    auditResults = singleResult
-  } else if (Array.isArray(results)) {
-    // If array contains URLs, audit them; otherwise normalize each result object
+  if (Array.isArray(results)) {
     const urlResults = await Promise.all(
       results.map(async (r) => {
-        if (typeof r === 'string') {
-          const { urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p } = resolveBasicAuth(
-            r,
-            basicAuthUsername,
-            basicAuthPassword
-          )
-          return await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
+        const resolved = resolveAuditInput(r, basicAuthUsername, basicAuthPassword)
+        if (resolved.kind === 'url') {
+          return await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
         }
-        const normalized = normalizeAuditResult(r)
-        return normalized ?? (r as AuditResult)
+        return resolved.result
       })
     )
     auditResults = urlResults
   } else {
-    const normalized = normalizeAuditResult(results)
-    auditResults = normalized ?? (results as AuditResult)
+    const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+    if (resolved.kind === 'url') {
+      auditResults = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
+    } else {
+      auditResults = resolved.result
+    }
   }
 
   // Format report based on requested format

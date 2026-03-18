@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.1.0...v2.2.0) (2026-03-18)
+
+
+### Features
+
+* enhance audit result normalization and metadata handling ([af4acb3](https://github.com/dallask/a11y-mcp-srv/commit/af4acb363f95f0e6387102c6e46c6429d995f372))
+
 # [2.1.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.0.0...v2.1.0) (2026-03-18)
 
 

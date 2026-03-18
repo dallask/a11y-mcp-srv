@@ -54,6 +54,14 @@ describe('normalizeAuditResult', () => {
     expect(result!.summary.totalIssues).toBe(2)
   })
 
+  it('extracts and normalizes when client passes content array directly as results', () => {
+    const contentArray = [{ type: 'text', text: JSON.stringify(auditResultFixture) }]
+    const result = normalizeAuditResult(contentArray)
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(2)
+    expect(result!.prioritizedIssues).toHaveLength(2)
+  })
+
   it('returns null when MCP wrapper content text is invalid JSON', () => {
     const wrapped = { content: [{ type: 'text', text: '{' }] }
     expect(normalizeAuditResult(wrapped)).toBeNull()

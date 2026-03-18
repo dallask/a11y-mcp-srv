@@ -202,6 +202,24 @@ export function normalizeAuditResult(value: unknown): AuditResult | null {
     return null
   }
 
+  // Some MCP clients (e.g. Codemie) pass the content array directly as results: [ { type, text } ]
+  if (Array.isArray(value) && value.length > 0) {
+    const first = value[0]
+    if (
+      first != null &&
+      typeof first === 'object' &&
+      'text' in first &&
+      typeof (first as { text: unknown }).text === 'string'
+    ) {
+      try {
+        const parsed = JSON.parse((first as { text: string }).text) as unknown
+        return normalizeAuditResult(parsed)
+      } catch {
+        return null
+      }
+    }
+  }
+
   const obj = value as Record<string, unknown>
 
   // MCP response wrapper: { content: [ { type, text } ] }

@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.0.0...v2.1.0) (2026-03-18)
+
+
+### Features
+
+* bump version to 2.0.0 ([17cf0d9](https://github.com/dallask/a11y-mcp-srv/commit/17cf0d9b24aca632e8cb0380a00dc5ec84897ecf))
+
 # 1.0.0 (2026-03-18)
 
 

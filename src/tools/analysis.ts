@@ -4,6 +4,7 @@
  */
 
 import { resolveBasicAuth } from '../core/basic-auth.js'
+import { normalizeAuditResult } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -179,8 +180,11 @@ export async function getAccessibilityScore(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = input.results
+    const normalized = normalizeAuditResult(input.results)
+    auditResult = normalized ?? (input.results as AuditResult)
   }
+
+  const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
 
   // Merge custom weights with defaults
   const weights = {
@@ -190,18 +194,18 @@ export async function getAccessibilityScore(
 
   // Calculate overall score
   const overallScore = calculateOverallScore(
-    auditResult.prioritizedIssues,
+    issues,
     weights
   )
 
   // Calculate breakdown by category
   const breakdown = calculateCategoryBreakdown(
-    auditResult.prioritizedIssues,
+    issues,
     weights
   )
 
   // Calculate WCAG compliance
-  const wcagCompliance = calculateWCAGCompliance(auditResult.prioritizedIssues)
+  const wcagCompliance = calculateWCAGCompliance(issues)
 
   // Note: Trend data would require historical tracking, which is not implemented yet
   // This is a placeholder for future enhancement
@@ -448,8 +452,10 @@ export function prioritizeIssues(
     limit,
   } = input
 
-  // Normalize: accept single result or placeholder from external tools (e.g. CodeMie)
-  const auditResult = Array.isArray(results) ? results[0] : results
+  // Normalize: accept single result, array, JSON string, or MCP wrapper
+  const raw = Array.isArray(results) ? results[0] : results
+  const normalized = normalizeAuditResult(raw)
+  const auditResult = normalized ?? (raw as AuditResult)
   const prioritizedIssues = Array.isArray(auditResult?.prioritizedIssues)
     ? auditResult.prioritizedIssues
     : []
@@ -917,12 +923,14 @@ export async function getQuickFixes(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = results
+    const normalized = normalizeAuditResult(results)
+    auditResult = normalized ?? (results as AuditResult)
   }
 
+  const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
   // Convert issues to quick fixes
   const fixes = issuesToQuickFixes(
-    auditResult.prioritizedIssues,
+    issues,
     includeCode
   )
 
@@ -1298,13 +1306,15 @@ export function generateComplianceReport(
     includeRemediation = false,
   } = input
 
-  // Normalize: accept single result or array (e.g. from external tools like CodeMie)
-  const auditResult = Array.isArray(results) ? results[0] : results
+  // Normalize: accept single result, array, JSON string, or MCP wrapper
+  const raw = Array.isArray(results) ? results[0] : results
+  const normalized = normalizeAuditResult(raw)
+  const auditResult = normalized ?? (raw as AuditResult)
   if (auditResult == null || typeof auditResult !== 'object') {
     throw new Error('Invalid results: expected an audit result object (or array with one result).')
   }
-  const prioritizedIssues = Array.isArray((auditResult as AuditResult).prioritizedIssues)
-    ? (auditResult as AuditResult).prioritizedIssues
+  const prioritizedIssues = Array.isArray(auditResult.prioritizedIssues)
+    ? auditResult.prioritizedIssues
     : []
 
   // Group issues by WCAG criterion
@@ -1416,13 +1426,14 @@ export async function getWCAGCompliance(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = input.results
+    const normalized = normalizeAuditResult(input.results)
+    auditResult = normalized ?? (input.results as AuditResult)
   }
 
   const level = input.level || 'AA'
-
+  const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
   // Group issues by WCAG criterion
-  const criterionMap = groupIssuesByCriterion(auditResult.prioritizedIssues)
+  const criterionMap = groupIssuesByCriterion(issues)
 
   // Build criteria breakdown
   const criteria: WCAGCriterion[] = []

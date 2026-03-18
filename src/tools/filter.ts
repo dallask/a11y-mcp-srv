@@ -3,6 +3,7 @@
  * Implements: filter_issues, search_issues
  */
 
+import { normalizeAuditResult } from '../core/normalize-audit-result.js'
 import type {
   AuditResult,
   PrioritizedIssue,
@@ -32,8 +33,9 @@ export function filterIssues(
     mode = 'include',
   } = input
 
-  // Normalize: accept single result or placeholder from external tools (e.g. CodeMie)
-  const auditResult = results != null && typeof results === 'object' ? results : ({} as AuditResult)
+  // Normalize: accept result object, JSON string, or MCP wrapper
+  const normalized = normalizeAuditResult(results)
+  const auditResult = normalized ?? (results != null && typeof results === 'object' ? results : ({} as AuditResult))
   const prioritizedIssues = Array.isArray(auditResult.prioritizedIssues)
     ? auditResult.prioritizedIssues
     : []
@@ -230,8 +232,11 @@ export function searchIssues(
     }
   }
 
-  const issuesToSearch = Array.isArray(results?.prioritizedIssues)
-    ? results.prioritizedIssues
+  // Normalize: accept result object, JSON string, or MCP wrapper
+  const normalized = normalizeAuditResult(results)
+  const auditResult = normalized ?? results
+  const issuesToSearch = Array.isArray(auditResult?.prioritizedIssues)
+    ? auditResult.prioritizedIssues
     : []
   const searchQuery = caseSensitive ? query : query.toLowerCase()
   const matches: PrioritizedIssue[] = []

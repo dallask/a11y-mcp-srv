@@ -4,6 +4,7 @@
  */
 
 import { resolveBasicAuth } from '../core/basic-auth.js'
+import { normalizeAuditResult } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -226,7 +227,8 @@ export async function compareAccessibility(
     )
     beforeResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    beforeResult = before
+    const normalized = normalizeAuditResult(before)
+    beforeResult = normalized ?? (before as AuditResult)
   }
 
   if (typeof after === 'string') {
@@ -237,17 +239,22 @@ export async function compareAccessibility(
     )
     afterResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    afterResult = after
+    const normalized = normalizeAuditResult(after)
+    afterResult = normalized ?? (after as AuditResult)
   }
 
+  const beforeIssues = Array.isArray(beforeResult?.prioritizedIssues) ? beforeResult.prioritizedIssues : []
+  const afterIssues = Array.isArray(afterResult?.prioritizedIssues) ? afterResult.prioritizedIssues : []
   // Compare issues
   const { fixed, introduced, remaining } = compareIssues(
-    beforeResult.prioritizedIssues,
-    afterResult.prioritizedIssues
+    beforeIssues,
+    afterIssues
   )
 
   // Calculate score improvement
-  const scoreImprovement = afterResult.summary.score - beforeResult.summary.score
+  const beforeScore = beforeResult?.summary?.score ?? 0
+  const afterScore = afterResult?.summary?.score ?? 0
+  const scoreImprovement = afterScore - beforeScore
 
   // Generate summary based on format
   let summary: string
@@ -255,7 +262,7 @@ export async function compareAccessibility(
     summary = generateDiffSummary(fixed, introduced, remaining, scoreImprovement)
   } else {
     // Summary format - concise version
-    summary = `Score: ${beforeResult.summary.score} → ${afterResult.summary.score} (${scoreImprovement > 0 ? '+' : ''}${scoreImprovement}). `
+    summary = `Score: ${beforeScore} → ${afterScore} (${scoreImprovement > 0 ? '+' : ''}${scoreImprovement}). `
     summary += `Fixed: ${fixed.length}, Introduced: ${introduced.length}, Remaining: ${remaining.length}`
   }
 

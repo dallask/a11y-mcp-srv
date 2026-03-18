@@ -4,6 +4,7 @@
  */
 
 import { resolveBasicAuth } from '../core/basic-auth.js'
+import { normalizeAuditResult } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -106,9 +107,11 @@ export async function exportToCsv(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = results
+    const normalized = normalizeAuditResult(results)
+    auditResult = normalized ?? (results as AuditResult)
   }
 
+  const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
   const csvRows: string[] = []
 
   // Add metadata section if requested
@@ -158,7 +161,7 @@ export async function exportToCsv(
     csvRows.push(headers.map(escapeCSV).join(','))
 
     // Add violation rows
-    auditResult.prioritizedIssues.forEach((issue) => {
+    issues.forEach((issue) => {
       const row: string[] = []
 
       if (format === 'minimal') {
@@ -245,9 +248,11 @@ export async function exportToExcel(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = results
+    const normalized = normalizeAuditResult(results)
+    auditResult = normalized ?? (results as AuditResult)
   }
 
+  const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
   // Try to import xlsx, but handle gracefully if not available
   let XLSX: any
   try {
@@ -320,7 +325,7 @@ export async function exportToExcel(
     ],
   ]
 
-  auditResult.prioritizedIssues.forEach((issue) => {
+  issues.forEach((issue) => {
     violationsData.push([
       issue.ruleId,
       issue.category || 'unknown',
@@ -396,7 +401,8 @@ export async function exportToJson(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = results
+    const normalized = normalizeAuditResult(results)
+    auditResult = normalized ?? (results as AuditResult)
   }
 
   // Prepare export data
@@ -449,6 +455,7 @@ function generateHtmlReport(
 ): string {
   const metadata = result.metadata
   const summary = result.summary
+  const issues = Array.isArray(result?.prioritizedIssues) ? result.prioritizedIssues : []
 
   // Generate chart data if requested
   let chartScript = ''
@@ -509,7 +516,7 @@ function generateHtmlReport(
   }
 
   // Generate issues table rows
-  const issuesRows = result.prioritizedIssues
+  const issuesRows = issues
     .map(
       (issue) => `
     <tr>
@@ -546,7 +553,7 @@ function generateHtmlReport(
             </tr>
           </thead>
           <tbody>
-            ${result.prioritizedIssues
+            ${issues
               .map(
                 (issue) => `
               <tr>
@@ -602,7 +609,7 @@ function generateHtmlReport(
             </tr>
           </thead>
           <tbody>
-            ${result.prioritizedIssues
+            ${issues
               .map(
                 (issue) => `
               <tr>
@@ -868,7 +875,8 @@ export async function exportToHtmlReport(
     )
     auditResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
   } else {
-    auditResult = results
+    const normalized = normalizeAuditResult(results)
+    auditResult = normalized ?? (results as AuditResult)
   }
 
   const htmlContent = generateHtmlReport(auditResult, template, includeCharts)

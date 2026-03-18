@@ -3,6 +3,7 @@
  * Implements: aggregate_audit_results, get_statistics
  */
 
+import { normalizeAuditResult } from '../core/normalize-audit-result.js'
 import type {
   AuditResult,
   AuditSummary,
@@ -187,10 +188,13 @@ export function aggregateAuditResults(
     includeSummary = true,
   } = input
 
-  const resultsArray = Array.isArray(results) ? results : results != null ? [results] : []
-  if (resultsArray.length === 0) {
+  const rawArray = Array.isArray(results) ? results : results != null ? [results] : []
+  if (rawArray.length === 0) {
     throw new Error('At least one audit result is required')
   }
+
+  // Normalize each result (handles JSON string, MCP wrapper, partial object)
+  const resultsArray = rawArray.map((r) => normalizeAuditResult(r) ?? r)
 
   // Combine all issues from all results (safe when prioritizedIssues is missing or not an array)
   const allIssues: PrioritizedIssue[] = []
@@ -361,12 +365,12 @@ export function getStatistics(
     breakdown = ['category', 'impact', 'wcag', 'rule'],
   } = input
 
-  // Normalize input to array
-  const resultsArray = Array.isArray(results) ? results : [results]
-
-  if (resultsArray.length === 0) {
+  // Normalize input to array and normalize each element
+  const rawArray = Array.isArray(results) ? results : [results]
+  if (rawArray.length === 0) {
     throw new Error('At least one audit result is required')
   }
+  const resultsArray = rawArray.map((r) => normalizeAuditResult(r) ?? r)
 
   // Combine all issues (safe when prioritizedIssues is missing or not an array)
   const allIssues: PrioritizedIssue[] = []

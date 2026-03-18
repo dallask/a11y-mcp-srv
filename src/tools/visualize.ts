@@ -4,6 +4,7 @@
  */
 
 import { resolveBasicAuth } from '../core/basic-auth.js'
+import { normalizeAuditResult } from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -650,7 +651,7 @@ export async function generateDashboard(
     const singleResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
     auditResults = singleResult
   } else if (Array.isArray(results)) {
-    // If array contains URLs, audit them (each with optional Basic Auth)
+    // If array contains URLs, audit them; otherwise normalize each result object
     const urlResults = await Promise.all(
       results.map(async (r) => {
         if (typeof r === 'string') {
@@ -661,12 +662,14 @@ export async function generateDashboard(
           )
           return await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
         }
-        return r
+        const normalized = normalizeAuditResult(r)
+        return normalized ?? (r as AuditResult)
       })
     )
     auditResults = urlResults
   } else {
-    auditResults = results
+    const normalized = normalizeAuditResult(results)
+    auditResults = normalized ?? (results as AuditResult)
   }
 
   // Format dashboard based on requested format
@@ -686,13 +689,13 @@ export async function generateDashboard(
         {
           summary: resultsArray.map((r) => ({
             url: r.metadata?.url || 'Unknown',
-            totalIssues: r.summary.totalIssues,
-            score: r.summary.score,
-            wcagCompliance: r.summary.wcagCompliance,
-            byImpact: r.summary.byImpact,
-            byCategory: r.summary.byCategory,
-            criticalBlockers: r.criticalBlockers.length,
-            quickWins: r.quickWins.length,
+            totalIssues: r.summary?.totalIssues ?? 0,
+            score: r.summary?.score ?? 0,
+            wcagCompliance: r.summary?.wcagCompliance ?? { A: 0, AA: 0, AAA: 0 },
+            byImpact: r.summary?.byImpact ?? {},
+            byCategory: r.summary?.byCategory ?? {},
+            criticalBlockers: Array.isArray(r.criticalBlockers) ? r.criticalBlockers.length : 0,
+            quickWins: Array.isArray(r.quickWins) ? r.quickWins.length : 0,
           })),
         },
         null,
@@ -1159,7 +1162,7 @@ export async function generateSummaryReport(
     const singleResult = await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
     auditResults = singleResult
   } else if (Array.isArray(results)) {
-    // If array contains URLs, audit them (each with optional Basic Auth)
+    // If array contains URLs, audit them; otherwise normalize each result object
     const urlResults = await Promise.all(
       results.map(async (r) => {
         if (typeof r === 'string') {
@@ -1170,12 +1173,14 @@ export async function generateSummaryReport(
           )
           return await auditUrl({ url: urlWithoutAuth, basicAuthUsername: u, basicAuthPassword: p })
         }
-        return r
+        const normalized = normalizeAuditResult(r)
+        return normalized ?? (r as AuditResult)
       })
     )
     auditResults = urlResults
   } else {
-    auditResults = results
+    const normalized = normalizeAuditResult(results)
+    auditResults = normalized ?? (results as AuditResult)
   }
 
   // Format report based on requested format

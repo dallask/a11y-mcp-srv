@@ -1260,6 +1260,12 @@ npm run dev
 npm start
 ```
 
+**Testing**
+- `npm test` – run unit and integration tests (watch mode)
+- `npm run test:run` – run all tests once
+- `npm run test:coverage` – run tests with coverage
+- `npm run test:e2e` – build and run E2E tests (real MCP server over stdio via `@modelcontextprotocol/sdk` Client)
+
 ### Using Local Version in MCP Client
 
 If you want to use the local version instead of the published package:

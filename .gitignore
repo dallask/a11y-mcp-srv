@@ -41,3 +41,5 @@ TEST-*.md
 *.tmp
 *.temp
 
+coverage/*
+results/*

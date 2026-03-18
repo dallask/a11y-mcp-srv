@@ -156,6 +156,11 @@ function parseScreenSizes(input: string | undefined): ScreenSize[] {
  */
 let cachedConfig: ServerConfig | null = null
 
+/** Reset config cache (for testing only). */
+export function __resetConfigCache(): void {
+  cachedConfig = null
+}
+
 export function loadConfig(): ServerConfig {
   if (cachedConfig) return cachedConfig
 

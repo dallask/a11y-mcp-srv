@@ -1,0 +1,62 @@
+{
+  "summary": {
+    "totalIssues": 2,
+    "score": 85,
+    "wcagCompliance": { "A": 90, "AA": 85, "AAA": 80 },
+    "byCategory": { "error": 1, "contrast": 1 },
+    "byImpact": { "serious": 1, "moderate": 1 }
+  },
+  "prioritizedIssues": [
+    {
+      "ruleId": "image-alt",
+      "impact": "serious",
+      "description": "Images must have alternate text",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": ["wcag2aa", "wcag22aa"],
+      "element": "img#hero",
+      "xpath": "/html/body/img[1]",
+      "fix": {
+        "current": "<img id=\"hero\" src=\"hero.png\">",
+        "suggested": "<img id=\"hero\" src=\"hero.png\" alt=\"Description\">",
+        "explanation": "Add descriptive alt text."
+      },
+      "userImpact": "Screen reader users cannot understand image content.",
+      "priority": 45,
+      "category": "error"
+    },
+    {
+      "ruleId": "color-contrast",
+      "impact": "moderate",
+      "description": "Elements must have sufficient color contrast",
+      "wcagLevel": "WCAG 2.2 AA",
+      "tags": ["wcag2aa"],
+      "element": "div.text-muted",
+      "xpath": "/html/body/div[2]",
+      "fix": {
+        "current": "<div class=\"text-muted\">",
+        "suggested": "Increase contrast ratio to at least 4.5:1",
+        "explanation": "Improve color contrast."
+      },
+      "userImpact": "Users with low vision may not read text.",
+      "priority": 30,
+      "category": "contrast"
+    }
+  ],
+  "quickWins": [
+    {
+      "ruleId": "image-alt",
+      "description": "Add alt text to images",
+      "impact": "serious",
+      "fix": {
+        "current": "<img>",
+        "suggested": "<img alt=\"...\">",
+        "explanation": "Add alt."
+      },
+      "estimatedTime": "5 minutes",
+      "affectedElements": 1
+    }
+  ],
+  "criticalBlockers": [],
+  "conversationalSummary": "2 accessibility issues found: 1 serious (missing image alt), 1 moderate (color contrast).",
+  "issuesTable": "| Rule | Impact | Description |\n|------|--------|-------------|\n| image-alt | serious | Images must have alternate text |\n| color-contrast | moderate | Elements must have sufficient color contrast |"
+}

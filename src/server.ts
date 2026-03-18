@@ -50,7 +50,7 @@ import type { BatchAuditProgress } from './types/index.js'
 /**
  * Create and configure the MCP server
  */
-async function createServer(): Promise<Server> {
+export async function createServer(): Promise<Server> {
   const server = new Server(
     {
       name: 'accessibility-audit',

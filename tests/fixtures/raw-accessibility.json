@@ -1,0 +1,33 @@
+{
+  "url": "https://example.com/page",
+  "timestamp": "2026-03-18T12:00:00.000Z",
+  "testEngine": { "name": "axe-core", "version": "4.11.0" },
+  "testRunner": { "name": "playwright" },
+  "testEnvironment": {
+    "userAgent": "Mozilla/5.0",
+    "windowWidth": 1280,
+    "windowHeight": 720
+  },
+  "violations": {
+    "error": {
+      "count": 1,
+      "items": {
+        "image-alt": {
+          "count": 1,
+          "xpaths": ["/html/body/img[1]"],
+          "description": "Images must have alternate text",
+          "impact": "serious",
+          "tags": ["wcag2aa", "wcag22aa"],
+          "domInfo": [
+            {
+              "tagName": "img",
+              "id": "hero",
+              "className": null,
+              "innerHTML": "<img id=\"hero\" src=\"hero.png\">"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

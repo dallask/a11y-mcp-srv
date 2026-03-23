@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.6.0...v2.7.0) (2026-03-23)
+
+
+### Features
+
+* enhance accessibility auditing with new options and shared browser integration ([5acd2c0](https://github.com/dallask/a11y-mcp-srv/commit/5acd2c03979d755a529123a31b8181e9d05bbfda))
+
 # [2.6.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.5.0...v2.6.0) (2026-03-23)
 
 

@@ -3,8 +3,8 @@
  * Implements: create_session, audit_with_session
  */
 
-import type { Browser, BrowserContext, Page } from 'playwright'
-import { launchChromium } from '../core/playwright-bootstrap.js'
+import type { BrowserContext, Page } from 'playwright'
+import { acquireSharedBrowser } from '../core/shared-browser.js'
 import { SessionManager } from '../core/session-manager.js'
 import { AccessibilityRunner } from '../core/accessibility-runner.js'
 import { ResultProcessor, getWcagLabelFromTags } from '../core/result-processor.js'
@@ -13,6 +13,8 @@ import {
   handleErrorGracefully,
   formatErrorMessage,
 } from '../core/error-handler.js'
+import { getConfig, getAxeTagsFromConfig } from '../core/config.js'
+import { VALID_ACCESSIBILITY_TAGS } from '../core/accessibility-tags.js'
 import type {
   SessionConfig,
   SessionResult,
@@ -65,28 +67,11 @@ export async function createSession(
     ? domain
     : `https://${domain}`
 
-  let browser: Browser | null = null
   let context: BrowserContext | null = null
 
   try {
-    // Launch browser with retry logic
-    console.log(`Launching browser for session creation: ${normalizedDomain}`)
-    browser = await retryWithBackoff(
-      async () => {
-        return await launchChromium({
-          headless: true,
-          args: [
-            '--disable-dev-shm-usage',
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-          ],
-        })
-      },
-      {
-        maxRetries: 2,
-        initialDelay: 1000,
-      }
-    )
+    console.log(`Creating session (shared browser): ${normalizedDomain}`)
+    const browser = await acquireSharedBrowser()
 
     // Create browser context (this will store cookies/auth state)
     context = await browser.newContext({
@@ -142,11 +127,6 @@ export async function createSession(
         console.warn(`Warning: Error closing context: ${err}`)
       })
     }
-    if (browser) {
-      await browser.close().catch((err) => {
-        console.warn(`Warning: Error closing browser: ${err}`)
-      })
-    }
 
     throw new Error(errorInfo.error)
   }
@@ -186,7 +166,16 @@ function normalizeUrl(url: string, domain?: string): string {
 export async function auditWithSession(
   input: AuditWithSessionInput
 ): Promise<AuditResult> {
-  const { sessionId, url, domain, tags } = input
+  const {
+    sessionId,
+    url,
+    domain,
+    tags: inputTags,
+    waitForLoad = 'load',
+    timeout = 30,
+    engine: inputEngine,
+  } = input
+  const appConfig = getConfig()
 
   // Validate required fields
   if (!sessionId) {
@@ -224,24 +213,23 @@ export async function auditWithSession(
   // Normalize URL
   const fullUrl = normalizeUrl(url, auditDomain)
 
-  // Validate tags if provided
-  if (tags && tags.length > 0) {
-    const validTags: AccessibilityTag[] = [
-      'wcag2a',
-      'wcag2aa',
-      'wcag2aaa',
-      'wcag21a',
-      'wcag21aa',
-      'wcag21aaa',
-      'best-practice',
-    ]
-    const invalidTags = tags.filter((tag) => !validTags.includes(tag as AccessibilityTag))
+  const userProvidedTags = Boolean(inputTags && inputTags.length > 0)
+  const tags = userProvidedTags
+    ? (inputTags as AccessibilityTag[])
+    : (getAxeTagsFromConfig() as AccessibilityTag[])
+
+  if (tags.length > 0) {
+    const invalidTags = tags.filter(
+      (tag) => !VALID_ACCESSIBILITY_TAGS.includes(tag as AccessibilityTag)
+    )
     if (invalidTags.length > 0) {
       throw new Error(
-        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${validTags.join(', ')}`
+        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${VALID_ACCESSIBILITY_TAGS.join(', ')}`
       )
     }
   }
+
+  const engine = (inputEngine ?? appConfig.engine) as 'axe' | 'ace'
 
   let page: Page | null = null
 
@@ -266,9 +254,11 @@ export async function auditWithSession(
       async () => {
         return await accessibilityRunner.run(page!, {
           url: fullUrl,
-          waitForLoad: 'load' as WaitStrategy,
-          timeout: 30000, // 30 seconds
-          tags: tags as AccessibilityTag[],
+          waitForLoad: waitForLoad as WaitStrategy,
+          timeout: timeout * 1000,
+          tags,
+          engine,
+          applyTagFilter: userProvidedTags,
         })
       },
       {
@@ -284,7 +274,7 @@ export async function auditWithSession(
     const resultsToProcess =
       accessibilityResult.filteredResults || accessibilityResult.accessibilityResults
 
-    const auditWcagLabel = getWcagLabelFromTags((tags || []) as string[])
+    const auditWcagLabel = getWcagLabelFromTags(tags as string[])
     const auditResult = resultProcessor.process(
       resultsToProcess,
       accessibilityResult.appliedFilters,

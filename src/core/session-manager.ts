@@ -91,10 +91,10 @@ export class SessionManager {
           await page.waitForSelector(selectors.successIndicator, { timeout: 10000 })
         } catch {
           // If success indicator not found, wait for navigation
-          await page.waitForLoadState('networkidle', { timeout: 10000 })
+          await page.waitForLoadState('load', { timeout: 10000 })
         }
       } else {
-        await page.waitForLoadState('networkidle', { timeout: 10000 })
+        await page.waitForLoadState('load', { timeout: 10000 })
       }
 
       console.log('Login successful')
@@ -139,9 +139,9 @@ export class SessionManager {
       }
     }
 
+    let page: Page | null = null
     try {
-      // Create a new page for login
-      const page = await context.newPage()
+      page = await context.newPage()
 
       // Determine login URL
       const loginPageUrl = loginUrl || `${domain}/login`
@@ -149,7 +149,7 @@ export class SessionManager {
       // Navigate to login page
       console.log(`Navigating to login page: ${loginPageUrl}`)
       await page.goto(loginPageUrl, {
-        waitUntil: 'networkidle',
+        waitUntil: 'load',
         timeout: 30000,
       })
 
@@ -177,12 +177,18 @@ export class SessionManager {
 
       console.log(`Session created: ${sessionId} (expires: ${expiresAt})`)
 
+      await page.close().catch(() => undefined)
+      page = null
+
       return {
         sessionId,
         expiresAt,
         testUrl,
       }
     } catch (error) {
+      if (page) {
+        await page.close().catch(() => undefined)
+      }
       const errorMessage =
         error instanceof Error ? error.message : String(error)
       // Provide more context for session creation failures
@@ -242,6 +248,10 @@ export class SessionManager {
       session.isActive = false
       this.sessions.delete(sessionId)
     }
+    const ctx = this.contexts.get(sessionId)
+    if (ctx) {
+      void ctx.close().catch(() => undefined)
+    }
     this.contexts.delete(sessionId)
     console.log(`Session invalidated: ${sessionId}`)
   }
@@ -288,6 +298,9 @@ export class SessionManager {
    * Clear all sessions (useful for testing or shutdown)
    */
   clearAllSessions(): void {
+    this.contexts.forEach((ctx) => {
+      void ctx.close().catch(() => undefined)
+    })
     this.sessions.clear()
     this.contexts.clear()
     console.log('All sessions cleared')

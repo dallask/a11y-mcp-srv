@@ -48,6 +48,53 @@ import {
 import { formatTimeRemaining } from './core/progress-streamer.js'
 import type { BatchAuditProgress } from './types/index.js'
 
+/** MCP inputSchema fragment: same URL-audit options as audit_url when export* `results` is a URL. */
+const EXPORT_URL_AUDIT_SCHEMA_PROPERTIES = {
+  domain: {
+    type: 'string',
+    description:
+      'When results is a URL: base domain if the URL is relative (same as audit_url).',
+  },
+  tags: {
+    type: 'array',
+    items: {
+      type: 'string',
+      enum: [
+        'wcag2a',
+        'wcag2aa',
+        'wcag2aaa',
+        'wcag21a',
+        'wcag21aa',
+        'wcag21aaa',
+        'wcag22a',
+        'wcag22aa',
+        'wcag22aaa',
+        'best-practice',
+      ],
+    },
+    description:
+      'When results is a URL: WCAG tags (same as audit_url). If omitted, env WCAG_LEVEL applies.',
+  },
+  engine: {
+    type: 'string',
+    enum: ['axe', 'ace'],
+    description:
+      'When results is a URL: axe (axe-core) or ace (IBM Equal Access). Overrides env A11Y_ENGINE.',
+  },
+  waitForLoad: {
+    type: 'string',
+    enum: ['networkidle', 'load', 'domcontentloaded'],
+    default: 'load',
+    description:
+      'When results is a URL: page load wait (same as audit_url). Default load.',
+  },
+  timeout: {
+    type: 'number',
+    default: 30,
+    description: 'When results is a URL: timeout in seconds (same as audit_url).',
+  },
+} as const
+
 /**
  * Create and configure the MCP server
  */
@@ -308,11 +355,32 @@ export async function createServer(): Promise<Server> {
                   'wcag21a',
                   'wcag21aa',
                   'wcag21aaa',
+                  'wcag22a',
+                  'wcag22aa',
+                  'wcag22aaa',
                   'best-practice',
                 ],
               },
               description:
-                'Specific accessibility tags to check. If not provided, all tags are checked.',
+                'Specific accessibility tags to check. If not provided, tags from env WCAG_LEVEL and BEST_PRACTICES are used (same as audit_url).',
+            },
+            waitForLoad: {
+              type: 'string',
+              enum: ['networkidle', 'load', 'domcontentloaded'],
+              default: 'load',
+              description:
+                'Wait strategy for page loading. Default load; use networkidle for heavy SPAs.',
+            },
+            timeout: {
+              type: 'number',
+              default: 30,
+              description: 'Timeout in seconds (default: 30).',
+            },
+            engine: {
+              type: 'string',
+              enum: ['axe', 'ace'],
+              description:
+                'Testing engine: "axe" (axe-core, default) or "ace" (IBM Equal Access). Overrides env A11Y_ENGINE when provided.',
             },
           },
           required: ['sessionId', 'url'],
@@ -678,6 +746,7 @@ export async function createServer(): Promise<Server> {
               description:
                 'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
+            ...EXPORT_URL_AUDIT_SCHEMA_PROPERTIES,
           },
           required: ['results'],
         },
@@ -724,6 +793,7 @@ export async function createServer(): Promise<Server> {
               description:
                 'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
+            ...EXPORT_URL_AUDIT_SCHEMA_PROPERTIES,
           },
           required: ['results'],
         },
@@ -770,6 +840,7 @@ export async function createServer(): Promise<Server> {
               description:
                 'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
+            ...EXPORT_URL_AUDIT_SCHEMA_PROPERTIES,
           },
           required: ['results'],
         },
@@ -817,6 +888,7 @@ export async function createServer(): Promise<Server> {
               description:
                 'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
+            ...EXPORT_URL_AUDIT_SCHEMA_PROPERTIES,
           },
           required: ['results'],
         },
@@ -1260,6 +1332,13 @@ export async function createServer(): Promise<Server> {
             url: args?.url as string,
             domain: args?.domain as string | undefined,
             tags: args?.tags as string[] | undefined,
+            waitForLoad: args?.waitForLoad as
+              | 'networkidle'
+              | 'load'
+              | 'domcontentloaded'
+              | undefined,
+            timeout: args?.timeout as number | undefined,
+            engine: args?.engine as 'axe' | 'ace' | undefined,
           })
 
           return {
@@ -1429,6 +1508,15 @@ export async function createServer(): Promise<Server> {
             format: args?.format as 'standard' | 'detailed' | 'minimal' | undefined,
             basicAuthUsername: args?.basicAuthUsername as string | undefined,
             basicAuthPassword: args?.basicAuthPassword as string | undefined,
+            domain: args?.domain as string | undefined,
+            tags: args?.tags as string[] | undefined,
+            engine: args?.engine as 'axe' | 'ace' | undefined,
+            waitForLoad: args?.waitForLoad as
+              | 'networkidle'
+              | 'load'
+              | 'domcontentloaded'
+              | undefined,
+            timeout: args?.timeout as number | undefined,
           })
 
           return {
@@ -1448,6 +1536,15 @@ export async function createServer(): Promise<Server> {
             formatting: args?.formatting as boolean | undefined,
             basicAuthUsername: args?.basicAuthUsername as string | undefined,
             basicAuthPassword: args?.basicAuthPassword as string | undefined,
+            domain: args?.domain as string | undefined,
+            tags: args?.tags as string[] | undefined,
+            engine: args?.engine as 'axe' | 'ace' | undefined,
+            waitForLoad: args?.waitForLoad as
+              | 'networkidle'
+              | 'load'
+              | 'domcontentloaded'
+              | undefined,
+            timeout: args?.timeout as number | undefined,
           })
 
           return {
@@ -1467,6 +1564,15 @@ export async function createServer(): Promise<Server> {
             includeRaw: args?.includeRaw as boolean | undefined,
             basicAuthUsername: args?.basicAuthUsername as string | undefined,
             basicAuthPassword: args?.basicAuthPassword as string | undefined,
+            domain: args?.domain as string | undefined,
+            tags: args?.tags as string[] | undefined,
+            engine: args?.engine as 'axe' | 'ace' | undefined,
+            waitForLoad: args?.waitForLoad as
+              | 'networkidle'
+              | 'load'
+              | 'domcontentloaded'
+              | undefined,
+            timeout: args?.timeout as number | undefined,
           })
 
           return {
@@ -1486,6 +1592,15 @@ export async function createServer(): Promise<Server> {
             includeCharts: args?.includeCharts as boolean | undefined,
             basicAuthUsername: args?.basicAuthUsername as string | undefined,
             basicAuthPassword: args?.basicAuthPassword as string | undefined,
+            domain: args?.domain as string | undefined,
+            tags: args?.tags as string[] | undefined,
+            engine: args?.engine as 'axe' | 'ace' | undefined,
+            waitForLoad: args?.waitForLoad as
+              | 'networkidle'
+              | 'load'
+              | 'domcontentloaded'
+              | undefined,
+            timeout: args?.timeout as number | undefined,
           })
 
           return {

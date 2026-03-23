@@ -44,13 +44,15 @@ const { mockPage, mockContext, mockBrowser, sessions, rawFixture } = vi.hoisted(
   const mockBrowser = {
     newContext: vi.fn().mockResolvedValue(mockContext),
     close: vi.fn().mockResolvedValue(undefined),
+    isConnected: vi.fn().mockReturnValue(true),
   }
   const sessions = new Map<string, unknown>()
   return { mockPage, mockContext, mockBrowser, sessions, rawFixture }
 })
 
-vi.mock('../../../src/core/playwright-bootstrap.js', () => ({
-  launchChromium: vi.fn().mockResolvedValue(mockBrowser),
+vi.mock('../../../src/core/shared-browser.js', () => ({
+  acquireSharedBrowser: vi.fn().mockResolvedValue(mockBrowser),
+  shutdownSharedBrowser: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('../../../src/core/accessibility-runner.js', () => ({

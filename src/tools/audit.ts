@@ -13,6 +13,7 @@ import {
   formatErrorMessage,
 } from '../core/error-handler.js'
 import { getConfig, getAxeTagsFromConfig } from '../core/config.js'
+import { VALID_ACCESSIBILITY_TAGS } from '../core/accessibility-tags.js'
 import { parseUrlCredentials, getBasicAuthHeader } from '../core/basic-auth.js'
 import type {
   AuditUrlInput,
@@ -61,19 +62,6 @@ function normalizeUrl(url: string, domain?: string): string {
  * @param input - Audit configuration
  * @returns Structured audit results with prioritized issues, quick wins, and conversational summary
  */
-const VALID_TAGS: AccessibilityTag[] = [
-  'wcag2a',
-  'wcag2aa',
-  'wcag2aaa',
-  'wcag21a',
-  'wcag21aa',
-  'wcag21aaa',
-  'wcag22a',
-  'wcag22aa',
-  'wcag22aaa',
-  'best-practice',
-]
-
 /** Resolved inputs for one audit run (shared browser; new context/page per call). */
 interface SingleAuditParams {
   fullUrl: string
@@ -240,11 +228,11 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
 
   if (tags && tags.length > 0) {
     const invalidTags = tags.filter(
-      (tag) => !VALID_TAGS.includes(tag as AccessibilityTag)
+      (tag) => !VALID_ACCESSIBILITY_TAGS.includes(tag as AccessibilityTag)
     )
     if (invalidTags.length > 0) {
       throw new Error(
-        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${VALID_TAGS.join(', ')}`
+        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${VALID_ACCESSIBILITY_TAGS.join(', ')}`
       )
     }
   }

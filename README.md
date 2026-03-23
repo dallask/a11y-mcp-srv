@@ -318,7 +318,7 @@ Intelligent site-wide audit with prioritization.
 
 #### `create_session` - Authenticated Session
 
-Create a reusable authenticated session for testing protected pages.
+Create a reusable authenticated session for testing protected pages. Uses the same shared Chromium instance as `audit_url` (one browser per MCP process; each session gets its own browser context).
 
 **Inputs:**
 - `domain` (required): Base domain
@@ -356,9 +356,10 @@ Run an audit using an existing authenticated session.
 - `sessionId` (required): Session from `create_session`
 - `url` (required): URL to test (can be relative)
 - `domain` (optional): Base domain
-- `tags` (optional): Array of accessibility tags
-- `waitForLoad` (optional): Wait strategy (default: `"load"`)
+- `tags` (optional): Accessibility tags; if omitted, uses env `WCAG_LEVEL` and `BEST_PRACTICES` (same as `audit_url`)
+- `waitForLoad` (optional): `"load"` (default) | `"domcontentloaded"` | `"networkidle"`
 - `timeout` (optional): Timeout in seconds (default: 30)
+- `engine` (optional): `"axe"` or `"ace"`; defaults to env `A11Y_ENGINE`
 
 **Example:**
 ```json

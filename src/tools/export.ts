@@ -15,7 +15,38 @@ import type {
   ExportToJsonResult,
   ExportToHtmlInput,
   ExportToHtmlResult,
+  ExportUrlAuditOptions,
 } from '../types/index.js'
+
+/**
+ * Options forwarded to {@link auditUrl} when `results` is a URL (shared browser, ACE cache, default wait `load`).
+ */
+function pickUrlAuditOptions(o: ExportUrlAuditOptions): ExportUrlAuditOptions {
+  const { domain, tags, waitForLoad, timeout, engine } = o
+  return { domain, tags, waitForLoad, timeout, engine }
+}
+
+/**
+ * Resolve `results` to an {@link AuditResult}, running {@link auditUrl} when `results` is a URL.
+ */
+async function auditResultFromExportInput(
+  results: AuditResult | string,
+  basicAuthUsername: string | undefined,
+  basicAuthPassword: string | undefined,
+  urlAudit?: ExportUrlAuditOptions
+): Promise<AuditResult> {
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    const opts = urlAudit ? pickUrlAuditOptions(urlAudit) : {}
+    return auditUrl({
+      url: resolved.urlWithoutAuth,
+      basicAuthUsername: resolved.basicAuthUsername,
+      basicAuthPassword: resolved.basicAuthPassword,
+      ...opts,
+    })
+  }
+  return resolved.result
+}
 
 /**
  * Escape CSV field - handles quotes, commas, and newlines
@@ -104,14 +135,12 @@ export async function exportToCsv(
     basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
-  if (resolved.kind === 'url') {
-    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
-  } else {
-    auditResult = resolved.result
-  }
+  const auditResult = await auditResultFromExportInput(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    input
+  )
 
   const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
   const csvRows: string[] = []
@@ -239,14 +268,12 @@ export async function exportToExcel(
     basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
-  if (resolved.kind === 'url') {
-    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
-  } else {
-    auditResult = resolved.result
-  }
+  const auditResult = await auditResultFromExportInput(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    input
+  )
 
   const issues = Array.isArray(auditResult?.prioritizedIssues) ? auditResult.prioritizedIssues : []
   // Try to import xlsx, but handle gracefully if not available
@@ -386,14 +413,12 @@ export async function exportToJson(
     basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
-  if (resolved.kind === 'url') {
-    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
-  } else {
-    auditResult = resolved.result
-  }
+  const auditResult = await auditResultFromExportInput(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    input
+  )
 
   // Prepare export data
   const exportData: any = {
@@ -857,14 +882,12 @@ export async function exportToHtmlReport(
     basicAuthPassword,
   } = input
 
-  let auditResult: AuditResult
-
-  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
-  if (resolved.kind === 'url') {
-    auditResult = await auditUrl({ url: resolved.urlWithoutAuth, basicAuthUsername: resolved.basicAuthUsername, basicAuthPassword: resolved.basicAuthPassword })
-  } else {
-    auditResult = resolved.result
-  }
+  const auditResult = await auditResultFromExportInput(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    input
+  )
 
   const htmlContent = generateHtmlReport(auditResult, template, includeCharts)
 

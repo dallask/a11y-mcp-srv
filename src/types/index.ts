@@ -364,6 +364,9 @@ export interface AuditWithSessionInput {
   url: string
   domain?: string
   tags?: string[]
+  waitForLoad?: WaitStrategy
+  timeout?: number
+  engine?: AccessibilityEngine
 }
 
 /**
@@ -680,9 +683,18 @@ export interface TagFilter {
 // ============================================================================
 
 /**
+ * When `results` is a URL string, these fields are forwarded to {@link audit_url}
+ * (shared browser, context Basic Auth, default wait `load`, ACE policy cache).
+ */
+export type ExportUrlAuditOptions = Pick<
+  AuditUrlInput,
+  'waitForLoad' | 'timeout' | 'engine' | 'tags' | 'domain'
+>
+
+/**
  * Export to CSV input
  */
-export interface ExportToCsvInput {
+export interface ExportToCsvInput extends ExportUrlAuditOptions {
   results: AuditResult | string // Audit result object or URL string
   includeMetadata?: boolean // Include test information and environment data (default: true)
   includeViolations?: boolean // Include detailed violation rows (default: true)
@@ -707,7 +719,7 @@ export interface ExportToCsvResult {
 /**
  * Export to Excel input
  */
-export interface ExportToExcelInput {
+export interface ExportToExcelInput extends ExportUrlAuditOptions {
   results: AuditResult | string // Audit result object or URL string
   includeCharts?: boolean // Generate charts for score trends and category breakdown (default: false)
   formatting?: boolean // Apply colors, headers, and styling (default: true)
@@ -729,7 +741,7 @@ export interface ExportToExcelResult {
 /**
  * Export to JSON input
  */
-export interface ExportToJsonInput {
+export interface ExportToJsonInput extends ExportUrlAuditOptions {
   results: AuditResult | string // Audit result object or URL string
   pretty?: boolean // Pretty-print JSON (default: true)
   includeRaw?: boolean // Include raw accessibility engine results (default: false)
@@ -750,7 +762,7 @@ export interface ExportToJsonResult {
 /**
  * Export to HTML input
  */
-export interface ExportToHtmlInput {
+export interface ExportToHtmlInput extends ExportUrlAuditOptions {
   results: AuditResult | string // Audit result object or URL string
   template?: 'default' | 'minimal' | 'detailed' // Report template (default: "default")
   includeCharts?: boolean // Include visual charts (default: true)

@@ -4,7 +4,7 @@
  */
 
 import type { Browser, BrowserContext, Page } from 'playwright'
-import { launchChromium } from '../core/playwright-bootstrap.js'
+import { acquireSharedBrowser } from '../core/shared-browser.js'
 import { AccessibilityRunner } from '../core/accessibility-runner.js'
 import { ResultProcessor, getWcagLabelFromTags } from '../core/result-processor.js'
 import {
@@ -74,50 +74,37 @@ const VALID_TAGS: AccessibilityTag[] = [
   'best-practice',
 ]
 
-export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
+/** Resolved inputs for one audit run (shared browser; new context/page per call). */
+interface SingleAuditParams {
+  fullUrl: string
+  basicAuthUsername?: string
+  basicAuthPassword?: string
+  tags: AccessibilityTag[]
+  userProvidedTags: boolean
+  waitForLoad: WaitStrategy
+  timeout: number
+  engine: 'axe' | 'ace'
+}
+
+/**
+ * Run one audit using an existing Browser (shared). Closes only page/context, never the browser.
+ */
+async function runSingleUrlAudit(
+  browser: Browser,
+  params: SingleAuditParams
+): Promise<AuditResult> {
   const config = getConfig()
   const {
-    url,
-    domain,
-    tags: inputTags,
-    waitForLoad = 'networkidle',
-    timeout = 30,
-    engine: inputEngine,
-    basicAuthUsername: inputBasicUser,
-    basicAuthPassword: inputBasicPass,
-  } = input
+    fullUrl,
+    basicAuthUsername,
+    basicAuthPassword,
+    tags,
+    userProvidedTags,
+    waitForLoad,
+    timeout,
+    engine,
+  } = params
 
-  // Resolve URL and optional Basic Auth (from URL user:password@host or explicit params)
-  const fullUrlRaw = normalizeUrl(url, domain)
-  const parsedFromUrl = parseUrlCredentials(fullUrlRaw)
-  const fullUrl = parsedFromUrl.urlWithoutAuth
-  const basicAuthUsername = inputBasicUser ?? parsedFromUrl.username
-  const basicAuthPassword = inputBasicPass ?? parsedFromUrl.password
-
-  const engine = inputEngine ?? config.engine
-
-  // Determine tags to pass to the engine:
-  // - If user explicitly provides tags → use those (and post-filter results to match)
-  // - Otherwise → derive from env config (WCAG_LEVEL + BEST_PRACTICES) and pass to engine
-  //   but do NOT post-filter, so all matching issues are shown without silent filtering
-  const userProvidedTags = inputTags && inputTags.length > 0
-  const tags = userProvidedTags
-    ? (inputTags as AccessibilityTag[])
-    : (getAxeTagsFromConfig() as AccessibilityTag[])
-
-  // Validate tags if provided
-  if (tags && tags.length > 0) {
-    const invalidTags = tags.filter(
-      (tag) => !VALID_TAGS.includes(tag as AccessibilityTag)
-    )
-    if (invalidTags.length > 0) {
-      throw new Error(
-        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${VALID_TAGS.join(', ')}`
-      )
-    }
-  }
-
-  let browser: Browser | null = null
   let context: BrowserContext | null = null
   let page: Page | null = null
 
@@ -128,26 +115,9 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
   if (basicAuthHeader) debugLog('Using HTTP Basic Authentication')
 
   try {
-    // Launch browser with retry logic
-    debugLog(`Launching browser for audit: ${fullUrl}`)
-    browser = await retryWithBackoff(
-      async () => {
-        return await launchChromium({
-          headless: config.headless,
-          args: [
-            '--disable-dev-shm-usage',
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-          ],
-        })
-      },
-      {
-        maxRetries: 2,
-        initialDelay: 1000,
-      }
-    )
+    debugLog(`Running audit: ${fullUrl}`)
 
-    // Create context (with Basic Auth header when provided) and page
+    // Context extraHTTPHeaders apply to all requests (including navigation); no route / about:blank needed.
     if (basicAuthHeader) {
       context = await browser.newContext({
         userAgent,
@@ -159,9 +129,9 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       page = await context.newPage()
     } else {
       page = await browser.newPage({ userAgent })
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' })
     }
 
-    // Set viewport from config (first screen size)
     const viewport = config.screenSizes[0]
     if (viewport) {
       await page.setViewportSize({
@@ -170,42 +140,23 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
       })
     }
 
-    // When using Basic Auth, add route so every request (including first navigation) has the header
-    if (basicAuthHeader) {
-      const authHeaderValue = basicAuthHeader
-      await page.route('**/*', (route) => {
-        const req = route.request()
-        const reqHeaders = req.headers() as Record<string, string>
-        const withAuth: Record<string, string> = {}
-        for (const [k, v] of Object.entries(reqHeaders)) {
-          if (v != null && typeof v === 'string') withAuth[k] = v
-        }
-        withAuth['Authorization'] = authHeaderValue
-        void route.continue({ headers: withAuth })
-      })
-      await page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 5000 })
-    } else {
-      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' })
-    }
-
-    // Initialize AccessibilityRunner
     const accessibilityRunner = new AccessibilityRunner()
 
-    // Run accessibility test with retry logic for transient errors
     debugLog(`Running accessibility test on: ${fullUrl}`)
+    if (page === null) {
+      throw new Error('Failed to create browser page')
+    }
+    const auditPage: Page = page
     const accessibilityResult = await retryWithBackoff(
-      async () => {
-        return await accessibilityRunner.run(page!, {
+      async () =>
+        accessibilityRunner.run(auditPage, {
           url: fullUrl,
-          waitForLoad: waitForLoad as WaitStrategy,
+          waitForLoad,
           timeout: timeout * 1000,
-          tags: tags as AccessibilityTag[],
-          engine: engine as 'axe' | 'ace',
-          // Only post-filter results when user explicitly provided tags.
-          // Config-derived tags are passed to the engine for scoping but don't hide results.
+          tags,
+          engine,
           applyTagFilter: userProvidedTags,
-        })
-      },
+        }),
       {
         maxRetries: 2,
         initialDelay: 2000,
@@ -214,16 +165,17 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
 
     const responseStatus = accessibilityResult.responseStatus
     const usedBasicAuth = basicAuthUsername != null && basicAuthPassword != null
-    if (usedBasicAuth && responseStatus != null && (responseStatus === 401 || responseStatus === 403)) {
+    if (
+      usedBasicAuth &&
+      responseStatus != null &&
+      (responseStatus === 401 || responseStatus === 403)
+    ) {
       throw new Error(
         `HTTP ${responseStatus}: Basic Auth failed. The server rejected the credentials (or did not accept Basic Auth). Check username and password.`
       )
     }
 
-    // Process results
     const resultProcessor = new ResultProcessor()
-
-    // Use filtered results if tags were applied, otherwise use original
     const resultsToProcess =
       accessibilityResult.filteredResults || accessibilityResult.accessibilityResults
 
@@ -257,12 +209,59 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
         console.warn(`Warning: Error closing context: ${err}`)
       })
     }
-    if (browser) {
-      await browser.close().catch((err) => {
-        console.warn(`Warning: Error closing browser: ${err}`)
-      })
+  }
+}
+
+export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
+  const config = getConfig()
+  const {
+    url,
+    domain,
+    tags: inputTags,
+    waitForLoad = 'load',
+    timeout = 30,
+    engine: inputEngine,
+    basicAuthUsername: inputBasicUser,
+    basicAuthPassword: inputBasicPass,
+  } = input
+
+  const fullUrlRaw = normalizeUrl(url, domain)
+  const parsedFromUrl = parseUrlCredentials(fullUrlRaw)
+  const fullUrl = parsedFromUrl.urlWithoutAuth
+  const basicAuthUsername = inputBasicUser ?? parsedFromUrl.username
+  const basicAuthPassword = inputBasicPass ?? parsedFromUrl.password
+
+  const engine = (inputEngine ?? config.engine) as 'axe' | 'ace'
+
+  const userProvidedTags = Boolean(inputTags && inputTags.length > 0)
+  const tags = userProvidedTags
+    ? (inputTags as AccessibilityTag[])
+    : (getAxeTagsFromConfig() as AccessibilityTag[])
+
+  if (tags && tags.length > 0) {
+    const invalidTags = tags.filter(
+      (tag) => !VALID_TAGS.includes(tag as AccessibilityTag)
+    )
+    if (invalidTags.length > 0) {
+      throw new Error(
+        `Invalid tags: ${invalidTags.join(', ')}. Valid tags are: ${VALID_TAGS.join(', ')}`
+      )
     }
   }
+
+  const params: SingleAuditParams = {
+    fullUrl,
+    basicAuthUsername,
+    basicAuthPassword,
+    tags,
+    userProvidedTags,
+    waitForLoad: waitForLoad as WaitStrategy,
+    timeout,
+    engine,
+  }
+
+  const browser = await acquireSharedBrowser()
+  return await runSingleUrlAudit(browser, params)
 }
 
 /**
@@ -323,93 +322,95 @@ async function processBatchParallel(
   basicAuthPassword?: string
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
-    []
+    new Array(urlArray.length)
   const completedUrls: string[] = []
   const failedUrls: string[] = []
   const startTime = Date.now()
+  let finishedCount = 0
+  let nextIndex = 0
 
-  // Process URLs in batches
-  for (let i = 0; i < urlArray.length; i += parallel) {
-    const batch = urlArray.slice(i, i + parallel)
-    const batchPromises = batch.map((url) =>
-      processSingleUrl(url, domain, tags, continueOnError, engine, basicAuthUsername, basicAuthPassword)
-    )
-
-    // Wait for batch to complete
-    const batchResults = await Promise.allSettled(batchPromises)
-
-    // Process batch results with graceful error handling
-    for (let j = 0; j < batchResults.length; j++) {
-      const promiseResult = batchResults[j]
-      const url = batch[j]
-
-      if (promiseResult.status === 'fulfilled') {
-        const result = promiseResult.value
-        results.push(result)
-
-        if (result.result) {
-          completedUrls.push(url)
-        } else if (result.error) {
-          failedUrls.push(url)
-          // Only throw if continueOnError is false and it's a critical error
-          if (!continueOnError) {
-            const errorInfo = handleErrorGracefully(
-              new Error(result.error),
-              `Batch audit: ${url}`
-            )
-            // Only throw if it's not a transient error
-            if (!errorInfo.retryable) {
-              throw new Error(`Audit failed for ${url}: ${result.error}`)
-            }
-          }
-        }
-      } else {
-        const errorInfo = handleErrorGracefully(
-          promiseResult.reason,
-          `Batch audit: ${url}`
-        )
-        const errorMessage = formatErrorMessage(
-          promiseResult.reason,
-          `Batch audit: ${url}`
-        )
-        results.push({ url, error: errorMessage })
-        failedUrls.push(url)
-        
-        // Only throw if continueOnError is false and it's not a transient error
-        if (!continueOnError && !errorInfo.retryable) {
-          throw new Error(`Audit failed for ${url}: ${errorMessage}`)
-        }
-      }
-    }
-
-    // Calculate progress
-    const completed = results.length
+  const emitProgress = (currentUrl: string) => {
+    const completed = finishedCount
     const percentage = Math.round((completed / urlArray.length) * 100)
-    const elapsed = (Date.now() - startTime) / 1000 // seconds
-    const avgTimePerUrl = elapsed / completed
+    const elapsed = (Date.now() - startTime) / 1000
+    const avgTimePerUrl = completed > 0 ? elapsed / completed : 0
     const remaining = urlArray.length - completed
     const estimatedTimeRemaining = Math.round(avgTimePerUrl * remaining)
 
-    // Send progress update
     if (onProgress) {
       onProgress({
         current: completed,
         total: urlArray.length,
         percentage,
-        status: `Processing batch ${Math.floor(i / parallel) + 1} of ${Math.ceil(urlArray.length / parallel)}`,
+        status: `Parallel pool: ${completed}/${urlArray.length} URLs completed`,
         estimatedTimeRemaining,
-        currentItem: batch[batch.length - 1],
+        currentItem: currentUrl,
         completedUrls: [...completedUrls],
         failedUrls: [...failedUrls],
-        currentUrl: batch[batch.length - 1],
+        currentUrl,
       })
     }
-
-    // Log progress
     debugLog(
       `Progress: ${completed}/${urlArray.length} (${percentage}%) - Completed: ${completedUrls.length}, Failed: ${failedUrls.length}`
     )
   }
+
+  const worker = async () => {
+    while (true) {
+      const i = nextIndex++
+      if (i >= urlArray.length) return
+      const url = urlArray[i]
+      let outcome: { url: string; result?: AuditResult; error?: string }
+
+      try {
+        outcome = await processSingleUrl(
+          url,
+          domain,
+          tags,
+          continueOnError,
+          engine,
+          basicAuthUsername,
+          basicAuthPassword
+        )
+      } catch (e) {
+        const errorInfo = handleErrorGracefully(e, `Batch audit: ${url}`)
+        const errorMessage = formatErrorMessage(e, `Batch audit: ${url}`)
+        outcome = { url, error: errorMessage }
+        failedUrls.push(url)
+        results[i] = outcome
+        finishedCount++
+        emitProgress(url)
+        if (!continueOnError && !errorInfo.retryable) {
+          throw new Error(`Audit failed for ${url}: ${errorMessage}`)
+        }
+        continue
+      }
+
+      results[i] = outcome
+      if (outcome.result) {
+        completedUrls.push(url)
+      } else if (outcome.error) {
+        failedUrls.push(url)
+        if (!continueOnError) {
+          const errorInfo = handleErrorGracefully(
+            new Error(outcome.error),
+            `Batch audit: ${url}`
+          )
+          if (!errorInfo.retryable) {
+            finishedCount++
+            emitProgress(url)
+            throw new Error(`Audit failed for ${url}: ${outcome.error}`)
+          }
+        }
+      }
+
+      finishedCount++
+      emitProgress(url)
+    }
+  }
+
+  const workers = Math.min(Math.max(1, parallel), urlArray.length)
+  await Promise.all(Array.from({ length: workers }, () => worker()))
 
   return results
 }
@@ -618,6 +619,9 @@ export async function auditMultipleUrls(
   debugLog(
     `Starting batch audit: ${urlArray.length} URL(s), parallel: ${parallel}`
   )
+
+  // Warm shared browser once for the whole batch (parallel workers reuse it).
+  await acquireSharedBrowser()
 
   // Process URLs (parallel or sequential)
   const results =

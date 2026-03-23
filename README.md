@@ -253,7 +253,7 @@ Test a single URL for accessibility issues with conversational, actionable resul
 - `url` (required): Full URL or relative path
 - `domain` (optional): Base domain if URL is relative
 - `tags` (optional): Array of accessibility tags to check (e.g., `["wcag2a", "wcag2aa", "wcag21a", "best-practice"]`). If not provided, all tags are checked.
-- `waitForLoad` (optional): Wait strategy - `"networkidle"` (default) | `"load"` | `"domcontentloaded"`
+- `waitForLoad` (optional): Wait strategy - `"load"` (default) | `"networkidle"` | `"domcontentloaded"`
 - `timeout` (optional): Timeout in seconds (default: 30)
 
 **Example:**
@@ -357,7 +357,7 @@ Run an audit using an existing authenticated session.
 - `url` (required): URL to test (can be relative)
 - `domain` (optional): Base domain
 - `tags` (optional): Array of accessibility tags
-- `waitForLoad` (optional): Wait strategy (default: `"networkidle"`)
+- `waitForLoad` (optional): Wait strategy (default: `"load"`)
 - `timeout` (optional): Timeout in seconds (default: 30)
 
 **Example:**

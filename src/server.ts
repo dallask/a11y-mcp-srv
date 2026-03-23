@@ -15,6 +15,7 @@ import {
 
 // Import tool implementations
 import { auditUrl } from './tools/audit.js'
+import { shutdownSharedBrowser } from './core/shared-browser.js'
 import { auditMultipleUrls } from './tools/audit.js'
 import { createSession } from './tools/session.js'
 import { auditWithSession } from './tools/session.js'
@@ -112,8 +113,9 @@ export async function createServer(): Promise<Server> {
             waitForLoad: {
               type: 'string',
               enum: ['networkidle', 'load', 'domcontentloaded'],
-              default: 'networkidle',
-              description: 'Wait strategy for page loading.',
+              default: 'load',
+              description:
+                'Wait strategy for page loading. Default load; use networkidle for heavy SPAs when dynamic content must settle.',
             },
             timeout: {
               type: 'number',
@@ -1661,6 +1663,12 @@ async function main() {
   await server.connect(transport)
 
   console.error('Accessibility MCP Server running on stdio')
+
+  const onShutdown = () => {
+    void shutdownSharedBrowser()
+  }
+  process.once('SIGINT', onShutdown)
+  process.once('SIGTERM', onShutdown)
 }
 
 // Start the server

@@ -266,7 +266,7 @@ export async function auditWithSession(
       async () => {
         return await accessibilityRunner.run(page!, {
           url: fullUrl,
-          waitForLoad: 'networkidle' as WaitStrategy,
+          waitForLoad: 'load' as WaitStrategy,
           timeout: 30000, // 30 seconds
           tags: tags as AccessibilityTag[],
         })

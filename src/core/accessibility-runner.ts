@@ -17,6 +17,7 @@ import type {
 } from '../types/index.js'
 import { IMPACT_ORDER } from '../types/index.js'
 import type { DOMInfo } from '../types/index.js'
+import { getConfiguredAceChecker } from './ace-policy-cache.js'
 
 /**
  * Debug logger that writes to stderr to avoid interfering with MCP protocol
@@ -34,7 +35,7 @@ export type { AccessibilityEngine } from '../types/index.js'
 export interface AccessibilityRunnerConfig {
   /** URL to test */
   url: string
-  /** Wait strategy for page loading */
+  /** Wait strategy for page loading (default: load) */
   waitForLoad?: WaitStrategy
   /** Timeout in milliseconds (default: 30000) */
   timeout?: number
@@ -178,7 +179,7 @@ export class AccessibilityRunner {
   private async navigateAndWait(
     page: Page,
     url: string,
-    waitStrategy: WaitStrategy = 'networkidle',
+    waitStrategy: WaitStrategy = 'load',
     timeout: number = 30000
   ): Promise<number | undefined> {
     debugLog(`Navigating to ${url}...`)
@@ -363,30 +364,27 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Run IBM Equal Access (accessibility-checker) analysis on HTML content.
-   * ACE never fetches URLs; the caller loads the page in Playwright and passes the final HTML
-   * (including everything changed by JavaScript). This avoids ACE's internal Puppeteer launch.
-   * WCAG level/policy is configured via setConfig before the scan — tags are engine settings.
+   * Run IBM Equal Access (accessibility-checker) analysis using the Playwright page directly.
+   * Passing the Playwright Page object to getCompliance() lets ACE use its native Playwright
+   * integration instead of spawning an internal Puppeteer browser (which caused intermittent
+   * TargetCloseError crashes). The page must already be navigated to the target URL.
+   * WCAG level/policy is configured via setConfig — tags map to ACE policies. Module load and
+   * setConfig are cached (see ace-policy-cache) until policies or rule archive change.
    */
   private async runACEAnalysis(
-    htmlContent: string,
+    page: Page,
     url: string,
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
-    const aChecker = await import('accessibility-checker')
     const label = `audit-${Date.now()}`
 
     const policies = this.acePolicesFromTags(tags)
     debugLog(`ACE policies: ${policies.join(', ')}`)
 
-    try {
-      await aChecker.setConfig({ policies, ruleArchive: 'latest' })
-      const result = await aChecker.getCompliance(htmlContent, label)
-      const report = result.report as unknown as ACEReport
-      return this.aceToAccessibilityResults(report, url)
-    } finally {
-      await aChecker.close?.()
-    }
+    const aChecker = await getConfiguredAceChecker(policies, 'latest')
+    const result = await aChecker.getCompliance(page, label)
+    const report = result.report as unknown as ACEReport
+    return this.aceToAccessibilityResults(report, url)
   }
 
   /**
@@ -480,8 +478,7 @@ export class AccessibilityRunner {
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
     if (engine === 'ace') {
-      const html = await page.content()
-      return this.runACEAnalysis(html, url, tags)
+      return this.runACEAnalysis(page, url, tags)
     }
 
     const axeResult = await this.runAxeAnalysis(page, tags)
@@ -622,7 +619,7 @@ export class AccessibilityRunner {
   ): Promise<AccessibilityRunnerResult> {
     const {
       url,
-      waitForLoad = 'networkidle',
+      waitForLoad = 'load',
       timeout = 30000,
       tags,
       engine = 'axe',
@@ -631,12 +628,12 @@ export class AccessibilityRunner {
 
     try {
       if (engine === 'ace') {
-        // Always load the page in Playwright and pass the final HTML to ACE (no separate ACE browser).
-        // This gives us JS-rendered content and supports Basic Auth; ACE only analyzes the HTML string.
+        // Navigate in Playwright, then pass the live Page to ACE's getCompliance().
+        // ACE's native Playwright integration analyses the page in-process — no separate
+        // Puppeteer browser is launched, avoiding TargetCloseError crashes.
         const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
-        const html = await page.content()
-        debugLog(`Running IBM Equal Access (ACE) analysis on page content (${url})...`)
-        const accessibilityResults = await this.runACEAnalysis(html, url, tags)
+        debugLog(`Running IBM Equal Access (ACE) analysis on page (${url})...`)
+        const accessibilityResults = await this.runACEAnalysis(page, url, tags)
 
         return {
           accessibilityResults,

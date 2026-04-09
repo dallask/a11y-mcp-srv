@@ -74,6 +74,16 @@ describe('normalizeAuditResult', () => {
     expect(result!.summary.totalIssues).toBe(2)
   })
 
+  it('normalizes raw array [AuditResult, ...] to first element', () => {
+    const second = {
+      ...auditResultFixture,
+      summary: { ...auditResultFixture.summary, totalIssues: 99 },
+    }
+    const result = normalizeAuditResult([auditResultFixture, second])
+    expect(result).not.toBeNull()
+    expect(result!.summary.totalIssues).toBe(2)
+  })
+
   it('normalizes plain object with summary and prioritizedIssues', () => {
     const result = normalizeAuditResult(auditResultFixture)
     expect(result).not.toBeNull()

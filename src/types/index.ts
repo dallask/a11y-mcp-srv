@@ -398,9 +398,12 @@ export type PrioritizationCriteria = 'impact' | 'wcag' | 'fixability' | 'user-im
  * Prioritize issues input
  */
 export interface PrioritizeIssuesInput {
-  results: AuditResult
+  /** Audit result, JSON string, MCP wrapper, batch shape, or http(s) URL (audited first). */
+  results: AuditResult | string | unknown
   criteria?: PrioritizationCriteria
   limit?: number // Top N issues to return
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -560,10 +563,13 @@ export type ComplianceReportFormat = 'VPAT' | 'WCAG' | 'ADA' | 'Section508'
  * Generate compliance report input
  */
 export interface GenerateComplianceReportInput {
-  results: AuditResult
+  /** Audit result, JSON string, MCP wrapper, batch shape, or http(s) URL (audited first). */
+  results: AuditResult | string | unknown
   format?: ComplianceReportFormat
   level?: WCAGLevel
   includeRemediation?: boolean
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -800,9 +806,12 @@ export interface FilterCriteria {
  * Filter issues input
  */
 export interface FilterIssuesInput {
-  results: AuditResult // Audit result object
+  /** Audit result, JSON string, MCP wrapper, batch shape, or http(s) URL (audited first). */
+  results: AuditResult | string | unknown
   filters: FilterCriteria // Filter criteria
   mode?: 'include' | 'exclude' // Filter mode (default: "include")
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**
@@ -820,10 +829,13 @@ export interface FilterIssuesResult {
  * Search issues input
  */
 export interface SearchIssuesInput {
-  results: AuditResult // Audit result object
+  /** Audit result, JSON string, MCP wrapper, batch shape, or http(s) URL (audited first). */
+  results: AuditResult | string | unknown
   query: string // Search query string
   fields?: ('description' | 'element' | 'xpath' | 'selector' | 'ruleId' | 'userImpact' | 'fix' | 'all')[] // Fields to search (default: ["all"])
   caseSensitive?: boolean // Case-sensitive search (default: false)
+  basicAuthUsername?: string
+  basicAuthPassword?: string
 }
 
 /**

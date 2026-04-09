@@ -43,7 +43,7 @@ This is an MCP server exposing 22 accessibility auditing tools to AI agents over
    - `visualize.ts` — `generate_dashboard`, `generate_summary_report`
 
 3. **`src/core/`** — Shared infrastructure:
-   - `normalize-audit-result.ts` — **Critical**: `resolveAuditInput()` normalizes raw engine output (JSON strings, MCP wrappers, batch results, ACE/axe shapes) into the canonical `AuditResult`. All downstream tools depend on this.
+   - `normalize-audit-result.ts` — **Critical**: `normalizeAuditResult()` / `resolveAuditInput()` / `resolveToAuditResult()` normalize raw input (JSON strings, MCP `{ content: [{ text }] }`, batch `{ results: [...] }`, raw `[AuditResult, ...]`, http(s) URLs) into the canonical `AuditResult`. Tools that accept “results or URL” should use `resolveToAuditResult(..., auditUrl)` so URL inputs run `audit_url` first.
    - `accessibility-runner.ts` — Interfaces with axe-core and IBM ACE engines
    - `playwright-bootstrap.ts` — Manages headless browser instances
    - `config.ts` — Environment variable parsing (`A11Y_ENGINE`, `WCAG_LEVEL`, `BEST_PRACTICES`, `SCREEN_SIZES`, `HEADLESS_BROWSER`)
@@ -87,3 +87,22 @@ Configured via MCP client `env` section:
 | `BEST_PRACTICES` | `true` | Include best-practice rules |
 | `SCREEN_SIZES` | `1280x1024` | Comma-separated `WIDTHxHEIGHT` |
 | `HEADLESS_BROWSER` | `true` | Set `false` to show browser window |
+
+## ACE rule metadata
+
+IBM Equal Access uses generated rule metadata at `src/generated/ace-rule-metadata.json` (copied to `dist/generated/` on build). **When upgrading the `accessibility-checker` dependency**, run `npm run generate:ace-metadata` (requires `git` and network, or set `ACE_RULES_SOURCE_DIR` to a local clone of `accessibility-checker-engine/src/v4/rules`), then commit the updated JSON so WCAG level labels and filters stay aligned with the engine.
+
+## Audit `results` parameter (MCP clients)
+
+Supported shapes for tools that take `results` (and optional URL):
+
+- Single `AuditResult` object (as returned by `audit_url`).
+- JSON string of that object.
+- MCP-style `{ content: [{ type, text: "<json>" }] }` or a plain array of that shape.
+- Batch wrapper `{ results: [ audit1, audit2, ... ] }` — **first** result is used (except `aggregate_audit_results`, which expects an array).
+- Raw array `[ audit1, audit2 ]` where each element looks like an audit — **first** element is normalized.
+- `http://` or `https://` string — tool runs a live audit first (use `basicAuthUsername` / `basicAuthPassword` when needed).
+
+## Explicit `tags` on `audit_url` / session audits
+
+If the client passes the `tags` array explicitly, both **axe** and **ACE** apply the same post-filtering to match those tags (subset of issues). Omit `tags` to use server env (`WCAG_LEVEL`, `BEST_PRACTICES`) without that filter.

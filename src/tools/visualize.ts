@@ -13,6 +13,14 @@ import type {
   GenerateSummaryReportResult,
 } from '../types/index.js'
 
+function safeCriticalBlockers(r: AuditResult) {
+  return Array.isArray(r.criticalBlockers) ? r.criticalBlockers : []
+}
+
+function safeQuickWins(r: AuditResult) {
+  return Array.isArray(r.quickWins) ? r.quickWins : []
+}
+
 /**
  * Generate ASCII bar chart
  */
@@ -213,24 +221,24 @@ function formatDashboardAsMarkdown(
   // Critical blockers and quick wins
   if (!isMultiple) {
     const result = resultsArray[0]
-    if (result.criticalBlockers.length > 0) {
+    if (safeCriticalBlockers(result).length > 0) {
       parts.push('\n## 🚨 Critical Blockers\n')
       parts.push(
-        `Found ${result.criticalBlockers.length} critical blocker(s) that must be fixed before launch.\n`
+        `Found ${safeCriticalBlockers(result).length} critical blocker(s) that must be fixed before launch.\n`
       )
-      result.criticalBlockers.slice(0, 5).forEach((blocker, index) => {
+      safeCriticalBlockers(result).slice(0, 5).forEach((blocker, index) => {
         parts.push(
           `${index + 1}. **${blocker.description}** (${blocker.affectedElements} element(s))`
         )
       })
     }
 
-    if (result.quickWins.length > 0) {
+    if (safeQuickWins(result).length > 0) {
       parts.push('\n## ✨ Quick Wins\n')
       parts.push(
-        `Found ${result.quickWins.length} quick win(s) - easy fixes with high impact.\n`
+        `Found ${safeQuickWins(result).length} quick win(s) - easy fixes with high impact.\n`
       )
-      result.quickWins.slice(0, 5).forEach((win, index) => {
+      safeQuickWins(result).slice(0, 5).forEach((win, index) => {
         parts.push(
           `${index + 1}. **${win.description}** (${win.affectedElements} element(s), ${win.estimatedTime})`
         )
@@ -682,8 +690,8 @@ export async function generateDashboard(
             wcagCompliance: r.summary?.wcagCompliance ?? { A: 0, AA: 0, AAA: 0 },
             byImpact: r.summary?.byImpact ?? {},
             byCategory: r.summary?.byCategory ?? {},
-            criticalBlockers: Array.isArray(r.criticalBlockers) ? r.criticalBlockers.length : 0,
-            quickWins: Array.isArray(r.quickWins) ? r.quickWins.length : 0,
+            criticalBlockers: safeCriticalBlockers(r).length,
+            quickWins: safeQuickWins(r).length,
           })),
         },
         null,
@@ -746,7 +754,7 @@ function generateExecutiveSummary(
       }
 
       const quickWinsCount = resultsArray.reduce(
-        (sum, r) => sum + r.quickWins.length,
+        (sum, r) => sum + safeQuickWins(r).length,
         0
       )
       if (quickWinsCount > 0) {
@@ -768,15 +776,15 @@ function generateExecutiveSummary(
       parts.push(`- Accessibility Score: ${result.summary.score}/100`)
       parts.push(`- Total Issues Found: ${result.summary.totalIssues}`)
 
-      if (result.criticalBlockers.length > 0) {
+      if (safeCriticalBlockers(result).length > 0) {
         parts.push(
-          `- Critical Blockers: ${result.criticalBlockers.length} (must be fixed before launch)`
+          `- Critical Blockers: ${safeCriticalBlockers(result).length} (must be fixed before launch)`
         )
       }
 
-      if (result.quickWins.length > 0) {
+      if (safeQuickWins(result).length > 0) {
         parts.push(
-          `- Quick Wins Available: ${result.quickWins.length} (easy fixes with high impact)`
+          `- Quick Wins Available: ${safeQuickWins(result).length} (easy fixes with high impact)`
         )
       }
 
@@ -860,7 +868,7 @@ function generateExecutiveSummary(
         return sum + (byImpact.critical ?? 0) + (byImpact.violation ?? 0) + (byImpact.serious ?? 0) + (byImpact.potentialviolation ?? 0)
       }, 0)
       const quickWinsCount = resultsArray.reduce(
-        (sum, r) => sum + r.quickWins.length,
+        (sum, r) => sum + safeQuickWins(r).length,
         0
       )
 
@@ -908,18 +916,18 @@ function generateExecutiveSummary(
           parts.push(`- ${category}: ${count}`)
         })
 
-      if (result.criticalBlockers.length > 0) {
+      if (safeCriticalBlockers(result).length > 0) {
         parts.push(`\n**Critical Blockers:**`)
-        result.criticalBlockers.slice(0, 5).forEach((blocker, index) => {
+        safeCriticalBlockers(result).slice(0, 5).forEach((blocker, index) => {
           parts.push(
             `${index + 1}. ${blocker.description} (${blocker.affectedElements} element(s))`
           )
         })
       }
 
-      if (result.quickWins.length > 0) {
+      if (safeQuickWins(result).length > 0) {
         parts.push(`\n**Quick Wins:**`)
-        result.quickWins.slice(0, 5).forEach((win, index) => {
+        safeQuickWins(result).slice(0, 5).forEach((win, index) => {
           parts.push(
             `${index + 1}. ${win.description} (${win.affectedElements} element(s), ${win.estimatedTime})`
           )
@@ -961,11 +969,11 @@ function generateExecutiveSummary(
         parts.push(
           `   - WCAG: A: ${result.summary.wcagCompliance.A}%, AA: ${result.summary.wcagCompliance.AA}%, AAA: ${result.summary.wcagCompliance.AAA}%`
         )
-        if (result.criticalBlockers.length > 0) {
-          parts.push(`   - Critical Blockers: ${result.criticalBlockers.length}`)
+        if (safeCriticalBlockers(result).length > 0) {
+          parts.push(`   - Critical Blockers: ${safeCriticalBlockers(result).length}`)
         }
-        if (result.quickWins.length > 0) {
-          parts.push(`   - Quick Wins: ${result.quickWins.length}`)
+        if (safeQuickWins(result).length > 0) {
+          parts.push(`   - Quick Wins: ${safeQuickWins(result).length}`)
         }
       })
     } else {
@@ -990,18 +998,18 @@ function generateExecutiveSummary(
         parts.push(`- ${category}: ${count}`)
       })
 
-      if (result.criticalBlockers.length > 0) {
-        parts.push(`\n**Critical Blockers (${result.criticalBlockers.length}):**`)
-        result.criticalBlockers.forEach((blocker) => {
+      if (safeCriticalBlockers(result).length > 0) {
+        parts.push(`\n**Critical Blockers (${safeCriticalBlockers(result).length}):**`)
+        safeCriticalBlockers(result).forEach((blocker) => {
           parts.push(`- ${blocker.ruleId}: ${blocker.description}`)
           parts.push(`  - Affected Elements: ${blocker.affectedElements}`)
           parts.push(`  - WCAG Level: ${blocker.wcagLevel}`)
         })
       }
 
-      if (result.quickWins.length > 0) {
-        parts.push(`\n**Quick Wins (${result.quickWins.length}):**`)
-        result.quickWins.forEach((win) => {
+      if (safeQuickWins(result).length > 0) {
+        parts.push(`\n**Quick Wins (${safeQuickWins(result).length}):**`)
+        safeQuickWins(result).forEach((win) => {
           parts.push(`- ${win.ruleId}: ${win.description}`)
           parts.push(`  - Affected Elements: ${win.affectedElements}`)
           parts.push(`  - Estimated Time: ${win.estimatedTime}`)

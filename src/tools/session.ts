@@ -259,6 +259,7 @@ export async function auditWithSession(
           tags,
           engine,
           applyTagFilter: userProvidedTags,
+          userProvidedTags,
         })
       },
       {

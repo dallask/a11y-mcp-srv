@@ -18,6 +18,10 @@ import type {
 import { IMPACT_ORDER } from '../types/index.js'
 import type { DOMInfo } from '../types/index.js'
 import { getConfiguredAceChecker } from './ace-policy-cache.js'
+import { resolveAcePolicies } from './ace-policies.js'
+import { filterAceResultsByWcagLevel } from './ace-wcag-level-filter.js'
+import { getAceRuleMeta } from './ace-rule-metadata.js'
+import { getConfig } from './config.js'
 
 /**
  * Debug logger that writes to stderr to avoid interfering with MCP protocol
@@ -47,6 +51,8 @@ export interface AccessibilityRunnerConfig {
    *  Set to true only when the user explicitly requested specific tags.
    *  When false, tags are passed to the engine for scoping but all returned issues are shown. */
   applyTagFilter?: boolean
+  /** True when audit tool arguments included explicit tags (drives ACE policy resolution). */
+  userProvidedTags?: boolean
 }
 
 /**
@@ -348,43 +354,29 @@ export class AccessibilityRunner {
   }
 
   /**
-   * Map axe-style WCAG tags to IBM Equal Access policy IDs.
-   * ACE is scoped at scan time via setConfig({ policies }) — not post-filtered.
-   *   wcag22* → WCAG_2_2
-   *   wcag21* → WCAG_2_1
-   *   wcag2*  → WCAG_2_0
-   *   best-practice / (default) → IBM_Accessibility
-   */
-  private acePolicesFromTags(tags?: AccessibilityTag[]): string[] {
-    if (!tags || tags.length === 0) return ['IBM_Accessibility']
-    if (tags.some((t) => t.startsWith('wcag22'))) return ['WCAG_2_2']
-    if (tags.some((t) => t.startsWith('wcag21'))) return ['WCAG_2_1']
-    if (tags.some((t) => t.startsWith('wcag2'))) return ['WCAG_2_0']
-    return ['IBM_Accessibility']
-  }
-
-  /**
    * Run IBM Equal Access (accessibility-checker) analysis using the Playwright page directly.
    * Passing the Playwright Page object to getCompliance() lets ACE use its native Playwright
    * integration instead of spawning an internal Puppeteer browser (which caused intermittent
    * TargetCloseError crashes). The page must already be navigated to the target URL.
-   * WCAG level/policy is configured via setConfig — tags map to ACE policies. Module load and
-   * setConfig are cached (see ace-policy-cache) until policies or rule archive change.
+   * Policies come from {@link resolveAcePolicies}; module load and setConfig are cached.
    */
   private async runACEAnalysis(
     page: Page,
     url: string,
-    tags?: AccessibilityTag[]
+    tags: AccessibilityTag[] | undefined,
+    userProvidedTags: boolean
   ): Promise<AccessibilityResults> {
     const label = `audit-${Date.now()}`
 
-    const policies = this.acePolicesFromTags(tags)
+    const policies = resolveAcePolicies(tags, userProvidedTags)
     debugLog(`ACE policies: ${policies.join(', ')}`)
 
     const aChecker = await getConfiguredAceChecker(policies, 'latest')
     const result = await aChecker.getCompliance(page, label)
     const report = result.report as unknown as ACEReport
-    return this.aceToAccessibilityResults(report, url)
+    let out = this.aceToAccessibilityResults(report, url, policies)
+    out = filterAceResultsByWcagLevel(out, getConfig().wcagLevel, policies)
+    return out
   }
 
   /**
@@ -402,7 +394,8 @@ export class AccessibilityRunner {
    */
   private aceToAccessibilityResults(
     report: ACEReport,
-    url: string
+    url: string,
+    activeAcePolicies: readonly string[]
   ): AccessibilityResults {
     const violations: AccessibilityReport = { error: { count: 0, items: {} } }
     const timestamp = new Date().toISOString()
@@ -421,12 +414,14 @@ export class AccessibilityRunner {
       // Use ACE native level (violation, potentialviolation, recommendation, etc.)
       const itemImpact = item.level.toLowerCase() as AccessibilityRuleData['impact']
       if (!violations.error!.items[ruleId]) {
+        const meta = getAceRuleMeta(ruleId, activeAcePolicies)
+        const tagList = meta ? [...meta.tags] : []
         violations.error!.items[ruleId] = {
           count: 0,
           xpaths: [],
           description: item.message,
           domInfo: [],
-          tags: [],
+          tags: tagList,
           impact: itemImpact,
         }
       }
@@ -478,7 +473,7 @@ export class AccessibilityRunner {
     tags?: AccessibilityTag[]
   ): Promise<AccessibilityResults> {
     if (engine === 'ace') {
-      return this.runACEAnalysis(page, url, tags)
+      return await this.runACEAnalysis(page, url, tags, false)
     }
 
     const axeResult = await this.runAxeAnalysis(page, tags)
@@ -560,7 +555,8 @@ export class AccessibilityRunner {
   private ruleMatchesTags(
     ruleId: string,
     ruleData: AccessibilityRuleData,
-    tags: AccessibilityTag[]
+    tags: AccessibilityTag[],
+    strictUnknownTags: boolean
   ): boolean {
     if (!tags || tags.length === 0) return true
     if (ruleData.tags && Array.isArray(ruleData.tags) && ruleData.tags.length > 0) {
@@ -571,7 +567,7 @@ export class AccessibilityRunner {
     if (ruleTags?.length) {
       return ruleTags.some((tag) => tags.includes(tag))
     }
-    return true
+    return !strictUnknownTags
   }
 
   /**
@@ -579,7 +575,8 @@ export class AccessibilityRunner {
    */
   private filterByTags(
     results: AccessibilityResults,
-    tags: AccessibilityTag[]
+    tags: AccessibilityTag[],
+    strictUnknownTags: boolean
   ): AccessibilityResults {
     if (!tags || tags.length === 0) return results
 
@@ -590,7 +587,7 @@ export class AccessibilityRunner {
 
       const filteredItems: Record<string, AccessibilityRuleData> = {}
       Object.entries(category.items).forEach(([ruleId, ruleData]) => {
-        if (this.ruleMatchesTags(ruleId, ruleData, tags)) {
+        if (this.ruleMatchesTags(ruleId, ruleData, tags, strictUnknownTags)) {
           filteredItems[ruleId] = ruleData
         }
       })
@@ -624,6 +621,7 @@ export class AccessibilityRunner {
       tags,
       engine = 'axe',
       applyTagFilter = false,
+      userProvidedTags = false,
     } = config
 
     try {
@@ -633,12 +631,30 @@ export class AccessibilityRunner {
         // Puppeteer browser is launched, avoiding TargetCloseError crashes.
         const responseStatus = await this.navigateAndWait(page, url, waitForLoad, timeout)
         debugLog(`Running IBM Equal Access (ACE) analysis on page (${url})...`)
-        const accessibilityResults = await this.runACEAnalysis(page, url, tags)
+        const accessibilityResults = await this.runACEAnalysis(
+          page,
+          url,
+          tags,
+          userProvidedTags
+        )
+
+        const originalIssueCount = this.countTotalIssues(accessibilityResults.violations)
+        let filteredResults: AccessibilityResults | undefined
+        let appliedFilters: AccessibilityRunnerResult['appliedFilters'] =
+          tags && tags.length > 0 ? { tags } : undefined
+
+        if (applyTagFilter && tags && tags.length > 0) {
+          filteredResults = this.filterByTags(accessibilityResults, tags, true)
+          appliedFilters = { tags, originalIssueCount }
+          debugLog(
+            `Filtered results: ${originalIssueCount} -> ${this.countTotalIssues(filteredResults.violations)} issues (tags: ${tags.join(', ')})`
+          )
+        }
 
         return {
           accessibilityResults,
-          filteredResults: undefined,
-          appliedFilters: tags && tags.length > 0 ? { tags } : undefined,
+          filteredResults,
+          appliedFilters,
           responseStatus,
         }
       }
@@ -659,7 +675,7 @@ export class AccessibilityRunner {
       let appliedFilters: AccessibilityRunnerResult['appliedFilters']
 
       if (applyTagFilter && tags && tags.length > 0) {
-        filteredResults = this.filterByTags(accessibilityResults, tags)
+        filteredResults = this.filterByTags(accessibilityResults, tags, true)
         appliedFilters = { tags, originalIssueCount }
         debugLog(
           `Filtered results: ${originalIssueCount} -> ${this.countTotalIssues(filteredResults.violations)} issues (tags: ${tags.join(', ')})`

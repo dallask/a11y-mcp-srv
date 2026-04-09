@@ -3,7 +3,10 @@
  * Implements: get_accessibility_score, prioritize_issues, explain_issue, get_quick_fixes
  */
 
-import { normalizeAuditResult, resolveAuditInput } from '../core/normalize-audit-result.js'
+import {
+  resolveAuditInput,
+  resolveToAuditResult,
+} from '../core/normalize-audit-result.js'
 import { auditUrl } from './audit.js'
 import type {
   AuditResult,
@@ -439,19 +442,23 @@ function generatePrioritizationReasoning(
  * @param input - Prioritization input (results, criteria, limit)
  * @returns Prioritized issues with quick wins, critical blockers, and reasoning
  */
-export function prioritizeIssues(
+export async function prioritizeIssues(
   input: PrioritizeIssuesInput
-): PrioritizeIssuesResult {
+): Promise<PrioritizeIssuesResult> {
   const {
     results,
     criteria = 'impact',
     limit,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  // Normalize: accept single result, array, JSON string, or MCP wrapper
-  const raw = Array.isArray(results) ? results[0] : results
-  const normalized = normalizeAuditResult(raw)
-  const auditResult = normalized ?? (raw as AuditResult)
+  const auditResult = await resolveToAuditResult(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    auditUrl
+  )
   const prioritizedIssues = Array.isArray(auditResult?.prioritizedIssues)
     ? auditResult.prioritizedIssues
     : []
@@ -1286,20 +1293,24 @@ function generateExecutiveSummary(
  * @param input - Compliance report input (results, format, level, includeRemediation)
  * @returns Formatted compliance report with executive summary and WCAG mapping
  */
-export function generateComplianceReport(
+export async function generateComplianceReport(
   input: GenerateComplianceReportInput
-): ComplianceReport {
+): Promise<ComplianceReport> {
   const {
     results,
     format = 'WCAG',
     level = 'AA',
     includeRemediation = false,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  // Normalize: accept single result, array, JSON string, or MCP wrapper
-  const raw = Array.isArray(results) ? results[0] : results
-  const normalized = normalizeAuditResult(raw)
-  const auditResult = normalized ?? (raw as AuditResult)
+  const auditResult = await resolveToAuditResult(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    auditUrl
+  )
   if (auditResult == null || typeof auditResult !== 'object') {
     throw new Error('Invalid results: expected an audit result object (or array with one result).')
   }

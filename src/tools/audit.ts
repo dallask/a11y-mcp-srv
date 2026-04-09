@@ -144,6 +144,7 @@ async function runSingleUrlAudit(
           tags,
           engine,
           applyTagFilter: userProvidedTags,
+          userProvidedTags,
         }),
       {
         maxRetries: 2,

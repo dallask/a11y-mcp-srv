@@ -54,8 +54,8 @@ describe('getAccessibilityScore', () => {
 })
 
 describe('prioritizeIssues', () => {
-  it('returns prioritized list and reasoning', () => {
-    const result = prioritizeIssues({
+  it('returns prioritized list and reasoning', async () => {
+    const result = await prioritizeIssues({
       results: auditResultFixture,
       criteria: 'impact',
     })
@@ -66,8 +66,8 @@ describe('prioritizeIssues', () => {
     expect(result.criticalBlockers).toBeDefined()
   })
 
-  it('respects limit', () => {
-    const result = prioritizeIssues({
+  it('respects limit', async () => {
+    const result = await prioritizeIssues({
       results: auditResultFixture,
       criteria: 'impact',
       limit: 1,
@@ -75,10 +75,18 @@ describe('prioritizeIssues', () => {
     expect(result.prioritized.length).toBeLessThanOrEqual(1)
   })
 
-  it('supports criteria wcag, fixability, user-impact', () => {
-    expect(prioritizeIssues({ results: auditResultFixture, criteria: 'wcag' }).prioritized.length).toBeGreaterThanOrEqual(0)
-    expect(prioritizeIssues({ results: auditResultFixture, criteria: 'fixability' }).prioritized.length).toBeGreaterThanOrEqual(0)
-    expect(prioritizeIssues({ results: auditResultFixture, criteria: 'user-impact' }).prioritized.length).toBeGreaterThanOrEqual(0)
+  it('supports criteria wcag, fixability, user-impact', async () => {
+    expect(
+      (await prioritizeIssues({ results: auditResultFixture, criteria: 'wcag' })).prioritized.length
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      (await prioritizeIssues({ results: auditResultFixture, criteria: 'fixability' })).prioritized
+        .length
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      (await prioritizeIssues({ results: auditResultFixture, criteria: 'user-impact' })).prioritized
+        .length
+    ).toBeGreaterThanOrEqual(0)
   })
 })
 
@@ -136,8 +144,8 @@ describe('getQuickFixes', () => {
 })
 
 describe('generateComplianceReport', () => {
-  it('returns report with format, level, executiveSummary, wcagMapping', () => {
-    const result = generateComplianceReport({
+  it('returns report with format, level, executiveSummary, wcagMapping', async () => {
+    const result = await generateComplianceReport({
       results: auditResultFixture,
       format: 'WCAG',
       level: 'AA',
@@ -151,10 +159,16 @@ describe('generateComplianceReport', () => {
     expect(result.reportContent).toBeDefined()
   })
 
-  it('supports VPAT, ADA, Section508 formats', () => {
-    expect(generateComplianceReport({ results: auditResultFixture, format: 'VPAT' }).format).toBe('VPAT')
-    expect(generateComplianceReport({ results: auditResultFixture, format: 'ADA' }).format).toBe('ADA')
-    expect(generateComplianceReport({ results: auditResultFixture, format: 'Section508' }).format).toBe('Section508')
+  it('supports VPAT, ADA, Section508 formats', async () => {
+    expect(
+      (await generateComplianceReport({ results: auditResultFixture, format: 'VPAT' })).format
+    ).toBe('VPAT')
+    expect((await generateComplianceReport({ results: auditResultFixture, format: 'ADA' })).format).toBe(
+      'ADA'
+    )
+    expect(
+      (await generateComplianceReport({ results: auditResultFixture, format: 'Section508' })).format
+    ).toBe('Section508')
   })
 })
 

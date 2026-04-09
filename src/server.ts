@@ -149,13 +149,13 @@ export async function createServer(): Promise<Server> {
                 ],
               },
               description:
-                'Specific accessibility tags to check. If not provided, tags from env WCAG_LEVEL and BEST_PRACTICES are used.',
+                'Specific accessibility tags to check. If omitted, tags come from env WCAG_LEVEL and BEST_PRACTICES. If you pass this array explicitly, results are post-filtered to issues matching those tags (same behavior for axe and IBM Equal Access / ACE).',
             },
             engine: {
               type: 'string',
               enum: ['axe', 'ace'],
               description:
-                'Testing engine: "axe" (axe-core, default) or "ace" (IBM Equal Access). Overrides env A11Y_ENGINE when provided.',
+                'Testing engine: "axe" (axe-core) or "ace" (IBM Equal Access). Overrides env A11Y_ENGINE when provided.',
             },
             waitForLoad: {
               type: 'string',
@@ -432,13 +432,25 @@ export async function createServer(): Promise<Server> {
       {
         name: 'prioritize_issues',
         description:
-          'Intelligently prioritize accessibility issues based on specified criteria, identifying quick wins (easy fixes with high impact) and critical blockers (must fix before launch).',
+          'Intelligently prioritize accessibility issues based on specified criteria, identifying quick wins (easy fixes with high impact) and critical blockers (must fix before launch). Accepts the same result shapes as audit_url (including JSON string, MCP content wrapper, batch { results: [...] }, or http(s) URL to audit first).',
         inputSchema: {
           type: 'object',
           properties: {
             results: {
-              type: 'object',
-              description: 'Audit result object from a previous audit.',
+              oneOf: [
+                {
+                  type: 'object',
+                  description:
+                    'Audit result from a previous tool, or batch wrapper { results: [ ... ] }.',
+                },
+                {
+                  type: 'string',
+                  description:
+                    'JSON string of an audit result or http(s) URL to audit first.',
+                },
+              ],
+              description:
+                'Audit result object, JSON string, MCP wrapper fields, batch shape, or URL (runs audit then prioritizes).',
             },
             criteria: {
               type: 'string',
@@ -451,6 +463,16 @@ export async function createServer(): Promise<Server> {
               type: 'number',
               description:
                 'Top N issues to return. If not provided, all issues are returned.',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
           },
           required: ['results'],
@@ -623,13 +645,23 @@ export async function createServer(): Promise<Server> {
       {
         name: 'generate_compliance_report',
         description:
-          'Generate compliance reports in VPAT, WCAG, ADA, or Section 508 format. Includes WCAG criterion mapping, compliance percentages, executive summary, and optional remediation plan.',
+          'Generate compliance reports in VPAT, WCAG, ADA, or Section 508 format. Includes WCAG criterion mapping, compliance percentages, executive summary, and optional remediation plan. Accepts the same result shapes as audit_url or a URL to audit first.',
         inputSchema: {
           type: 'object',
           properties: {
             results: {
-              type: 'object',
-              description: 'Audit result object from a previous audit.',
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result or batch wrapper { results: [ ... ] }.',
+                },
+                {
+                  type: 'string',
+                  description: 'JSON string of audit result or http(s) URL to audit first.',
+                },
+              ],
+              description:
+                'Audit result object, JSON string, MCP/batch shapes, or URL (runs audit first).',
             },
             format: {
               type: 'string',
@@ -650,6 +682,16 @@ export async function createServer(): Promise<Server> {
               default: false,
               description:
                 'Include remediation plan with fix suggestions in the report (default: false).',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
           },
           required: ['results'],
@@ -896,13 +938,23 @@ export async function createServer(): Promise<Server> {
       {
         name: 'filter_issues',
         description:
-          'Filter issues from audit results by various criteria (rule IDs, categories, impact levels, WCAG levels, etc.). Supports include/exclude modes.',
+          'Filter issues from audit results by various criteria (rule IDs, categories, impact levels, WCAG levels, etc.). Supports include/exclude modes. Accepts the same result shapes as audit_url or a URL to audit first.',
         inputSchema: {
           type: 'object',
           properties: {
             results: {
-              type: 'object',
-              description: 'Audit result object from a previous audit.',
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result or batch wrapper { results: [ ... ] }.',
+                },
+                {
+                  type: 'string',
+                  description: 'JSON string of audit result or http(s) URL to audit first.',
+                },
+              ],
+              description:
+                'Audit result object, JSON string, MCP/batch shapes, or URL (runs audit first).',
             },
             filters: {
               type: 'object',
@@ -948,6 +1000,16 @@ export async function createServer(): Promise<Server> {
               description:
                 'Filter mode: "include" (only include matching issues) or "exclude" (exclude matching issues).',
             },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
+            },
           },
           required: ['results', 'filters'],
         },
@@ -955,13 +1017,23 @@ export async function createServer(): Promise<Server> {
       {
         name: 'search_issues',
         description:
-          'Search issues by text content, selector, XPath, or description. Supports case-sensitive and case-insensitive search.',
+          'Search issues by text content, selector, XPath, or description. Supports case-sensitive and case-insensitive search. Accepts the same result shapes as audit_url or a URL to audit first.',
         inputSchema: {
           type: 'object',
           properties: {
             results: {
-              type: 'object',
-              description: 'Audit result object from a previous audit.',
+              oneOf: [
+                {
+                  type: 'object',
+                  description: 'Audit result or batch wrapper { results: [ ... ] }.',
+                },
+                {
+                  type: 'string',
+                  description: 'JSON string of audit result or http(s) URL to audit first.',
+                },
+              ],
+              description:
+                'Audit result object, JSON string, MCP/batch shapes, or URL (runs audit first).',
             },
             query: {
               type: 'string',
@@ -990,6 +1062,16 @@ export async function createServer(): Promise<Server> {
               type: 'boolean',
               default: false,
               description: 'Case-sensitive search (default: false).',
+            },
+            basicAuthUsername: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth username when results is a URL. Use with basicAuthPassword.',
+            },
+            basicAuthPassword: {
+              type: 'string',
+              description:
+                'HTTP Basic Auth password when results is a URL. Use with basicAuthUsername.',
             },
           },
           required: ['results', 'query'],
@@ -1370,8 +1452,8 @@ export async function createServer(): Promise<Server> {
         }
 
         case 'prioritize_issues': {
-          const prioritizeResult = prioritizeIssues({
-            results: args?.results as any, // AuditResult
+          const prioritizeResult = await prioritizeIssues({
+            results: args?.results as any,
             criteria: args?.criteria as
               | 'impact'
               | 'wcag'
@@ -1379,6 +1461,8 @@ export async function createServer(): Promise<Server> {
               | 'user-impact'
               | undefined,
             limit: args?.limit as number | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1465,11 +1549,13 @@ export async function createServer(): Promise<Server> {
         }
 
         case 'generate_compliance_report': {
-          const complianceReport = generateComplianceReport({
-            results: args?.results as any, // AuditResult
+          const complianceReport = await generateComplianceReport({
+            results: args?.results as any,
             format: args?.format as 'VPAT' | 'WCAG' | 'ADA' | 'Section508' | undefined,
             level: args?.level as 'A' | 'AA' | 'AAA' | undefined,
             includeRemediation: args?.includeRemediation as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1614,10 +1700,12 @@ export async function createServer(): Promise<Server> {
         }
 
         case 'filter_issues': {
-          const filterResult = filterIssues({
-            results: args?.results as any, // AuditResult
-            filters: args?.filters as any, // FilterCriteria
+          const filterResult = await filterIssues({
+            results: args?.results as any,
+            filters: args?.filters as any,
             mode: args?.mode as 'include' | 'exclude' | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {
@@ -1631,11 +1719,13 @@ export async function createServer(): Promise<Server> {
         }
 
         case 'search_issues': {
-          const searchResult = searchIssues({
-            results: args?.results as any, // AuditResult
+          const searchResult = await searchIssues({
+            results: args?.results as any,
             query: args?.query as string,
-            fields: args?.fields as any, // Array of field names
+            fields: args?.fields as any,
             caseSensitive: args?.caseSensitive as boolean | undefined,
+            basicAuthUsername: args?.basicAuthUsername as string | undefined,
+            basicAuthPassword: args?.basicAuthPassword as string | undefined,
           })
 
           return {

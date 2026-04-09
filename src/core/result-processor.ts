@@ -278,7 +278,8 @@ export class ResultProcessor {
   }
 
   /**
-   * Calculate WCAG compliance percentages
+   * Calculate WCAG compliance percentages.
+   * Note: This is a heuristic based on issue counts, not official WCAG conformance testing.
    */
   private calculateWCAGCompliance(issues: PrioritizedIssue[]): WCAGCompliance {
     const levelA = issues.filter((i) => wcagLevelMatches(i.wcagLevel, 'A'))

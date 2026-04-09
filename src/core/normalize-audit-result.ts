@@ -11,6 +11,13 @@ import type {
   WCAGCompliance,
 } from '../types/index.js'
 
+/** Injected to avoid circular imports; typically `auditUrl` from audit tools. */
+export type AuditUrlFn = (input: {
+  url: string
+  basicAuthUsername?: string
+  basicAuthPassword?: string
+}) => Promise<AuditResult>
+
 import { resolveBasicAuth } from './basic-auth.js'
 
 /**
@@ -55,6 +62,27 @@ export function resolveAuditInput(
   }
 
   return { kind: 'result', result: normalizeObject({}) }
+}
+
+/**
+ * Resolve `results` to an AuditResult, running `auditUrl` when input is an http(s) URL.
+ * Use for tools that accept the same shapes as {@link resolveAuditInput}.
+ */
+export async function resolveToAuditResult(
+  results: unknown,
+  basicAuthUsername: string | undefined,
+  basicAuthPassword: string | undefined,
+  auditUrl: AuditUrlFn
+): Promise<AuditResult> {
+  const resolved = resolveAuditInput(results, basicAuthUsername, basicAuthPassword)
+  if (resolved.kind === 'url') {
+    return auditUrl({
+      url: resolved.urlWithoutAuth,
+      basicAuthUsername: resolved.basicAuthUsername,
+      basicAuthPassword: resolved.basicAuthPassword,
+    })
+  }
+  return resolved.result
 }
 
 const DEFAULT_SUMMARY: AuditSummary = {
@@ -172,6 +200,7 @@ function normalizeObject(obj: Record<string, unknown>): AuditResult {
  * - JSON string of single result: parses and normalizes.
  * - MCP wrapper { content: [{ text: "..." }] }: extracts and normalizes.
  * - Batch { results: [...] }: normalizes first element.
+ * - Raw array of audit objects [AuditResult, ...]: normalizes the first element.
  * - Plain object: fills missing fields with defaults.
  *
  * @param value - Raw value (string, or object from previous tool output).
@@ -202,7 +231,7 @@ export function normalizeAuditResult(value: unknown): AuditResult | null {
     return null
   }
 
-  // Some MCP clients (e.g. Codemie) pass the content array directly as results: [ { type, text } ]
+  // Array: MCP content [ { type, text } ] or raw [ AuditResult, ... ]
   if (Array.isArray(value) && value.length > 0) {
     const first = value[0]
     if (
@@ -216,6 +245,12 @@ export function normalizeAuditResult(value: unknown): AuditResult | null {
         return normalizeAuditResult(parsed)
       } catch {
         return null
+      }
+    }
+    if (first != null && typeof first === 'object' && !Array.isArray(first)) {
+      const rec = first as Record<string, unknown>
+      if ('prioritizedIssues' in rec || 'summary' in rec) {
+        return normalizeAuditResult(first)
       }
     }
   }

@@ -8,7 +8,8 @@
     "accessibility-mcp-server": "bin/server.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-ace-metadata.mjs",
+    "generate:ace-metadata": "node scripts/generate-ace-rule-metadata.mjs",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "test": "vitest",
@@ -50,6 +51,7 @@
     "@semantic-release/npm": "^11.0.0",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^4.1.0",
+    "accessibility-checker-engine": "^4.0.15",
     "semantic-release": "^24.2.0",
     "tsx": "^4.7.0",
     "typescript": "^5.0.0",

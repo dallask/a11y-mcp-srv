@@ -1267,6 +1267,16 @@ npm start
 - `npm run test:coverage` – run tests with coverage
 - `npm run test:e2e` – build and run E2E tests (real MCP server over stdio via `@modelcontextprotocol/sdk` Client)
 
+### IBM Equal Access rule metadata
+
+After upgrading the `accessibility-checker` npm dependency, regenerate and commit the metadata file so ACE WCAG labels stay aligned with the engine:
+
+```bash
+npm run generate:ace-metadata
+```
+
+This updates `src/generated/ace-rule-metadata.json` (copied to `dist/generated/` during `npm run build`). Requires `git` and network unless you set `ACE_RULES_SOURCE_DIR` to a local `accessibility-checker-engine/src/v4/rules` directory.
+
 ### Using Local Version in MCP Client
 
 If you want to use the local version instead of the published package:

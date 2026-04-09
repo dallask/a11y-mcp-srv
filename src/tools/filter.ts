@@ -3,7 +3,8 @@
  * Implements: filter_issues, search_issues
  */
 
-import { normalizeAuditResult } from '../core/normalize-audit-result.js'
+import { resolveToAuditResult } from '../core/normalize-audit-result.js'
+import { auditUrl } from './audit.js'
 import type {
   AuditResult,
   PrioritizedIssue,
@@ -24,18 +25,23 @@ import { wcagLevelMatches } from '../core/result-processor.js'
  * @param input - Filter configuration
  * @returns Filtered audit result object
  */
-export function filterIssues(
+export async function filterIssues(
   input: FilterIssuesInput
-): FilterIssuesResult {
+): Promise<FilterIssuesResult> {
   const {
     results,
     filters,
     mode = 'include',
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
-  // Normalize: accept result object, JSON string, or MCP wrapper
-  const normalized = normalizeAuditResult(results)
-  const auditResult = normalized ?? (results != null && typeof results === 'object' ? results : ({} as AuditResult))
+  const auditResult = await resolveToAuditResult(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    auditUrl
+  )
   const prioritizedIssues = Array.isArray(auditResult.prioritizedIssues)
     ? auditResult.prioritizedIssues
     : []
@@ -213,14 +219,16 @@ export function filterIssues(
  * @param input - Search configuration
  * @returns Array of matching issues
  */
-export function searchIssues(
+export async function searchIssues(
   input: SearchIssuesInput
-): SearchIssuesResult {
+): Promise<SearchIssuesResult> {
   const {
     results,
     query,
     fields = ['all'],
     caseSensitive = false,
+    basicAuthUsername,
+    basicAuthPassword,
   } = input
 
   if (!query || query.trim().length === 0) {
@@ -232,9 +240,12 @@ export function searchIssues(
     }
   }
 
-  // Normalize: accept result object, JSON string, or MCP wrapper
-  const normalized = normalizeAuditResult(results)
-  const auditResult = normalized ?? results
+  const auditResult = await resolveToAuditResult(
+    results,
+    basicAuthUsername,
+    basicAuthPassword,
+    auditUrl
+  )
   const issuesToSearch = Array.isArray(auditResult?.prioritizedIssues)
     ? auditResult.prioritizedIssues
     : []

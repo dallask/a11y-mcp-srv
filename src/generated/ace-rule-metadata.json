@@ -1,0 +1,6016 @@
+{
+  "engineVersion": "4.0.15",
+  "generatedRef": "main-4.x",
+  "byPolicy": {
+    "WCAG_2_0": {
+      "a_target_warning": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "a_text_purpose": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "applet_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "application_content_accessible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "area_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_accessiblename_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_activedescendant_tabindex_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_activedescendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_application_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_application_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_article_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_attribute_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_attribute_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_attribute_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_attribute_redundant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_attribute_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_attribute_value_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_banner_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_banner_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_child_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_child_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_complementary_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_complementary_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_complementary_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_content_in_landmark": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_contentinfo_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_contentinfo_misuse": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_contentinfo_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_descendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_document_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_eventhandler_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_form_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_hidden_nontabbable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "aria_id_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_keyboard_handler_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_landmark_name_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_main_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_main_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_navigation_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_parent_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_region_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_region_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_role_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_search_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "aria_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_toolbar_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "aria_widget_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "asciiart_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "blink_css_review": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "blink_elem_deprecated": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "blockquote_cite_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "canvas_content_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "caption_track_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "combobox_active_descendant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "combobox_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "combobox_design_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "combobox_focusable_elements": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "combobox_haspopup_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "combobox_popup_reference": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "dir_attribute_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "download_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "element_accesskey_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "html_lang_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "element_mouseevent_keyboard": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "element_orientation_unlocked": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "element_scrollable_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "element_tabbable_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "element_tabbable_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "embed_alt_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "emoticons_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "error_message_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "fieldset_label_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "fieldset_legend_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "figure_label_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "form_font_color": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "form_interaction_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "form_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "form_submit_button_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "form_submit_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "frame_src_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "frame_title_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "heading_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "heading_markup_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "html_lang_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "html_skipnav_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "iframe_interactive_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "imagebutton_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "imagemap_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "img_alt_background": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "img_alt_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "img_alt_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "img_alt_null": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "img_alt_redundant": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "img_alt_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "img_ismap_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "img_longdesc_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "input_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "input_checkboxes_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "input_fields_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "input_haspopup_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "input_label_after": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "input_label_before": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "input_label_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "input_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "input_onchange_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "input_placeholder_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "label_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "label_ref_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "list_children_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "list_markup_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "list_structure_proper": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "marquee_elem_avoid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "media_alt_brief": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "media_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "media_audio_transcribed": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "media_autostart_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "media_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "media_live_captioned": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "media_track_available": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "meta_redirect_optional": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "meta_refresh_delay": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "meta_viewport_zoomable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "noembed_content_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "object_text_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "page_title_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "page_title_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "script_focus_blur_review": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "script_onclick_avoid": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "script_onclick_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "script_select_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "select_options_grouped": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "skip_main_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "skip_main_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "style_background_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "style_color_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "style_focus_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "style_highcontrast_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "style_viewport_resizable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "svg_graphics_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "table_aria_descendants": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "table_caption_empty": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "table_caption_nested": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "table_headers_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "table_headers_ref_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "table_headers_related": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "table_layout_linearized": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "table_scope_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "table_structure_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "table_summary_redundant": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "text_block_heading": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "text_contrast_sufficient": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "text_quoted_correctly": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "text_sensory_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa"
+        ]
+      },
+      "text_spacing_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "text_whitespace_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa"
+        ]
+      },
+      "widget_tabbable_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      },
+      "widget_tabbable_single": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a"
+        ]
+      }
+    },
+    "WCAG_2_1": {
+      "a_target_warning": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "a_text_purpose": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "applet_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "application_content_accessible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "area_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_accessiblename_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_activedescendant_tabindex_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_activedescendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_application_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_application_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_article_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_attribute_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_attribute_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_attribute_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_attribute_redundant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_attribute_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_attribute_value_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_banner_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_banner_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_child_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_child_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_complementary_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_complementary_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_complementary_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_content_in_landmark": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_contentinfo_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_contentinfo_misuse": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_contentinfo_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_descendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_document_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_eventhandler_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_form_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_hidden_nontabbable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "aria_id_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_keyboard_handler_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_landmark_name_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_main_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_main_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_navigation_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_parent_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_region_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_region_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_role_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_search_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "aria_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_toolbar_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "aria_widget_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "asciiart_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "blink_css_review": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "blink_elem_deprecated": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "blockquote_cite_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "canvas_content_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "caption_track_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "combobox_active_descendant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "combobox_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "combobox_design_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "combobox_focusable_elements": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "combobox_haspopup_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "combobox_popup_reference": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "dir_attribute_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "download_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "element_accesskey_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "html_lang_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "element_mouseevent_keyboard": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "element_orientation_unlocked": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "element_scrollable_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "element_tabbable_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "element_tabbable_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "embed_alt_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "emoticons_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "error_message_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "fieldset_label_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "fieldset_legend_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "figure_label_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "form_font_color": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "form_interaction_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "form_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "form_submit_button_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "form_submit_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "frame_src_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "frame_title_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "heading_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "heading_markup_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "html_lang_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "html_skipnav_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "iframe_interactive_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "imagebutton_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "imagemap_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "img_alt_background": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "img_alt_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "img_alt_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "img_alt_null": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "img_alt_redundant": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "img_alt_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "img_ismap_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "img_longdesc_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "input_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "input_checkboxes_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "input_fields_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "input_haspopup_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "input_label_after": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "input_label_before": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "input_label_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "input_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "input_onchange_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "input_placeholder_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "label_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "label_name_visible": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "label_ref_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "list_children_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "list_markup_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "list_structure_proper": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "marquee_elem_avoid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "media_alt_brief": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "media_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "media_audio_transcribed": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "media_autostart_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "media_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "media_live_captioned": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "media_track_available": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "meta_redirect_optional": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "meta_refresh_delay": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "meta_viewport_zoomable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "noembed_content_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "object_text_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "page_title_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "page_title_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "script_focus_blur_review": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "script_onclick_avoid": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "script_onclick_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "script_select_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "select_options_grouped": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "skip_main_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "skip_main_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "style_background_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "style_color_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "style_focus_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "style_highcontrast_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "style_hover_persistent": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "style_viewport_resizable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "svg_graphics_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "table_aria_descendants": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "table_caption_empty": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "table_caption_nested": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "table_headers_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "table_headers_ref_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "table_headers_related": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "table_layout_linearized": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "table_scope_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "table_structure_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "table_summary_redundant": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "text_block_heading": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "text_contrast_sufficient": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "text_quoted_correctly": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "text_sensory_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ]
+      },
+      "text_spacing_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "text_whitespace_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa"
+        ]
+      },
+      "widget_tabbable_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      },
+      "widget_tabbable_single": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a"
+        ]
+      }
+    },
+    "WCAG_2_2": {
+      "a_target_warning": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "a_text_purpose": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "applet_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "application_content_accessible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "area_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_accessiblename_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_activedescendant_tabindex_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_activedescendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_application_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_application_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_article_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_attribute_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_redundant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_value_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_banner_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_banner_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_child_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_child_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_complementary_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_complementary_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_complementary_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_content_in_landmark": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_contentinfo_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_contentinfo_misuse": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_contentinfo_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_descendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_document_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_eventhandler_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_form_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_hidden_nontabbable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "aria_id_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_keyboard_handler_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_landmark_name_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_main_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_main_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_navigation_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_parent_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_region_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_region_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_role_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_search_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_toolbar_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_widget_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "asciiart_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "blink_css_review": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "blink_elem_deprecated": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "blockquote_cite_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "canvas_content_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "caption_track_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_active_descendant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_design_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_focusable_elements": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_haspopup_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_popup_reference": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "dir_attribute_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "download_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "draggable_alternative_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "element_accesskey_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "html_lang_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_mouseevent_keyboard": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_orientation_unlocked": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "element_scrollable_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_tabbable_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_tabbable_unobscured": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "element_tabbable_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "embed_alt_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "emoticons_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "error_message_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "fieldset_label_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "fieldset_legend_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "figure_label_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "form_font_color": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "form_interaction_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "form_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "form_submit_button_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "form_submit_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "frame_src_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "frame_title_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "heading_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "heading_markup_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "html_lang_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "html_skipnav_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "iframe_interactive_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "imagebutton_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "imagemap_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_background": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "img_alt_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_null": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_redundant": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "img_alt_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_ismap_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "img_longdesc_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "input_checkboxes_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "input_fields_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "input_haspopup_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_after": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_before": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_onchange_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "input_placeholder_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "label_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "label_name_visible": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "label_ref_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "list_children_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "list_markup_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "list_structure_proper": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "marquee_elem_avoid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "media_alt_brief": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_audio_transcribed": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "media_autostart_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_live_captioned": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "media_track_available": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "meta_redirect_optional": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "meta_refresh_delay": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "meta_viewport_zoomable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "noembed_content_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "object_text_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "page_title_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "page_title_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "script_focus_blur_review": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "script_onclick_avoid": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "script_onclick_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "script_select_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "select_options_grouped": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "skip_main_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "skip_main_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "style_background_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "style_color_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "style_focus_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "style_highcontrast_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "style_hover_persistent": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "style_viewport_resizable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "svg_graphics_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_aria_descendants": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_caption_empty": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_caption_nested": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "table_headers_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_headers_ref_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_headers_related": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_layout_linearized": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "table_scope_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_structure_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_summary_redundant": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "target_spacing_sufficient": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "text_block_heading": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "text_contrast_sufficient": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "text_quoted_correctly": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "text_sensory_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "text_spacing_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "text_whitespace_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "widget_tabbable_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "widget_tabbable_single": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      }
+    },
+    "IBM_Accessibility": {
+      "a_target_warning": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "a_text_purpose": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "applet_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "application_content_accessible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "area_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_accessiblename_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_activedescendant_tabindex_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_activedescendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_application_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_application_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_article_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_attribute_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_deprecated": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_attribute_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_redundant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_attribute_value_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_banner_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_banner_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_child_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_child_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_complementary_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_complementary_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_complementary_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_content_in_landmark": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_contentinfo_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_contentinfo_misuse": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_contentinfo_single": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_descendant_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_document_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_eventhandler_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_form_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_hidden_nontabbable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "aria_id_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_keyboard_handler_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_landmark_name_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_main_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_main_label_visible": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_navigation_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_parent_required": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_region_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_region_labelled": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_role_allowed": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_role_redundant": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_search_label_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "aria_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_toolbar_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "aria_widget_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "asciiart_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "blink_css_review": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "blink_elem_deprecated": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "blockquote_cite_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "canvas_content_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "caption_track_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_active_descendant": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_design_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_focusable_elements": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_haspopup_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "combobox_popup_reference": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "dir_attribute_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "download_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "draggable_alternative_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "element_accesskey_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_accesskey_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "element_attribute_deprecated": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "element_id_unique": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "html_lang_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_mouseevent_keyboard": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_orientation_unlocked": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "element_scrollable_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_tabbable_role_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "element_tabbable_unobscured": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "element_tabbable_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "embed_alt_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "emoticons_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "error_message_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "fieldset_label_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "fieldset_legend_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "figure_label_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "form_font_color": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "form_interaction_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "form_label_unique": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "form_submit_button_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "form_submit_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "frame_src_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "frame_title_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "heading_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "heading_markup_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "html_lang_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "html_skipnav_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "iframe_interactive_tabbable": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "imagebutton_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "imagemap_alt_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_background": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "img_alt_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_null": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_alt_redundant": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "img_alt_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "img_ismap_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "img_longdesc_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_autocomplete_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "input_checkboxes_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "input_fields_grouped": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "input_haspopup_conflict": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_after": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_before": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "input_onchange_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "input_placeholder_label_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "label_content_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "label_name_visible": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "label_ref_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "list_children_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "list_markup_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "list_structure_proper": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "marquee_elem_avoid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "media_alt_brief": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_alt_exists": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_audio_transcribed": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "media_autostart_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_keyboard_controllable": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "media_live_captioned": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "media_track_available": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "meta_redirect_optional": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "meta_refresh_delay": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "meta_viewport_zoomable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "noembed_content_exists": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "object_text_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "page_title_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "page_title_valid": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "script_focus_blur_review": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "script_onclick_avoid": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "script_onclick_misuse": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "script_select_review": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "select_options_grouped": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "skip_main_described": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "skip_main_exists": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "style_background_decorative": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "style_color_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "style_focus_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "style_highcontrast_visible": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "style_hover_persistent": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "style_viewport_resizable": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "svg_graphics_labelled": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_aria_descendants": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_caption_empty": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_caption_nested": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "table_headers_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "table_headers_ref_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_headers_related": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_layout_linearized": {
+        "toolkitLevel": "LEVEL_FOUR",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "table_scope_valid": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_structure_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "table_summary_redundant": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "target_spacing_sufficient": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "text_block_heading": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "text_contrast_sufficient": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "text_quoted_correctly": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "text_sensory_misuse": {
+        "toolkitLevel": "LEVEL_TWO",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22a",
+          "wcag22aa"
+        ]
+      },
+      "text_spacing_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "text_whitespace_valid": {
+        "toolkitLevel": "LEVEL_THREE",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag2aaa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag21aaa",
+          "wcag22a",
+          "wcag22aa",
+          "wcag22aaa"
+        ]
+      },
+      "widget_tabbable_exists": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      },
+      "widget_tabbable_single": {
+        "toolkitLevel": "LEVEL_ONE",
+        "tags": [
+          "wcag2a",
+          "wcag21a",
+          "wcag22a"
+        ]
+      }
+    }
+  }
+}

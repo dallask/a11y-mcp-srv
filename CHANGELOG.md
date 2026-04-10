@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.7.0...v2.8.0) (2026-04-10)
+
+
+### Features
+
+* add support for includeRawResults option in audit functions ([034e6e3](https://github.com/dallask/a11y-mcp-srv/commit/034e6e3e5130b9e1d1123ff83e9e0298877bfcdc))
+
 # [2.7.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.6.0...v2.7.0) (2026-03-23)
 
 

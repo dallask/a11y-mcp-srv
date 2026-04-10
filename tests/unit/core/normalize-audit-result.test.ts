@@ -91,7 +91,6 @@ describe('normalizeAuditResult', () => {
     expect(result!.quickWins).toEqual([])
     expect(result!.criticalBlockers).toEqual([])
     expect(result!.conversationalSummary).toBe('')
-    expect(result!.issuesTable).toBe('')
   })
 
   it('returns null for non-object non-string', () => {

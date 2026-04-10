@@ -174,6 +174,7 @@ export async function auditWithSession(
     waitForLoad = 'load',
     timeout = 30,
     engine: inputEngine,
+    includeRawResults: inputIncludeRaw,
   } = input
   const appConfig = getConfig()
 
@@ -278,7 +279,10 @@ export async function auditWithSession(
     const auditResult = resultProcessor.process(
       resultsToProcess,
       accessibilityResult.appliedFilters,
-      { auditWcagLabel: auditWcagLabel !== 'N/A' ? auditWcagLabel : undefined }
+      {
+        auditWcagLabel: auditWcagLabel !== 'N/A' ? auditWcagLabel : undefined,
+        includeRawResults: inputIncludeRaw === true,
+      }
     )
 
     console.log(

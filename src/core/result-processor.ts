@@ -22,6 +22,10 @@ import { IMPACT_ORDER } from '../types/index.js'
 export interface ProcessOptions {
   /** WCAG version and level used for the audit (e.g. "WCAG 2.2 AA"). Used when rule tags are empty. */
   auditWcagLabel?: string
+  /**
+   * When true, attach full engine output as `rawResults`. Default false (smaller payloads).
+   */
+  includeRawResults?: boolean
 }
 
 /**
@@ -490,46 +494,6 @@ export class ResultProcessor {
   }
 
   /**
-   * Generate a markdown table summarising all prioritised issues.
-   * Columns: Severity | Rule ID | Description | WCAG | Element / XPath | Fix hint
-   */
-  private generateIssuesTable(issues: PrioritizedIssue[]): string {
-    if (issues.length === 0) {
-      return '| Severity | Rule | Description | WCAG | Element |\n|---|---|---|---|---|\n| — | — | No issues found | — | — |'
-    }
-
-    const severityIcon = (impact: string): string => {
-      const rank = IMPACT_ORDER[impact.toLowerCase()] ?? 2
-      if (rank >= 5) return `🚫 ${impact}`
-      if (rank >= 4) return `⚠️ ${impact}`
-      if (rank >= 3) return `ℹ️ ${impact}`
-      return impact
-    }
-
-    const truncate = (s: string, max = 80): string =>
-      s.length > max ? s.substring(0, max - 1) + '…' : s
-
-    const escape = (s: string): string =>
-      s.replace(/\|/g, '\\|').replace(/\n/g, ' ')
-
-    const header = '| # | Severity | Rule ID | Description | WCAG | Element |'
-    const divider = '|---|---|---|---|---|---|'
-
-    const rows = issues.map((issue, i) => {
-      const num = String(i + 1)
-      const severity = severityIcon(issue.impact)
-      const ruleId = `\`${escape(issue.ruleId)}\``
-      const description = escape(truncate(issue.description))
-      const wcag = issue.wcagLevel || 'N/A'
-      // Use selector from domInfo if available, fall back to xpath
-      const element = escape(truncate(issue.xpath || issue.element || '—', 60))
-      return `| ${num} | ${severity} | ${ruleId} | ${description} | ${wcag} | ${element} |`
-    })
-
-    return [header, divider, ...rows].join('\n')
-  }
-
-  /**
    * Process accessibility results into structured audit result
    */
   process(
@@ -570,19 +534,17 @@ export class ResultProcessor {
       url: accessibilityResults.url,
     }
 
-    // Generate issues table
-    const issuesTable = this.generateIssuesTable(issues)
+    const includeRaw = options?.includeRawResults === true
 
     return {
       summary,
       prioritizedIssues: issues,
       appliedFilters,
       conversationalSummary,
-      issuesTable,
       quickWins,
       criticalBlockers,
       metadata,
-      rawResults: accessibilityResults,
+      ...(includeRaw ? { rawResults: accessibilityResults } : {}),
     }
   }
 }

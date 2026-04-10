@@ -57,6 +57,5 @@
     }
   ],
   "criticalBlockers": [],
-  "conversationalSummary": "2 accessibility issues found: 1 serious (missing image alt), 1 moderate (color contrast).",
-  "issuesTable": "| Rule | Impact | Description |\n|------|--------|-------------|\n| image-alt | serious | Images must have alternate text |\n| color-contrast | moderate | Elements must have sufficient color contrast |"
+  "conversationalSummary": "2 accessibility issues found: 1 serious (missing image alt), 1 moderate (color contrast)."
 }

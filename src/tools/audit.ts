@@ -72,6 +72,7 @@ interface SingleAuditParams {
   waitForLoad: WaitStrategy
   timeout: number
   engine: 'axe' | 'ace'
+  includeRawResults?: boolean
 }
 
 /**
@@ -91,6 +92,7 @@ async function runSingleUrlAudit(
     waitForLoad,
     timeout,
     engine,
+    includeRawResults,
   } = params
 
   let context: BrowserContext | null = null
@@ -171,7 +173,10 @@ async function runSingleUrlAudit(
     const auditResult = resultProcessor.process(
       resultsToProcess,
       accessibilityResult.appliedFilters,
-      { auditWcagLabel: auditWcagLabel !== 'N/A' ? auditWcagLabel : undefined }
+      {
+        auditWcagLabel: auditWcagLabel !== 'N/A' ? auditWcagLabel : undefined,
+        includeRawResults: includeRawResults === true,
+      }
     )
 
     debugLog(
@@ -211,6 +216,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
     engine: inputEngine,
     basicAuthUsername: inputBasicUser,
     basicAuthPassword: inputBasicPass,
+    includeRawResults: inputIncludeRaw,
   } = input
 
   const fullUrlRaw = normalizeUrl(url, domain)
@@ -246,6 +252,7 @@ export async function auditUrl(input: AuditUrlInput): Promise<AuditResult> {
     waitForLoad: waitForLoad as WaitStrategy,
     timeout,
     engine,
+    includeRawResults: inputIncludeRaw === true,
   }
 
   const browser = await acquireSharedBrowser()
@@ -262,7 +269,8 @@ async function processSingleUrl(
   continueOnError: boolean = true,
   engine?: 'axe' | 'ace',
   basicAuthUsername?: string,
-  basicAuthPassword?: string
+  basicAuthPassword?: string,
+  includeRawResults?: boolean
 ): Promise<{ url: string; result?: AuditResult; error?: string }> {
   try {
     const result = await retryWithBackoff(
@@ -274,6 +282,7 @@ async function processSingleUrl(
           engine,
           basicAuthUsername,
           basicAuthPassword,
+          ...(includeRawResults === true ? { includeRawResults: true } : {}),
         })
       },
       {
@@ -307,7 +316,8 @@ async function processBatchParallel(
   onProgress?: (progress: BatchAuditProgress) => void,
   engine?: 'axe' | 'ace',
   basicAuthUsername?: string,
-  basicAuthPassword?: string
+  basicAuthPassword?: string,
+  includeRawResults?: boolean
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
     new Array(urlArray.length)
@@ -358,7 +368,8 @@ async function processBatchParallel(
           continueOnError,
           engine,
           basicAuthUsername,
-          basicAuthPassword
+          basicAuthPassword,
+          includeRawResults
         )
       } catch (e) {
         const errorInfo = handleErrorGracefully(e, `Batch audit: ${url}`)
@@ -414,7 +425,8 @@ async function processBatchSequential(
   onProgress?: (progress: BatchAuditProgress) => void,
   engine?: 'axe' | 'ace',
   basicAuthUsername?: string,
-  basicAuthPassword?: string
+  basicAuthPassword?: string,
+  includeRawResults?: boolean
 ): Promise<Array<{ url: string; result?: AuditResult; error?: string }>> {
   const results: Array<{ url: string; result?: AuditResult; error?: string }> =
     []
@@ -424,7 +436,16 @@ async function processBatchSequential(
 
   for (let i = 0; i < urlArray.length; i++) {
     const url = urlArray[i]
-    const result = await processSingleUrl(url, domain, tags, continueOnError, engine, basicAuthUsername, basicAuthPassword)
+    const result = await processSingleUrl(
+      url,
+      domain,
+      tags,
+      continueOnError,
+      engine,
+      basicAuthUsername,
+      basicAuthPassword,
+      includeRawResults
+    )
     results.push(result)
 
     if (result.result) {
@@ -592,6 +613,7 @@ export async function auditMultipleUrls(
     engine: inputEngine,
     basicAuthUsername,
     basicAuthPassword,
+    includeRawResults: batchIncludeRaw,
   } = input
   const engine = inputEngine ?? config.engine
 
@@ -623,7 +645,8 @@ export async function auditMultipleUrls(
           onProgress,
           engine as 'axe' | 'ace',
           basicAuthUsername,
-          basicAuthPassword
+          basicAuthPassword,
+          batchIncludeRaw
         )
       : await processBatchSequential(
           urlArray,
@@ -633,7 +656,8 @@ export async function auditMultipleUrls(
           onProgress,
           engine as 'axe' | 'ace',
           basicAuthUsername,
-          basicAuthPassword
+          basicAuthPassword,
+          batchIncludeRaw
         )
 
   // Calculate aggregated summary

@@ -93,6 +93,12 @@ const EXPORT_URL_AUDIT_SCHEMA_PROPERTIES = {
     default: 30,
     description: 'When results is a URL: timeout in seconds (same as audit_url).',
   },
+  includeRawResults: {
+    type: 'boolean',
+    default: false,
+    description:
+      'When results is a URL: include full engine output in audit rawResults (default: false; smaller payloads).',
+  },
 } as const
 
 /**
@@ -179,6 +185,12 @@ export async function createServer(): Promise<Server> {
               description:
                 'HTTP Basic Auth password. Use with basicAuthUsername for sites that require Basic Authentication.',
             },
+            includeRawResults: {
+              type: 'boolean',
+              default: false,
+              description:
+                'When true, include full engine output in rawResults (default: false; omit for smaller MCP payloads).',
+            },
           },
           required: ['url'],
         },
@@ -257,6 +269,12 @@ export async function createServer(): Promise<Server> {
               type: 'string',
               description:
                 'HTTP Basic Auth password. Use with basicAuthUsername.',
+            },
+            includeRawResults: {
+              type: 'boolean',
+              default: false,
+              description:
+                'When true, each successful URL result includes rawResults (default: false).',
             },
           },
           required: ['urls'],
@@ -381,6 +399,12 @@ export async function createServer(): Promise<Server> {
               enum: ['axe', 'ace'],
               description:
                 'Testing engine: "axe" (axe-core, default) or "ace" (IBM Equal Access). Overrides env A11Y_ENGINE when provided.',
+            },
+            includeRawResults: {
+              type: 'boolean',
+              default: false,
+              description:
+                'When true, include full engine output in rawResults (default: false).',
             },
           },
           required: ['sessionId', 'url'],
@@ -1231,6 +1255,7 @@ export async function createServer(): Promise<Server> {
                 timeout: args?.timeout as number | undefined,
                 basicAuthUsername: args?.basicAuthUsername as string | undefined,
                 basicAuthPassword: args?.basicAuthPassword as string | undefined,
+                includeRawResults: args?.includeRawResults === true,
               }),
             {
               maxRetries: 2, // Fewer retries for single URL audits
@@ -1241,7 +1266,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(auditResult, null, 2),
+                text: JSON.stringify(auditResult),
               },
             ],
           } as CallToolResult
@@ -1275,6 +1300,7 @@ export async function createServer(): Promise<Server> {
                   engine: args?.engine as 'axe' | 'ace' | undefined,
                   basicAuthUsername: args?.basicAuthUsername as string | undefined,
                   basicAuthPassword: args?.basicAuthPassword as string | undefined,
+                  includeRawResults: args?.includeRawResults === true,
                 },
                 progressCallback
               ),
@@ -1293,7 +1319,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(response, null, 2),
+                text: JSON.stringify(response),
               },
             ],
           } as CallToolResult
@@ -1320,7 +1346,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(sessionResult, null, 2),
+                text: JSON.stringify(sessionResult),
               },
             ],
           } as CallToolResult
@@ -1339,13 +1365,14 @@ export async function createServer(): Promise<Server> {
               | undefined,
             timeout: args?.timeout as number | undefined,
             engine: args?.engine as 'axe' | 'ace' | undefined,
+            includeRawResults: args?.includeRawResults === true,
           })
 
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(authenticatedAuditResult, null, 2),
+                text: JSON.stringify(authenticatedAuditResult),
               },
             ],
           } as CallToolResult
@@ -1363,7 +1390,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(scoreResult, null, 2),
+                text: JSON.stringify(scoreResult),
               },
             ],
           } as CallToolResult
@@ -1385,7 +1412,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(prioritizeResult, null, 2),
+                text: JSON.stringify(prioritizeResult),
               },
             ],
           } as CallToolResult
@@ -1401,7 +1428,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(explanationResult, null, 2),
+                text: JSON.stringify(explanationResult),
               },
             ],
           } as CallToolResult
@@ -1420,7 +1447,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(quickFixesResult, null, 2),
+                text: JSON.stringify(quickFixesResult),
               },
             ],
           } as CallToolResult
@@ -1439,7 +1466,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(comparisonResult, null, 2),
+                text: JSON.stringify(comparisonResult),
               },
             ],
           } as CallToolResult
@@ -1458,7 +1485,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(trackingResult, null, 2),
+                text: JSON.stringify(trackingResult),
               },
             ],
           } as CallToolResult
@@ -1476,7 +1503,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(complianceReport, null, 2),
+                text: JSON.stringify(complianceReport),
               },
             ],
           } as CallToolResult
@@ -1494,7 +1521,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(wcagComplianceResult, null, 2),
+                text: JSON.stringify(wcagComplianceResult),
               },
             ],
           } as CallToolResult
@@ -1517,13 +1544,14 @@ export async function createServer(): Promise<Server> {
               | 'domcontentloaded'
               | undefined,
             timeout: args?.timeout as number | undefined,
+            includeRawResults: args?.includeRawResults === true,
           })
 
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(csvResult, null, 2),
+                text: JSON.stringify(csvResult),
               },
             ],
           } as CallToolResult
@@ -1545,13 +1573,14 @@ export async function createServer(): Promise<Server> {
               | 'domcontentloaded'
               | undefined,
             timeout: args?.timeout as number | undefined,
+            includeRawResults: args?.includeRawResults === true,
           })
 
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(excelResult, null, 2),
+                text: JSON.stringify(excelResult),
               },
             ],
           } as CallToolResult
@@ -1573,13 +1602,14 @@ export async function createServer(): Promise<Server> {
               | 'domcontentloaded'
               | undefined,
             timeout: args?.timeout as number | undefined,
+            includeRawResults: args?.includeRawResults === true,
           })
 
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(jsonResult, null, 2),
+                text: JSON.stringify(jsonResult),
               },
             ],
           } as CallToolResult
@@ -1601,13 +1631,14 @@ export async function createServer(): Promise<Server> {
               | 'domcontentloaded'
               | undefined,
             timeout: args?.timeout as number | undefined,
+            includeRawResults: args?.includeRawResults === true,
           })
 
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(htmlResult, null, 2),
+                text: JSON.stringify(htmlResult),
               },
             ],
           } as CallToolResult
@@ -1624,7 +1655,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(filterResult, null, 2),
+                text: JSON.stringify(filterResult),
               },
             ],
           } as CallToolResult
@@ -1642,7 +1673,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(searchResult, null, 2),
+                text: JSON.stringify(searchResult),
               },
             ],
           } as CallToolResult
@@ -1659,7 +1690,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(aggregateResult, null, 2),
+                text: JSON.stringify(aggregateResult),
               },
             ],
           } as CallToolResult
@@ -1675,7 +1706,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(statisticsResult, null, 2),
+                text: JSON.stringify(statisticsResult),
               },
             ],
           } as CallToolResult
@@ -1694,7 +1725,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(dashboardResult, null, 2),
+                text: JSON.stringify(dashboardResult),
               },
             ],
           } as CallToolResult
@@ -1713,7 +1744,7 @@ export async function createServer(): Promise<Server> {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(summaryReportResult, null, 2),
+                text: JSON.stringify(summaryReportResult),
               },
             ],
           } as CallToolResult
@@ -1757,7 +1788,7 @@ export async function createServer(): Promise<Server> {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(errorPayload, null, 2),
+            text: JSON.stringify(errorPayload),
           },
         ],
         isError: true,

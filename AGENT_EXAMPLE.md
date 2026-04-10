@@ -72,7 +72,7 @@ When the user says **"that exact audit result"**, **"the same result"**, **"the 
 
 1. **Run the audit once** (e.g. `audit_url` with URL and Basic Auth). Obtain the **full** tool response.
 2. **For every following step**, pass that **exact same result object** into the next tool:
-   - For tools with a `results` parameter: set `results` to the **complete JSON object** returned by the audit (the whole structure: `summary`, `prioritizedIssues`, `quickWins`, `criticalBlockers`, `metadata`, etc.).
+   - For tools with a `results` parameter: set `results` to the **complete JSON object** returned by the audit (the whole structure: `summary`, `prioritizedIssues`, `quickWins`, `criticalBlockers`, `metadata`, etc.). The field `rawResults` is only present when the audit was run with `includeRawResults: true`; you do not need it for score, filter, export (unless exporting raw), or dashboard tools.
    - For `compare_accessibility`: set both `before` and `after` to that same result object if comparing baseline to itself, or pass two distinct result objects when comparing two audits.
 3. **Do not** pass a URL, a summary, or a minimal object (e.g. `{ summary: { totalIssues: 0 } }`). Passing anything other than the full result will make downstream tools report wrong numbers (e.g. 0 issues, 100 score).
 4. **Platform support:** If your environment exposes the previous tool output (e.g. "last tool result", a variable, or a reference), use that verbatim as the `results` argument. If you cannot access the full previous result, inform the user and fall back to Pattern A (pass the URL) for tools that accept it.

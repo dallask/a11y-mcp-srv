@@ -22,8 +22,8 @@ import type {
  * Options forwarded to {@link auditUrl} when `results` is a URL (shared browser, ACE cache, default wait `load`).
  */
 function pickUrlAuditOptions(o: ExportUrlAuditOptions): ExportUrlAuditOptions {
-  const { domain, tags, waitForLoad, timeout, engine } = o
-  return { domain, tags, waitForLoad, timeout, engine }
+  const { domain, tags, waitForLoad, timeout, engine, includeRawResults } = o
+  return { domain, tags, waitForLoad, timeout, engine, includeRawResults }
 }
 
 /**
@@ -417,7 +417,11 @@ export async function exportToJson(
     results,
     basicAuthUsername,
     basicAuthPassword,
-    input
+    {
+      ...pickUrlAuditOptions(input),
+      includeRawResults:
+        includeRaw === true || input.includeRawResults === true,
+    }
   )
 
   // Prepare export data

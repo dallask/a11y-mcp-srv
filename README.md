@@ -255,6 +255,7 @@ Test a single URL for accessibility issues with conversational, actionable resul
 - `tags` (optional): Array of accessibility tags to check (e.g., `["wcag2a", "wcag2aa", "wcag21a", "best-practice"]`). If not provided, all tags are checked.
 - `waitForLoad` (optional): Wait strategy - `"load"` (default) | `"networkidle"` | `"domcontentloaded"`
 - `timeout` (optional): Timeout in seconds (default: 30)
+- `includeRawResults` (optional): When `true`, includes full engine output in `rawResults`. Default `false` for smaller tool payloads.
 
 **Example:**
 ```json
@@ -277,6 +278,7 @@ Test multiple URLs efficiently with progress updates.
 - `tags` (optional): Array of accessibility tags
 - `parallel` (optional): Number of parallel tests (default: 1)
 - `continueOnError` (optional): Continue if one fails (default: true)
+- `includeRawResults` (optional): When `true`, each successful result includes `rawResults`. Default `false`.
 
 **Example:**
 ```json
@@ -360,6 +362,7 @@ Run an audit using an existing authenticated session.
 - `waitForLoad` (optional): `"load"` (default) | `"domcontentloaded"` | `"networkidle"`
 - `timeout` (optional): Timeout in seconds (default: 30)
 - `engine` (optional): `"axe"` or `"ace"`; defaults to env `A11Y_ENGINE`
+- `includeRawResults` (optional): When `true`, includes full engine output in `rawResults`. Default `false`.
 
 **Example:**
 ```json

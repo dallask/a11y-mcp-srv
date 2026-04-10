@@ -80,7 +80,6 @@ describe('auditUrl', () => {
     expect(result.prioritizedIssues).toBeDefined()
     expect(Array.isArray(result.prioritizedIssues)).toBe(true)
     expect(result.conversationalSummary).toBeDefined()
-    expect(result.issuesTable).toBeDefined()
     expect(result.quickWins).toBeDefined()
     expect(result.criticalBlockers).toBeDefined()
   })

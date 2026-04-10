@@ -252,7 +252,6 @@ export function aggregateAuditResults(
     summary,
     prioritizedIssues: allIssues,
     conversationalSummary: `Aggregated ${resultsArray.length} audit result(s) with ${allIssues.length} total issue(s). ${summary.score}/100 accessibility score.`,
-    issuesTable: '',
     quickWins: [],
     criticalBlockers: [],
     metadata: firstMeta,

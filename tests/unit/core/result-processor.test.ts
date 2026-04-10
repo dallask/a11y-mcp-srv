@@ -78,9 +78,16 @@ describe('ResultProcessor', () => {
     expect(Array.isArray(result.criticalBlockers)).toBe(true)
     expect(result.conversationalSummary).toBeDefined()
     expect(typeof result.conversationalSummary).toBe('string')
-    expect(result.issuesTable).toBeDefined()
     expect(result.metadata).toBeDefined()
     expect(result.metadata?.url).toBe(rawFixture.url)
+    expect(result.rawResults).toBeUndefined()
+  })
+
+  it('includes rawResults when includeRawResults is true', () => {
+    const processor = new ResultProcessor()
+    const result = processor.process(rawFixture, undefined, {
+      includeRawResults: true,
+    })
     expect(result.rawResults).toBe(rawFixture)
   })
 
@@ -135,13 +142,14 @@ describe('ResultProcessor', () => {
     expect(result.conversationalSummary).toMatch(/Needs review|Recommendations|Minor|WCAG Compliance/)
   })
 
-  it('returns empty issues table when no issues', () => {
+  it('returns zero issues when violations are empty', () => {
     const emptyViolations = {
       ...rawFixture,
       violations: { error: { count: 0, items: {} } },
     }
     const processor = new ResultProcessor()
     const result = processor.process(emptyViolations)
-    expect(result.issuesTable).toContain('No issues found')
+    expect(result.summary.totalIssues).toBe(0)
+    expect(result.prioritizedIssues).toHaveLength(0)
   })
 })

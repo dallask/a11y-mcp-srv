@@ -152,16 +152,20 @@ function normalizeObject(obj: Record<string, unknown>): AuditResult {
 
   const metadata = buildCanonicalMetadata(obj)
 
+  const rawResults =
+    obj.rawResults != null && typeof obj.rawResults === 'object'
+      ? (obj.rawResults as AuditResult['rawResults'])
+      : undefined
+
   return {
     summary,
     prioritizedIssues,
     quickWins,
     criticalBlockers,
     conversationalSummary: typeof obj.conversationalSummary === 'string' ? obj.conversationalSummary : '',
-    issuesTable: typeof obj.issuesTable === 'string' ? obj.issuesTable : '',
     appliedFilters: obj.appliedFilters != null && typeof obj.appliedFilters === 'object' ? (obj.appliedFilters as AuditResult['appliedFilters']) : undefined,
     metadata: metadata ?? (obj.metadata != null && typeof obj.metadata === 'object' ? (obj.metadata as AuditResult['metadata']) : undefined),
-    rawResults: obj.rawResults as AuditResult['rawResults'],
+    ...(rawResults != null ? { rawResults } : {}),
     responseStatus: typeof obj.responseStatus === 'number' ? obj.responseStatus : undefined,
   }
 }

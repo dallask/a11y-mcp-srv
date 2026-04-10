@@ -238,7 +238,6 @@ export interface AuditResult {
   prioritizedIssues: PrioritizedIssue[]
   appliedFilters?: AppliedFilters
   conversationalSummary: string // Natural language summary
-  issuesTable: string // Markdown table of all issues
   quickWins: QuickWin[]
   criticalBlockers: CriticalBlocker[]
   metadata?: TestMetadata
@@ -327,6 +326,10 @@ export interface AuditUrlInput {
   basicAuthUsername?: string
   /** HTTP Basic Auth password. Use with basicAuthUsername for sites that require Basic Authentication. */
   basicAuthPassword?: string
+  /**
+   * When true, include full engine output in `rawResults`. Default false (smaller payloads).
+   */
+  includeRawResults?: boolean
 }
 
 /**
@@ -343,6 +346,10 @@ export interface AuditMultipleUrlsInput {
   basicAuthUsername?: string
   /** HTTP Basic Auth password. Use with basicAuthUsername. */
   basicAuthPassword?: string
+  /**
+   * When true, each URL result includes `rawResults`. Default false (smaller payloads).
+   */
+  includeRawResults?: boolean
 }
 
 /**
@@ -367,6 +374,10 @@ export interface AuditWithSessionInput {
   waitForLoad?: WaitStrategy
   timeout?: number
   engine?: AccessibilityEngine
+  /**
+   * When true, include full engine output in `rawResults`. Default false (smaller payloads).
+   */
+  includeRawResults?: boolean
 }
 
 /**
@@ -688,7 +699,7 @@ export interface TagFilter {
  */
 export type ExportUrlAuditOptions = Pick<
   AuditUrlInput,
-  'waitForLoad' | 'timeout' | 'engine' | 'tags' | 'domain'
+  'waitForLoad' | 'timeout' | 'engine' | 'tags' | 'domain' | 'includeRawResults'
 >
 
 /**

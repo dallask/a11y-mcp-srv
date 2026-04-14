@@ -725,6 +725,10 @@ export interface ExportToCsvResult {
   totalIssues: number
   includeMetadata: boolean
   includeViolations: boolean
+  /** Suggested filename for download (derived from audited URL hostname when available). */
+  filename?: string
+  /** MIME type for embedded CSV resources. */
+  mimeType?: string
 }
 
 /**
@@ -747,6 +751,10 @@ export interface ExportToExcelResult {
   totalIssues: number
   includeCharts: boolean
   formatting: boolean
+  /** Suggested filename for download (derived from audited URL hostname when available). */
+  filename?: string
+  /** MIME type for embedded XLSX resources. */
+  mimeType?: string
 }
 
 /**
@@ -768,6 +776,10 @@ export interface ExportToJsonResult {
   pretty: boolean
   includeRaw: boolean
   totalIssues: number
+  /** Suggested filename for download (derived from audited URL hostname when available). */
+  filename?: string
+  /** MIME type for embedded JSON resources. */
+  mimeType?: string
 }
 
 /**
@@ -789,6 +801,10 @@ export interface ExportToHtmlResult {
   template: 'default' | 'minimal' | 'detailed'
   includeCharts: boolean
   totalIssues: number
+  /** Suggested filename for download (derived from audited URL hostname when available). */
+  filename?: string
+  /** MIME type for embedded HTML resources. */
+  mimeType?: string
 }
 
 // ============================================================================

@@ -102,6 +102,46 @@ const EXPORT_URL_AUDIT_SCHEMA_PROPERTIES = {
 } as const
 
 /**
+ * Tool result with JSON text plus an embedded resource for download (MCP `resource` content block).
+ */
+function callToolResultWithEmbeddedExport(
+  payload: unknown,
+  resource:
+    | { filename: string; mimeType: string; text: string }
+    | { filename: string; mimeType: string; blob: string }
+): CallToolResult {
+  const uri = `a11y-mcp://export/${encodeURIComponent(resource.filename)}`
+  if ('blob' in resource) {
+    return {
+      content: [
+        { type: 'text', text: JSON.stringify(payload) },
+        {
+          type: 'resource',
+          resource: {
+            uri,
+            mimeType: resource.mimeType,
+            blob: resource.blob,
+          },
+        },
+      ],
+    } as CallToolResult
+  }
+  return {
+    content: [
+      { type: 'text', text: JSON.stringify(payload) },
+      {
+        type: 'resource',
+        resource: {
+          uri,
+          mimeType: resource.mimeType,
+          text: resource.text,
+        },
+      },
+    ],
+  } as CallToolResult
+}
+
+/**
  * Create and configure the MCP server
  */
 export async function createServer(): Promise<Server> {
@@ -724,7 +764,7 @@ export async function createServer(): Promise<Server> {
       {
         name: 'export_to_csv',
         description:
-          'Export audit results to CSV format for spreadsheet analysis. Includes metadata section and violation rows.',
+          'Export audit results to CSV format for spreadsheet analysis. Includes metadata section and violation rows. Returns JSON (including CSV text) plus an embedded CSV resource for download in supporting clients.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -778,7 +818,7 @@ export async function createServer(): Promise<Server> {
       {
         name: 'export_to_excel',
         description:
-          'Export audit results to Excel/XLSX format with formatting. Requires xlsx package.',
+          'Export audit results to Excel/XLSX format with formatting. Requires xlsx package. Returns JSON (including base64 file data) plus an embedded XLSX resource for download in supporting clients.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -825,7 +865,7 @@ export async function createServer(): Promise<Server> {
       {
         name: 'export_to_json',
         description:
-          'Export audit results as structured JSON. Supports pretty-printing and optional raw results.',
+          'Export audit results as structured JSON. Supports pretty-printing and optional raw results. Returns JSON plus an embedded JSON file resource for download in supporting clients.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -872,7 +912,7 @@ export async function createServer(): Promise<Server> {
       {
         name: 'export_to_html_report',
         description:
-          'Generate standalone HTML report with styling. Includes optional visual charts.',
+          'Generate standalone HTML report with styling. Includes optional visual charts. Returns JSON plus an embedded HTML resource for download in supporting clients.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1547,14 +1587,11 @@ export async function createServer(): Promise<Server> {
             includeRawResults: args?.includeRawResults === true,
           })
 
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(csvResult),
-              },
-            ],
-          } as CallToolResult
+          return callToolResultWithEmbeddedExport(csvResult, {
+            filename: csvResult.filename ?? 'accessibility-audit.csv',
+            mimeType: csvResult.mimeType ?? 'text/csv; charset=utf-8',
+            text: csvResult.csv,
+          })
         }
 
         case 'export_to_excel': {
@@ -1576,14 +1613,13 @@ export async function createServer(): Promise<Server> {
             includeRawResults: args?.includeRawResults === true,
           })
 
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(excelResult),
-              },
-            ],
-          } as CallToolResult
+          return callToolResultWithEmbeddedExport(excelResult, {
+            filename: excelResult.filename ?? 'accessibility-audit.xlsx',
+            mimeType:
+              excelResult.mimeType ??
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            blob: excelResult.excel,
+          })
         }
 
         case 'export_to_json': {
@@ -1605,14 +1641,11 @@ export async function createServer(): Promise<Server> {
             includeRawResults: args?.includeRawResults === true,
           })
 
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(jsonResult),
-              },
-            ],
-          } as CallToolResult
+          return callToolResultWithEmbeddedExport(jsonResult, {
+            filename: jsonResult.filename ?? 'accessibility-audit.json',
+            mimeType: jsonResult.mimeType ?? 'application/json; charset=utf-8',
+            text: jsonResult.json,
+          })
         }
 
         case 'export_to_html_report': {
@@ -1634,14 +1667,11 @@ export async function createServer(): Promise<Server> {
             includeRawResults: args?.includeRawResults === true,
           })
 
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(htmlResult),
-              },
-            ],
-          } as CallToolResult
+          return callToolResultWithEmbeddedExport(htmlResult, {
+            filename: htmlResult.filename ?? 'accessibility-audit.html',
+            mimeType: htmlResult.mimeType ?? 'text/html; charset=utf-8',
+            text: htmlResult.html,
+          })
         }
 
         case 'filter_issues': {

@@ -104,6 +104,168 @@ describe('Server integration', () => {
     expect(parsed.filteredCount).toBe(1)
   })
 
+  it('CallTool export_to_excel returns JSON and embedded XLSX resource', async () => {
+    triggerRequest({
+      id: 5,
+      method: 'tools/call',
+      params: {
+        name: 'export_to_excel',
+        arguments: {
+          results: auditResultFixture,
+          includeCharts: false,
+          formatting: true,
+        },
+      },
+    })
+    await vi.waitFor(() => {
+      expect(sentMessages.some((m: unknown) => (m as { id?: number }).id === 5)).toBe(true)
+    })
+    const response = sentMessages.find((m: unknown) => (m as { id?: number }).id === 5) as {
+      result?: {
+        content?: Array<{
+          type: string
+          text?: string
+          resource?: { uri?: string; mimeType?: string; blob?: string }
+        }>
+      }
+      error?: unknown
+    }
+    expect(response.error).toBeUndefined()
+    const content = response.result?.content
+    expect(content?.length).toBeGreaterThanOrEqual(2)
+    expect(content![0].type).toBe('text')
+    const parsed = JSON.parse(content![0].text!)
+    expect(parsed.excel).toBeDefined()
+    expect(parsed.filename).toBe('accessibility-audit.xlsx')
+    expect(content![1].type).toBe('resource')
+    const res = content![1].resource!
+    expect(res.uri).toMatch(/^a11y-mcp:\/\/export\//)
+    expect(res.mimeType).toBe(
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    expect(res.blob).toBe(parsed.excel)
+    const bytes = Buffer.from(res.blob!, 'base64')
+    expect(bytes[0]).toBe(0x50)
+    expect(bytes[1]).toBe(0x4b)
+  })
+
+  it('CallTool export_to_csv returns JSON and embedded CSV resource', async () => {
+    triggerRequest({
+      id: 6,
+      method: 'tools/call',
+      params: {
+        name: 'export_to_csv',
+        arguments: {
+          results: auditResultFixture,
+          includeMetadata: false,
+          includeViolations: true,
+          format: 'standard',
+        },
+      },
+    })
+    await vi.waitFor(() => {
+      expect(sentMessages.some((m: unknown) => (m as { id?: number }).id === 6)).toBe(true)
+    })
+    const response = sentMessages.find((m: unknown) => (m as { id?: number }).id === 6) as {
+      result?: {
+        content?: Array<{
+          type: string
+          text?: string
+          resource?: { uri?: string; mimeType?: string; text?: string }
+        }>
+      }
+      error?: unknown
+    }
+    expect(response.error).toBeUndefined()
+    const content = response.result?.content
+    expect(content?.length).toBeGreaterThanOrEqual(2)
+    const parsed = JSON.parse(content![0].text!)
+    expect(parsed.csv).toBeDefined()
+    expect(parsed.filename).toBe('accessibility-audit.csv')
+    expect(content![1].type).toBe('resource')
+    const res = content![1].resource!
+    expect(res.uri).toMatch(/^a11y-mcp:\/\/export\//)
+    expect(res.mimeType).toContain('text/csv')
+    expect(res.text).toBe(parsed.csv)
+  })
+
+  it('CallTool export_to_json returns JSON and embedded JSON resource', async () => {
+    triggerRequest({
+      id: 7,
+      method: 'tools/call',
+      params: {
+        name: 'export_to_json',
+        arguments: {
+          results: auditResultFixture,
+          pretty: true,
+          includeRaw: false,
+        },
+      },
+    })
+    await vi.waitFor(() => {
+      expect(sentMessages.some((m: unknown) => (m as { id?: number }).id === 7)).toBe(true)
+    })
+    const response = sentMessages.find((m: unknown) => (m as { id?: number }).id === 7) as {
+      result?: {
+        content?: Array<{
+          type: string
+          text?: string
+          resource?: { uri?: string; mimeType?: string; text?: string }
+        }>
+      }
+      error?: unknown
+    }
+    expect(response.error).toBeUndefined()
+    const content = response.result?.content
+    expect(content?.length).toBeGreaterThanOrEqual(2)
+    const parsed = JSON.parse(content![0].text!)
+    expect(parsed.json).toBeDefined()
+    expect(parsed.filename).toBe('accessibility-audit.json')
+    expect(content![1].type).toBe('resource')
+    const res = content![1].resource!
+    expect(res.mimeType).toContain('application/json')
+    expect(res.text).toBe(parsed.json)
+  })
+
+  it('CallTool export_to_html_report returns JSON and embedded HTML resource', async () => {
+    triggerRequest({
+      id: 8,
+      method: 'tools/call',
+      params: {
+        name: 'export_to_html_report',
+        arguments: {
+          results: auditResultFixture,
+          template: 'default',
+          includeCharts: false,
+        },
+      },
+    })
+    await vi.waitFor(() => {
+      expect(sentMessages.some((m: unknown) => (m as { id?: number }).id === 8)).toBe(true)
+    })
+    const response = sentMessages.find((m: unknown) => (m as { id?: number }).id === 8) as {
+      result?: {
+        content?: Array<{
+          type: string
+          text?: string
+          resource?: { uri?: string; mimeType?: string; text?: string }
+        }>
+      }
+      error?: unknown
+    }
+    expect(response.error).toBeUndefined()
+    const content = response.result?.content
+    expect(content?.length).toBeGreaterThanOrEqual(2)
+    const parsed = JSON.parse(content![0].text!)
+    expect(parsed.html).toBeDefined()
+    expect(parsed.filename).toBe('accessibility-audit.html')
+    expect(content![1].type).toBe('resource')
+    const res = content![1].resource!
+    expect(res.mimeType).toContain('text/html')
+    expect(res.text).toBe(parsed.html)
+    expect(res.text).toContain('<!DOCTYPE html')
+  })
+
   it('CallTool explain_issue returns explanation', async () => {
     triggerRequest({
       id: 3,

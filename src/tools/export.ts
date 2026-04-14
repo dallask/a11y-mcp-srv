@@ -26,6 +26,33 @@ function pickUrlAuditOptions(o: ExportUrlAuditOptions): ExportUrlAuditOptions {
   return { domain, tags, waitForLoad, timeout, engine, includeRawResults }
 }
 
+const EXCEL_MIME =
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' as const
+const CSV_MIME = 'text/csv; charset=utf-8' as const
+const JSON_EXPORT_MIME = 'application/json; charset=utf-8' as const
+const HTML_REPORT_MIME = 'text/html; charset=utf-8' as const
+
+/**
+ * Suggested export filename; uses audited URL hostname when metadata is present.
+ * @param extension - File extension with leading dot (e.g. `.csv`, `.xlsx`).
+ */
+function exportReportFilename(auditResult: AuditResult, extension: string): string {
+  const ext = extension.startsWith('.') ? extension : `.${extension}`
+  const url = auditResult.metadata?.url
+  if (!url || typeof url !== 'string') {
+    return `accessibility-audit${ext}`
+  }
+  try {
+    const hostname = new URL(url).hostname
+    const safe =
+      hostname.replace(/[^a-zA-Z0-9.-]+/g, '_').replace(/^_+|_+$/g, '') || 'site'
+    const base = safe.length > 80 ? safe.slice(0, 80) : safe
+    return `${base}-accessibility-audit${ext}`
+  } catch {
+    return `accessibility-audit${ext}`
+  }
+}
+
 /**
  * Resolve `results` to an {@link AuditResult}, running {@link auditUrl} when `results` is a URL.
  */
@@ -239,6 +266,7 @@ export async function exportToCsv(
   }
 
   const csvContent = csvRows.join('\n')
+  const filename = exportReportFilename(auditResult, 'csv')
 
   return {
     csv: csvContent,
@@ -246,6 +274,8 @@ export async function exportToCsv(
     totalIssues: auditResult.summary.totalIssues,
     includeMetadata,
     includeViolations,
+    filename,
+    mimeType: CSV_MIME,
   }
 }
 
@@ -384,6 +414,7 @@ export async function exportToExcel(
   // Generate Excel file as base64
   const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
   const base64Content = excelBuffer.toString('base64')
+  const filename = exportReportFilename(auditResult, 'xlsx')
 
   return {
     excel: base64Content,
@@ -391,6 +422,8 @@ export async function exportToExcel(
     totalIssues: auditResult.summary.totalIssues,
     includeCharts,
     formatting,
+    filename,
+    mimeType: EXCEL_MIME,
   }
 }
 
@@ -443,12 +476,15 @@ export async function exportToJson(
   const jsonContent = pretty
     ? JSON.stringify(exportData, null, 2)
     : JSON.stringify(exportData)
+  const filename = exportReportFilename(auditResult, 'json')
 
   return {
     json: jsonContent,
     pretty,
     includeRaw,
     totalIssues: auditResult.summary.totalIssues,
+    filename,
+    mimeType: JSON_EXPORT_MIME,
   }
 }
 
@@ -894,11 +930,14 @@ export async function exportToHtmlReport(
   )
 
   const htmlContent = generateHtmlReport(auditResult, template, includeCharts)
+  const filename = exportReportFilename(auditResult, 'html')
 
   return {
     html: htmlContent,
     template,
     includeCharts,
     totalIssues: auditResult.summary.totalIssues,
+    filename,
+    mimeType: HTML_REPORT_MIME,
   }
 }

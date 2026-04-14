@@ -27,6 +27,8 @@ describe('exportToCsv', () => {
     expect(result.format).toBe('standard')
     expect(result.totalIssues).toBe(2)
     expect(result.includeViolations).toBe(true)
+    expect(result.filename).toBe('accessibility-audit.csv')
+    expect(result.mimeType).toBe('text/csv; charset=utf-8')
   })
 
   it('includes Rule ID and Description in violation rows', async () => {
@@ -91,6 +93,24 @@ describe('exportToExcel', () => {
     expect(result.format).toBe('xlsx')
     expect(result.totalIssues).toBe(2)
     expect(Buffer.from(result.excel, 'base64').length).toBeGreaterThan(0)
+    expect(result.filename).toBe('accessibility-audit.xlsx')
+    expect(result.mimeType).toBe(
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+  })
+
+  it('derives filename from metadata URL hostname when present', async () => {
+    const withMeta = {
+      ...auditResultFixture,
+      metadata: {
+        testEngine: { name: 'axe', version: '4.0' },
+        testRunner: { name: 'playwright' },
+        url: 'https://www.example.com/page',
+        timestamp: '2024-01-01T00:00:00.000Z',
+      },
+    }
+    const result = await exportToExcel({ results: withMeta })
+    expect(result.filename).toBe('www.example.com-accessibility-audit.xlsx')
   })
 })
 
@@ -108,6 +128,8 @@ describe('exportToJson', () => {
     expect(parsed.prioritizedIssues.length).toBe(2)
     expect(result.pretty).toBe(true)
     expect(result.totalIssues).toBe(2)
+    expect(result.filename).toBe('accessibility-audit.json')
+    expect(result.mimeType).toBe('application/json; charset=utf-8')
   })
 
   it('supports includeRaw', async () => {
@@ -132,6 +154,8 @@ describe('exportToHtmlReport', () => {
     expect(result.html).toContain('</html>')
     expect(result.template).toBe('default')
     expect(result.totalIssues).toBe(2)
+    expect(result.filename).toBe('accessibility-audit.html')
+    expect(result.mimeType).toBe('text/html; charset=utf-8')
   })
 
   it('supports minimal and detailed templates', async () => {

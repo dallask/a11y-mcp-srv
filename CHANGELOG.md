@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.9.0...v2.10.0) (2026-04-14)
+
+
+### Features
+
+* add accessibility prompt handling to server ([53b3944](https://github.com/dallask/a11y-mcp-srv/commit/53b394431089863a74c6d55b8289b10f09871eaf))
+
 # [2.9.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.8.0...v2.9.0) (2026-04-14)
 
 

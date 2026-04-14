@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.8.0...v2.9.0) (2026-04-14)
+
+
+### Features
+
+* enhance export functionality with embedded resources for various formats ([6f93792](https://github.com/dallask/a11y-mcp-srv/commit/6f937928479896de16483433c4dbfdec4573ad61))
+
 # [2.8.0](https://github.com/dallask/a11y-mcp-srv/compare/v2.7.0...v2.8.0) (2026-04-10)
 
 

@@ -8,10 +8,16 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
   type CallToolResult,
   type ListToolsResult,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js'
+import {
+  getAccessibilityPrompt,
+  listAccessibilityPrompts,
+} from './prompts/accessibility-prompts.js'
 
 // Import tool implementations
 import { auditUrl } from './tools/audit.js'
@@ -153,9 +159,20 @@ export async function createServer(): Promise<Server> {
     {
       capabilities: {
         tools: {},
+        prompts: {},
       },
     }
   )
+
+  server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+    prompts: listAccessibilityPrompts(),
+  }))
+
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const name = request.params.name
+    const args = request.params.arguments
+    return getAccessibilityPrompt(name, args)
+  })
 
   // Register tool handlers
   server.setRequestHandler(ListToolsRequestSchema, async () => {

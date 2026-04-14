@@ -313,4 +313,45 @@ describe('Server integration', () => {
     expect(parsed.error).not.toBe('[object Object]')
     expect(response.result?.isError).toBe(true)
   })
+
+  it('prompts/list returns registered prompt templates', async () => {
+    triggerRequest({ id: 9, method: 'prompts/list', params: {} })
+    await vi.waitFor(() => {
+      expect(sentMessages.some((m: unknown) => (m as { id?: number }).id === 9)).toBe(true)
+    })
+    const response = sentMessages.find((m: unknown) => (m as { id?: number }).id === 9) as {
+      result?: { prompts?: Array<{ name: string; description?: string }> }
+      error?: unknown
+    }
+    expect(response.error).toBeUndefined()
+    const prompts = response.result?.prompts
+    expect(prompts?.length).toBe(15)
+    expect(prompts?.some((p) => p.name === 'audit-single-url')).toBe(true)
+  })
+
+  it('prompts/get returns user message for audit-single-url', async () => {
+    triggerRequest({
+      id: 10,
+      method: 'prompts/get',
+      params: {
+        name: 'audit-single-url',
+        arguments: { url: 'https://example.com' },
+      },
+    })
+    await vi.waitFor(() => {
+      expect(sentMessages.some((m: unknown) => (m as { id?: number }).id === 10)).toBe(true)
+    })
+    const response = sentMessages.find((m: unknown) => (m as { id?: number }).id === 10) as {
+      result?: {
+        messages?: Array<{ role: string; content: { type: string; text?: string } }>
+      }
+      error?: unknown
+    }
+    expect(response.error).toBeUndefined()
+    const msg = response.result?.messages?.[0]
+    expect(msg?.role).toBe('user')
+    expect(msg?.content.type).toBe('text')
+    expect(msg?.content.text).toContain('audit_url')
+    expect(msg?.content.text).toContain('https://example.com')
+  })
 })
